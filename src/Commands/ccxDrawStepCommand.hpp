@@ -4,7 +4,7 @@
 #include "CubitCommandInterface.hpp"
 
 /*!
- * \brief The Draw command lets you draw the loads, bcs and orientations
+ * \brief The Draw Step command lets you draw steps, and their loads and bcs.
  */
 class ccxDrawStepCommand : public CubitCommand
 {

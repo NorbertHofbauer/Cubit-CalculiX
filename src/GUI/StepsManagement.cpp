@@ -53,6 +53,10 @@ StepsManagement::StepsManagement()
   pushButton_remove->setText("<");
   boxLayout_assignment_2->addWidget(pushButton_remove);
 
+
+
+
+
   // labels
   label_steps = new QLabel();
   //label_material->setGeometry(10,10,80,16);
@@ -68,6 +72,8 @@ StepsManagement::StepsManagement()
   //label_used->setGeometry(450,10,100,16);
   label_used->setText("Used");
   boxLayout_assignment_3->addWidget(label_used);
+
+
 
   // tree/lists
   tree_steps = new QTreeWidget();
@@ -182,6 +188,7 @@ StepsManagement::StepsManagement()
   QObject::connect(pushButton_close, SIGNAL(clicked(bool)),this,SLOT(on_pushButton_close_clicked(bool)));
   QObject::connect(pushButton_add, SIGNAL(clicked(bool)),this,SLOT(on_pushButton_add_clicked(bool)));
   QObject::connect(pushButton_remove, SIGNAL(clicked(bool)),this,SLOT(on_pushButton_remove_clicked(bool)));
+  
   QObject::connect(tree_steps, SIGNAL(itemClicked(QTreeWidgetItem*, int)),this,SLOT(step_clicked(QTreeWidgetItem*, int)));
   QObject::connect(tree_steps, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),this,SLOT(step_changed(QTreeWidgetItem*,QTreeWidgetItem*)));
   QObject::connect(tree_used, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(used_doubleclicked(QTreeWidgetItem*,int)));

@@ -18,6 +18,8 @@
 #include <QComboBox>
 #include <QString>
 #include <QStringList>
+#include <QTableWidget>
+#include <QDoubleSpinBox>
 
 class CalculiXCoreInterface;
 
@@ -36,21 +38,28 @@ public:
   void clear(); // remove all data
   void update();
   void update_component(std::string result_block);
+  void update_increment(std::string result_block);
+  void update_result(QListWidgetItem* component);
   void set_current_job_id(int job_id);
 
   void addListItem(std::string item_name, QListWidget* parent_list); // adds a new item to the list
+  void addTableItem(std::string item_name, QTableWidget* parent_list); //adds a new item to the table
   void removeListItem(std::string item_name, QListWidget* parent_list); // removes the item from the list
 
   void createListItems(); // creates the list items for selected material
   void removeListItems(); // removes current list items
   void removeListItems_from_List(QListWidget* list); // removes current list items from list
+  void removeTableItems_from_Table(QTableWidget* table); // removes current table items from table
   void selectListItem(QListWidgetItem* item); // unselect all list items except the given
 
 private slots:
   void on_pushButton_refresh_clicked(bool);
   void on_pushButton_plot_clicked(bool);
+  void on_pushButton_apply_filter_clicked(bool);
   void result_block_clicked(QListWidgetItem* item);
   void result_block_changed(QListWidgetItem* current_item, QListWidgetItem* prev_item);
+  void component_clicked(QListWidgetItem* item);
+  void component_changed(QListWidgetItem* current_item, QListWidgetItem* prev_item);
   
 private:
   std::string log;
@@ -58,15 +67,35 @@ private:
   QHBoxLayout* boxLayout_window;
   QVBoxLayout* boxLayout_result_block;
   QVBoxLayout* boxLayout_component;
+  QVBoxLayout* boxLayout_increment;
   QVBoxLayout* boxLayout_widget;
+  QVBoxLayout* boxLayout_filter;
+  QHBoxLayout* time1_layout;
+  QHBoxLayout* time2_layout;
+  QHBoxLayout* node1_layout;
+  QHBoxLayout* node2_layout;
   QPushButton* pushButton_refresh;
   QPushButton* pushButton_plot;
+  QPushButton* pushButton_apply_filter;
   QLabel* label_result_block;
   QLabel* label_component;
+  QLabel* label_increment;
+  QLabel* label_filter;
+  QLabel* label_result;
+  QLabel* label_time1;
+  QLabel* label_time2;
+  QLabel* label_node1;
+  QLabel* label_node2;
   QListWidget* list_result_block;
   QListWidget* list_component;
+  QListWidget* list_filter;
+  QTableWidget* table_increment;
+  QLineEdit* textField1;
+  QLineEdit* textField2;
+  QLineEdit* textField3;
+  QLineEdit* textField4;
   // results
-  QFrame* result_frame;
+  QListWidget* list_result;
 };
 
 #endif // JOBSMONITORFRD_HPP

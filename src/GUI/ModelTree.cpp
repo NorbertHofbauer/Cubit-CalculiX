@@ -493,7 +493,7 @@ void ModelTree::showContextMenu(const QPoint &pos)
         QAction action1("Create Step",this);
         connect(&action1, SIGNAL(triggered()),this,SLOT(ContextMenuAction1()));
         contextMenu.addAction(&action1);
-        QAction action2("Draw Steps",this); //needs function Clemens
+        QAction action2("Draw Steps",this);
         connect(&action2, SIGNAL(triggered()),this,SLOT(ContextMenuAction4()));
         contextMenu.addAction(&action2);
 
