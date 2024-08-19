@@ -28,6 +28,7 @@ class CoreHBCs;
 class CoreSteps;
 class CoreJobs;
 class CoreResults;
+class CoreResultsFrd;
 class CoreTimer;
 class CoreCustomLines;
 class CoreDraw;
@@ -329,6 +330,7 @@ public:
   CoreSteps *steps;
   CoreJobs *jobs;
   CoreResults *results;
+  CoreResultsFrd *resultsfrd;
   CoreTimer *timer;
   CoreCustomLines *customlines;
   CoreDraw *draw;

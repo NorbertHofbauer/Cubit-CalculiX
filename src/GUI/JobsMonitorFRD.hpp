@@ -39,7 +39,7 @@ public:
   void update();
   void update_component(std::string result_block);
   void update_increment(std::string result_block);
-  void update_result(QListWidgetItem* component);
+  void update_result(std::vector<int> node_id, int total_increment);
   void set_current_job_id(int job_id);
 
   void addListItem(std::string item_name, QListWidget* parent_list); // adds a new item to the list
@@ -60,6 +60,9 @@ private slots:
   void result_block_changed(QListWidgetItem* current_item, QListWidgetItem* prev_item);
   void component_clicked(QListWidgetItem* item);
   void component_changed(QListWidgetItem* current_item, QListWidgetItem* prev_item);
+
+  QListWidgetItem* get_current_block() const;
+  QListWidgetItem* get_current_component() const;
   
 private:
   std::string log;
@@ -96,6 +99,8 @@ private:
   QLineEdit* textField4;
   // results
   QListWidget* list_result;
+  QListWidgetItem* current_block = nullptr;  //store the current block
+  QListWidgetItem* current_component = nullptr;  //store the current component
 };
 
 #endif // JOBSMONITORFRD_HPP
