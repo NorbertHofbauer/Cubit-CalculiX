@@ -60,34 +60,40 @@ JobsMonitorFRD::JobsMonitorFRD()
   list_filter = new QListWidget();
   list_filter->setFrameShape(QFrame::Box);
   list_filter->setFrameShadow(QFrame::Raised);
+  label_increment1 = new QLabel("Increment from");
   textField1 = new QLineEdit;
+  label_increment2 = new QLabel("Increment until");
   textField2 = new QLineEdit;
+  label_node1 = new QLabel("Node from");
   textField3 = new QLineEdit;
+  label_node2 = new QLabel("Node until");
   textField4 = new QLineEdit;
-  textField1->setPlaceholderText("Time from");
-  textField2->setPlaceholderText("Time until");
-  /* textField1->setRange(0.0, 1.0); //Time from until einfügen
-  textField2->setRange(0.0, 1.0);
-  textField1->setDecimals(3);
-  textField2->setDecimals(3);
-  textField1->setSingleStep(0.05);
-  textField2->setSingleStep(0.05); */
-  textField3->setPlaceholderText("Node from");
-  textField4->setPlaceholderText("Node until");
+  label_block1 = new QLabel("Block from");
+  textField5 = new QLineEdit;
+  label_block2 = new QLabel("Block until");
+  textField6 = new QLineEdit;
+  label_sideset1 = new QLabel("Sideset from");
+  textField7 = new QLineEdit;
+  label_sideset2 = new QLabel("Sideset until");
+  textField8 = new QLineEdit;
   pushButton_apply_filter = new QPushButton("Apply Filter");
+  boxLayout_filter->addWidget(label_increment1);
   boxLayout_filter->addWidget(textField1);
+  boxLayout_filter->addWidget(label_increment2);
   boxLayout_filter->addWidget(textField2);
+  boxLayout_filter->addWidget(label_node1);
   boxLayout_filter->addWidget(textField3);
+  boxLayout_filter->addWidget(label_node2);
   boxLayout_filter->addWidget(textField4);
   boxLayout_filter->addWidget(pushButton_apply_filter);
 
-  // card widgets
-  list_result = new QListWidget();
-  list_result->setMinimumSize(700,350);
-  list_result->setLineWidth(1);
-  list_result->setMidLineWidth(0);
-  list_result->setFrameStyle(QFrame::Box | QFrame::Raised);
-  boxLayout_widget->addWidget(list_result);
+  //table
+  table_result = new QTableWidget();
+  table_result->setMinimumSize(700,350);
+  table_result->setLineWidth(1);
+  table_result->setMidLineWidth(0);
+  table_result->setFrameStyle(QFrame::Box | QFrame::Raised);
+  boxLayout_widget->addWidget(table_result);
 
   //result_frame->show();
 
@@ -151,23 +157,50 @@ void JobsMonitorFRD::update_component(std::string result_block)
   }
 }
 
-void JobsMonitorFRD::update_result(std::vector<int> node_ids, int total_increment)
+void JobsMonitorFRD::update_result(std::vector<int> increment_ids, std::vector<int> node_ids)
 {
   if(current_job_id == -1)
   {
     return;
   }
 
+  table_result->setRowCount(0);
+  table_result->setColumnCount(0);
+
   std::string current_result_block = get_current_block()->text().toStdString();
   std::string current_component = get_current_component()->text().toStdString();
 
-  for (size_t i = 0; i < node_ids.size(); i++)
+  std::vector<std::vector<double>> results;
+
+  for (int i : increment_ids) //table looks like: {increment, node, result}
   {
-    int node_id = node_ids[i];
+    for (int j : node_ids)
+    {
+      results.push_back({i,j});
+    }
+  }
 
-    double node_result = ccx_iface->frd_get_node_value(current_job_id, node_id, total_increment, current_result_block ,current_component);
+  if (results.size() == 0)
+  {
+    return;
+  }
 
-    this->addListItem(std::to_string(total_increment) + " " + std::to_string(node_id) + " " + std::to_string(node_result),list_result);
+  table_result->setRowCount(results.size());
+  table_result->setColumnCount(results[0].size()+1);
+
+  for (size_t i = 0; i < results.size(); i++)
+  {
+    double node_result = ccx_iface->frd_get_node_value(current_job_id, results[i][1], results[i][0], current_result_block ,current_component);
+    results[i].push_back(node_result);
+  }
+
+  for (size_t i = 0; i < results.size(); i++)
+  {
+    for (size_t ii = 0; ii < results[0].size(); ii++)
+    {
+      QTableWidgetItem* item = new QTableWidgetItem(QString::number(results[i][ii]));
+      table_result->setItem(i, ii, item);
+    }
   }
 }
 
@@ -319,70 +352,78 @@ void JobsMonitorFRD::on_pushButton_apply_filter_clicked(bool)
     return;
   }
 
-  this->removeListItems_from_List(list_result);
-
-  QString string_time_lower = textField1->text();
-  QString string_time_upper = textField2->text();
+  QString string_increment_lower = textField1->text();
+  QString string_increment_upper = textField2->text();
   QString string_node_lower = textField3->text();
   QString string_node_upper = textField4->text();
   
-  double time_lower = string_time_lower.toDouble(); //Clemens what if not a number?
-  double time_upper = string_time_upper.toDouble();
+  double increment_lower = string_increment_lower.toDouble(); //Clemens what if not a number?
+  double increment_upper = string_increment_upper.toDouble();
   double node_lower = string_node_lower.toDouble();
   double node_upper = string_node_upper.toDouble();
 
-  std::vector<int> times; //Clemens how to hendl time?
+  std::vector<int> increments;
   std::vector<int> nodes;
 
   std::string current_result_block = get_current_block()->text().toStdString();
   std::string current_component = get_current_component()->text().toStdString();
 
-  if((!string_time_lower.isEmpty())&&(!string_time_upper.isEmpty()))
+  if((!string_increment_lower.isEmpty())&&(!string_increment_upper.isEmpty()))
   { 
-    for (size_t i = time_lower; i <= time_upper; i++)
+    for (size_t i = increment_lower; i <= increment_upper; i++)
     {
-      times.push_back(i);
+      increments.push_back(i);
     }
-  } else if ((string_time_lower.isEmpty())&&(!string_time_upper.isEmpty()))
+  } else if ((string_increment_lower.isEmpty())&&(!string_increment_upper.isEmpty()))
   {
-    for (size_t i = 1; i <= time_upper; i++)
+    for (size_t i = 1; i <= increment_upper; i++)
     {
-      times.push_back(i);
+      increments.push_back(i);
     }
-  } else if ((!string_time_lower.isEmpty())&&(string_time_upper.isEmpty()))
+  } else if ((!string_increment_lower.isEmpty())&&(string_increment_upper.isEmpty()))
   {
     std::vector<int> increments = ccx_iface->frd_get_total_increments(current_job_id);
     if (!increments.empty())
     {
       auto max_it = std::max_element(increments.begin(), increments.end());
       int time_max = *max_it;
-      for (size_t i = time_lower; i <= time_max; i++)
+      for (size_t i = increment_lower; i <= time_max; i++)
       {
-        times.push_back(i);
+        increments.push_back(i);
       }
     }
   } else {
     return;
   }
 
-  for (size_t i = 0; i < times.size(); i++)
-  {
-    int total_increment = times[i];
-    if((!string_node_lower.isEmpty())&&(!string_node_upper.isEmpty()))
-    { 
-      nodes = ccx_iface->frd_get_node_ids_between_values(current_job_id, total_increment, current_result_block, current_component, node_lower, node_upper);
-    } else if ((string_node_lower.isEmpty())&&(!string_node_upper.isEmpty()))
+  if((!string_node_lower.isEmpty())&&(!string_node_upper.isEmpty()))
+  { 
+    for (size_t i = node_lower; i <= node_upper; i++)
     {
-      nodes = ccx_iface->frd_get_node_ids_smaller_value(current_job_id, total_increment, current_result_block, current_component, node_upper);
-    } else if ((!string_node_lower.isEmpty())&&(string_node_upper.isEmpty()))
-    {
-      nodes = ccx_iface-> frd_get_node_ids_greater_value(current_job_id, total_increment, current_result_block, current_component, node_lower);
-    } else {
-      return;
+      nodes.push_back(i);
     }
-
-    this->update_result(nodes, total_increment); // Clemens if in loop, only the last one is shown in the window
+  } else if ((string_node_lower.isEmpty())&&(!string_node_upper.isEmpty()))
+  {
+    for (size_t i = 1; i <= node_upper; i++)
+    {
+      nodes.push_back(i);
+    }
+  } else if ((!string_node_lower.isEmpty())&&(string_node_upper.isEmpty()))
+  {
+    std::vector<int> nodes = CubitInterface::get_nodeset_id_list();
+    if(!nodes.empty())
+    {
+      auto max_node = std::max_element(nodes.begin(), nodes.end());
+      int node_max = *max_node;
+      for (size_t i = node_lower; i <= node_max; i++)
+      {
+        nodes.push_back(i);
+      }
+    }
+  } else {
+    return;
   }
+  this->update_result(increments, nodes);
 }
 
 void JobsMonitorFRD::result_block_clicked(QListWidgetItem* item)

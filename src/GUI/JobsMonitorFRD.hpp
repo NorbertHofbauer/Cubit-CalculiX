@@ -19,6 +19,7 @@
 #include <QString>
 #include <QStringList>
 #include <QTableWidget>
+#include <QTableWidgetItem>
 #include <QDoubleSpinBox>
 
 class CalculiXCoreInterface;
@@ -39,7 +40,7 @@ public:
   void update();
   void update_component(std::string result_block);
   void update_increment(std::string result_block);
-  void update_result(std::vector<int> node_id, int total_increment);
+  void update_result(std::vector<int> increment_ids, std::vector<int> node_ids);
   void set_current_job_id(int job_id);
 
   void addListItem(std::string item_name, QListWidget* parent_list); // adds a new item to the list
@@ -85,10 +86,14 @@ private:
   QLabel* label_increment;
   QLabel* label_filter;
   QLabel* label_result;
-  QLabel* label_time1;
-  QLabel* label_time2;
+  QLabel* label_increment1;
+  QLabel* label_increment2;
   QLabel* label_node1;
   QLabel* label_node2;
+  QLabel* label_block1;
+  QLabel* label_block2;
+  QLabel* label_sideset1;
+  QLabel* label_sideset2;
   QListWidget* list_result_block;
   QListWidget* list_component;
   QListWidget* list_filter;
@@ -97,8 +102,13 @@ private:
   QLineEdit* textField2;
   QLineEdit* textField3;
   QLineEdit* textField4;
+  QLineEdit* textField5;
+  QLineEdit* textField6;
+  QLineEdit* textField7;
+  QLineEdit* textField8;
+
   // results
-  QListWidget* list_result;
+  QTableWidget* table_result;
   QListWidgetItem* current_block = nullptr;  //store the current block
   QListWidgetItem* current_component = nullptr;  //store the current component
 };
