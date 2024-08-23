@@ -20,6 +20,7 @@
 #include <QStringList>
 #include <QTableWidget>
 #include <QTableWidgetItem>
+#include <QSpinBox>
 #include <QDoubleSpinBox>
 
 class CalculiXCoreInterface;
@@ -40,7 +41,7 @@ public:
   void update();
   void update_component(std::string result_block);
   void update_increment(std::string result_block);
-  void update_result(std::vector<int> increment_ids, std::vector<int> node_ids);
+  void update_result(std::vector<int> increment_ids, std::vector<int> node_ids, std::vector<int> block_ids, std::vector<int> sideset_ids);
   void set_current_job_id(int job_id);
 
   void addListItem(std::string item_name, QListWidget* parent_list); // adds a new item to the list
@@ -73,18 +74,16 @@ private:
   QVBoxLayout* boxLayout_component;
   QVBoxLayout* boxLayout_increment;
   QVBoxLayout* boxLayout_widget;
-  QVBoxLayout* boxLayout_filter;
-  QHBoxLayout* time1_layout;
-  QHBoxLayout* time2_layout;
-  QHBoxLayout* node1_layout;
-  QHBoxLayout* node2_layout;
+  QVBoxLayout* boxLayout_filter1;
+  QVBoxLayout* boxLayout_filter2;
   QPushButton* pushButton_refresh;
   QPushButton* pushButton_plot;
   QPushButton* pushButton_apply_filter;
   QLabel* label_result_block;
   QLabel* label_component;
   QLabel* label_increment;
-  QLabel* label_filter;
+  QLabel* label_filter1;
+  QLabel* label_filter2;
   QLabel* label_result;
   QLabel* label_increment1;
   QLabel* label_increment2;
@@ -98,15 +97,15 @@ private:
   QListWidget* list_component;
   QListWidget* list_filter;
   QTableWidget* table_increment;
-  QLineEdit* textField1;
-  QLineEdit* textField2;
-  QLineEdit* textField3;
-  QLineEdit* textField4;
-  QLineEdit* textField5;
-  QLineEdit* textField6;
-  QLineEdit* textField7;
-  QLineEdit* textField8;
-
+  QSpinBox* textField1;
+  QSpinBox* textField2;
+  QSpinBox* textField3;
+  QSpinBox* textField4;
+  QSpinBox* textField5;
+  QSpinBox* textField6;
+  QSpinBox* textField7;
+  QSpinBox* textField8;
+ 
   // results
   QTableWidget* table_result;
   QListWidgetItem* current_block = nullptr;  //store the current block

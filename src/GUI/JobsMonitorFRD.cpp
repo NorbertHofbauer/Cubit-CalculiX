@@ -17,13 +17,14 @@ JobsMonitorFRD::JobsMonitorFRD()
   boxLayout_window = new QHBoxLayout();
   boxLayout_result_block = new QVBoxLayout();
   boxLayout_component = new QVBoxLayout();
-  boxLayout_filter = new QVBoxLayout();
+  boxLayout_filter1 = new QVBoxLayout();
+  boxLayout_filter2 = new QVBoxLayout();
   boxLayout_widget = new QVBoxLayout();
   gridLayout->addLayout(boxLayout_window,2,4, Qt::AlignRight);
   gridLayout->addLayout(boxLayout_result_block,0,0, Qt::AlignTop);
   gridLayout->addLayout(boxLayout_component,0,1, Qt::AlignTop);
-/*   gridLayout->addLayout(boxLayout_increment,0,2, Qt::AlignTop); */
-  gridLayout->addLayout(boxLayout_filter,0,2, Qt::AlignTop);
+  gridLayout->addLayout(boxLayout_filter1,0,2, Qt::AlignTop);
+  gridLayout->addLayout(boxLayout_filter2,0,3, Qt::AlignTop);
   gridLayout->addLayout(boxLayout_widget,1,0,1,4, Qt::AlignTop);
 
   // buttons
@@ -46,9 +47,13 @@ JobsMonitorFRD::JobsMonitorFRD()
   label_component->setText("Components");
   boxLayout_component->addWidget(label_component);
 
-  label_filter = new QLabel();
-  label_filter->setText("Filter");
-  boxLayout_filter->addWidget(label_filter);
+  label_filter1 = new QLabel();
+  label_filter1->setText("Filter");
+  boxLayout_filter1->addWidget(label_filter1);
+
+  label_filter2 = new QLabel();
+  label_filter2->setText(" ");
+  boxLayout_filter2->addWidget(label_filter2);
 
   // lists
   list_result_block = new QListWidget();
@@ -61,31 +66,60 @@ JobsMonitorFRD::JobsMonitorFRD()
   list_filter->setFrameShape(QFrame::Box);
   list_filter->setFrameShadow(QFrame::Raised);
   label_increment1 = new QLabel("Increment from");
-  textField1 = new QLineEdit;
+  textField1 = new QSpinBox;
   label_increment2 = new QLabel("Increment until");
-  textField2 = new QLineEdit;
+  textField2 = new QSpinBox;
   label_node1 = new QLabel("Node from");
-  textField3 = new QLineEdit;
+  textField3 = new QSpinBox;
   label_node2 = new QLabel("Node until");
-  textField4 = new QLineEdit;
+  textField4 = new QSpinBox;
   label_block1 = new QLabel("Block from");
-  textField5 = new QLineEdit;
+  textField5 = new QSpinBox;
   label_block2 = new QLabel("Block until");
-  textField6 = new QLineEdit;
+  textField6 = new QSpinBox;
   label_sideset1 = new QLabel("Sideset from");
-  textField7 = new QLineEdit;
+  textField7 = new QSpinBox;
   label_sideset2 = new QLabel("Sideset until");
-  textField8 = new QLineEdit;
+  textField8 = new QSpinBox;
   pushButton_apply_filter = new QPushButton("Apply Filter");
-  boxLayout_filter->addWidget(label_increment1);
-  boxLayout_filter->addWidget(textField1);
-  boxLayout_filter->addWidget(label_increment2);
-  boxLayout_filter->addWidget(textField2);
-  boxLayout_filter->addWidget(label_node1);
-  boxLayout_filter->addWidget(textField3);
-  boxLayout_filter->addWidget(label_node2);
-  boxLayout_filter->addWidget(textField4);
-  boxLayout_filter->addWidget(pushButton_apply_filter);
+  boxLayout_filter1->addWidget(label_increment1);
+  boxLayout_filter1->addWidget(textField1);
+  boxLayout_filter1->addWidget(label_increment2);
+  boxLayout_filter1->addWidget(textField2);
+  boxLayout_filter1->addWidget(label_node1);
+  boxLayout_filter1->addWidget(textField3);
+  boxLayout_filter1->addWidget(label_node2);
+  boxLayout_filter1->addWidget(textField4);
+  boxLayout_filter2->addWidget(label_block1);
+  boxLayout_filter2->addWidget(textField5);
+  boxLayout_filter2->addWidget(label_block2);
+  boxLayout_filter2->addWidget(textField6);
+  boxLayout_filter2->addWidget(label_sideset1);
+  boxLayout_filter2->addWidget(textField7);
+  boxLayout_filter2->addWidget(label_sideset2);
+  boxLayout_filter2->addWidget(textField8);
+  boxLayout_filter2->addWidget(pushButton_apply_filter);
+
+  /* std::vector<int> total_increments = ccx_iface->frd_get_total_increments(current_job_id);
+  std::vector<int> total_nodes = CubitInterface::get_nodeset_id_list();
+  std::vector<int> total_blocks = ccx_iface->get_blocks();
+  std::vector<int> total_sidesets = CubitInterface::get_sideset_id_list();
+  auto max_increment = std::max_element(total_increments.begin(), total_increments.end());
+  int increment_max = *max_increment;
+  auto max_node = std::max_element(total_nodes.begin(), total_nodes.end());
+  int node_max = *max_node;
+  auto max_block = std::max_element(total_blocks.begin(), total_blocks.end());
+  int block_max = *max_block;
+  auto max_sideset = std::max_element(total_sidesets.begin(), total_sidesets.end());
+  int sideset_max = *max_sideset;
+  textField1->setMaximum(increment_max);
+  textField2->setMaximum(increment_max);
+  textField3->setMaximum(node_max);
+  textField4->setMaximum(node_max);
+  textField5->setMaximum(block_max);
+  textField6->setMaximum(block_max);
+  textField7->setMaximum(sideset_max);
+  textField8->setMaximum(sideset_max); */
 
   //table
   table_result = new QTableWidget();
@@ -157,7 +191,7 @@ void JobsMonitorFRD::update_component(std::string result_block)
   }
 }
 
-void JobsMonitorFRD::update_result(std::vector<int> increment_ids, std::vector<int> node_ids)
+void JobsMonitorFRD::update_result(std::vector<int> increment_ids, std::vector<int> node_ids, std::vector<int> block_ids, std::vector<int> sideset_ids)
 {
   if(current_job_id == -1)
   {
@@ -172,11 +206,24 @@ void JobsMonitorFRD::update_result(std::vector<int> increment_ids, std::vector<i
 
   std::vector<std::vector<double>> results;
 
-  for (int i : increment_ids) //table looks like: {increment, node, result}
+  // results[i][0] = increment id
+  // results[i][1] = node id
+  // results[i][2] = block id
+  // results[i][3] = sideset id
+  // results[i][4] = result (later)
+  // results[i][5] = increment time (later)
+
+  for (int i : increment_ids)
   {
     for (int j : node_ids)
     {
-      results.push_back({i,j});
+      for (int k : block_ids) //Clemens blocks & sidesets haben keinen Effekt
+      {
+        for (int l : sideset_ids)
+        {
+          results.push_back({i,j,k,l});
+        }
+      }
     }
   }
 
@@ -185,14 +232,20 @@ void JobsMonitorFRD::update_result(std::vector<int> increment_ids, std::vector<i
     return;
   }
 
-  table_result->setRowCount(results.size());
-  table_result->setColumnCount(results[0].size()+1);
-
   for (size_t i = 0; i < results.size(); i++)
   {
     double node_result = ccx_iface->frd_get_node_value(current_job_id, results[i][1], results[i][0], current_result_block ,current_component);
     results[i].push_back(node_result);
+    
+    double increment_time = ccx_iface->frd_get_time_from_total_increment(current_job_id, results[i][0]);
+    results[i].push_back(increment_time);
+
   }
+
+  table_result->setRowCount(results.size());
+  table_result->setColumnCount(results[0].size());
+  table_result->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  table_result->setHorizontalHeaderLabels(QStringList() << "Increment Id" << "Node Id" << "Block Id" << "Sideset Id" << "Result" << "Increment Time");
 
   for (size_t i = 0; i < results.size(); i++)
   {
@@ -227,7 +280,6 @@ void JobsMonitorFRD::update_result(std::vector<int> increment_ids, std::vector<i
 
     QString doubleAsString = QString::number(increment_time, 'f', 6); 
     QTableWidgetItem* increment_time_qtableitem = new QTableWidgetItem(doubleAsString);
-
 
     table_increment->setItem(i, 1, increment_qtableitem);
     table_increment->setItem(i, 2, increment_time_qtableitem);
@@ -292,7 +344,7 @@ void JobsMonitorFRD::removeListItems()
     {
       delete list_component->currentItem();
     }
-  } 
+  }
 }
 
 void JobsMonitorFRD::removeListItems_from_List(QListWidget* list)
@@ -356,38 +408,57 @@ void JobsMonitorFRD::on_pushButton_apply_filter_clicked(bool)
   QString string_increment_upper = textField2->text();
   QString string_node_lower = textField3->text();
   QString string_node_upper = textField4->text();
+  QString string_block_lower = textField5->text();
+  QString string_block_upper = textField6->text();
+  QString string_sideset_lower = textField7->text();
+  QString string_sideset_upper = textField8->text();
   
-  double increment_lower = string_increment_lower.toDouble(); //Clemens what if not a number?
-  double increment_upper = string_increment_upper.toDouble();
-  double node_lower = string_node_lower.toDouble();
-  double node_upper = string_node_upper.toDouble();
+  double increment_lower = string_increment_lower.toInt(); //Clemens what if not a number?
+  double increment_upper = string_increment_upper.toInt();
+  double node_lower = string_node_lower.toInt();
+  double node_upper = string_node_upper.toInt();
+  double block_lower = string_block_lower.toInt();
+  double block_upper = string_block_upper.toInt();
+  double sideset_lower = string_sideset_lower.toInt();
+  double sideset_upper = string_sideset_upper.toInt();
 
   std::vector<int> increments;
   std::vector<int> nodes;
+  std::vector<int> blocks;
+  std::vector<int> sidesets;
 
-  std::string current_result_block = get_current_block()->text().toStdString();
-  std::string current_component = get_current_component()->text().toStdString();
-
-  if((!string_increment_lower.isEmpty())&&(!string_increment_upper.isEmpty()))
+  if((!increment_lower==0)&&(!increment_upper==0))
   { 
     for (size_t i = increment_lower; i <= increment_upper; i++)
     {
       increments.push_back(i);
     }
-  } else if ((string_increment_lower.isEmpty())&&(!string_increment_upper.isEmpty()))
+  } else if ((increment_lower==0)&&(!increment_upper==0))
   {
     for (size_t i = 1; i <= increment_upper; i++)
     {
       increments.push_back(i);
     }
-  } else if ((!string_increment_lower.isEmpty())&&(string_increment_upper.isEmpty()))
+  } else if ((!increment_lower==0)&&(increment_upper==0))
   {
-    std::vector<int> increments = ccx_iface->frd_get_total_increments(current_job_id);
-    if (!increments.empty())
+    std::vector<int> total_increments = ccx_iface->frd_get_total_increments(current_job_id);
+    if (!total_increments.empty())
     {
-      auto max_it = std::max_element(increments.begin(), increments.end());
-      int time_max = *max_it;
-      for (size_t i = increment_lower; i <= time_max; i++)
+      auto max_increment = std::max_element(total_increments.begin(), total_increments.end());
+      int increment_max = *max_increment;
+      for (size_t i = increment_lower; i <= increment_max; i++)
+      {
+        increments.push_back(i);
+      }
+    }
+  } else if ((increment_lower==0)&&(increment_upper==0))
+  {
+    std::vector<int> total_increments = ccx_iface->frd_get_total_increments(current_job_id);
+    if (!total_increments.empty())
+    {
+      auto max_increment = std::max_element(total_increments.begin(), total_increments.end());
+      int increment_max = *max_increment;
+      for (size_t i = 1; i <= increment_max; i++)
       {
         increments.push_back(i);
       }
@@ -396,26 +467,38 @@ void JobsMonitorFRD::on_pushButton_apply_filter_clicked(bool)
     return;
   }
 
-  if((!string_node_lower.isEmpty())&&(!string_node_upper.isEmpty()))
+  if((!node_lower==0)&&(!node_upper==0))
   { 
     for (size_t i = node_lower; i <= node_upper; i++)
     {
       nodes.push_back(i);
     }
-  } else if ((string_node_lower.isEmpty())&&(!string_node_upper.isEmpty()))
+  } else if ((node_lower==0)&&(!node_upper==0))
   {
     for (size_t i = 1; i <= node_upper; i++)
     {
       nodes.push_back(i);
     }
-  } else if ((!string_node_lower.isEmpty())&&(string_node_upper.isEmpty()))
+  } else if ((!node_lower==0)&&(node_upper==0))
   {
-    std::vector<int> nodes = CubitInterface::get_nodeset_id_list();
-    if(!nodes.empty())
+    std::vector<int> total_nodes = CubitInterface::get_nodeset_id_list();
+    if(!total_nodes.empty())
     {
-      auto max_node = std::max_element(nodes.begin(), nodes.end());
+      auto max_node = std::max_element(total_nodes.begin(), total_nodes.end());
       int node_max = *max_node;
       for (size_t i = node_lower; i <= node_max; i++)
+      {
+        nodes.push_back(i);
+      }
+    }
+  } else if ((node_lower==0)&&(node_upper==0))
+  {
+    std::vector<int> total_nodes = CubitInterface::get_nodeset_id_list();
+    if(!total_nodes.empty())
+    {
+      auto max_node = std::max_element(total_nodes.begin(), total_nodes.end());
+      int node_max = *max_node;
+      for (size_t i = 1; i <= node_max; i++)
       {
         nodes.push_back(i);
       }
@@ -423,7 +506,88 @@ void JobsMonitorFRD::on_pushButton_apply_filter_clicked(bool)
   } else {
     return;
   }
-  this->update_result(increments, nodes);
+
+  if((!block_lower==0)&&(!block_upper==0))
+  { 
+    for (size_t i = block_lower; i <= block_upper; i++)
+    {
+      blocks.push_back(i);
+    }
+  } else if ((block_lower==0)&&(!block_upper==0))
+  {
+    for (size_t i = 1; i <= block_upper; i++)
+    {
+      blocks.push_back(i);
+    }
+  } else if ((!block_lower==0)&&(block_upper==0))
+  {
+    std::vector<int> total_blocks = ccx_iface->get_blocks();
+    if (!total_blocks.empty())
+    {
+      auto max_block = std::max_element(total_blocks.begin(), total_blocks.end());
+      int block_max = *max_block;
+      for (size_t i = block_lower; i <= block_max; i++)
+      {
+        blocks.push_back(i);
+      }
+    }
+  } else if ((block_lower==0)&&(block_upper==0))
+  {
+    std::vector<int> total_blocks = ccx_iface->get_blocks();
+    if (!total_blocks.empty())
+    {
+      auto max_block = std::max_element(total_blocks.begin(), total_blocks.end());
+      int block_max = *max_block;
+      for (size_t i = 1; i <= block_max; i++)
+      {
+        blocks.push_back(i);
+      }
+    }
+  } else {
+    return;
+  }
+
+  if((!sideset_lower==0)&&(!sideset_upper==0))
+  { 
+    for (size_t i = sideset_lower; i <= sideset_upper; i++)
+    {
+      sidesets.push_back(i);
+    }
+  } else if ((sideset_lower==0)&&(!sideset_upper==0))
+  {
+    for (size_t i = 1; i <= sideset_upper; i++)
+    {
+      sidesets.push_back(i);
+    }
+  } else if ((!sideset_lower==0)&&(sideset_upper==0))
+  {
+    std::vector<int> total_sidesets = CubitInterface::get_sideset_id_list();
+    if (!total_sidesets.empty())
+    {
+      auto max_sideset = std::max_element(total_sidesets.begin(), total_sidesets.end());
+      int sideset_max = *max_sideset;
+      for (size_t i = sideset_lower; i <= sideset_max; i++)
+      {
+        sidesets.push_back(i);
+      }
+    }
+  } else if ((sideset_lower==0)&&(sideset_upper==0))
+  {
+    std::vector<int> total_sidesets = CubitInterface::get_sideset_id_list();
+    if (!total_sidesets.empty())
+    {
+      auto max_sideset = std::max_element(total_sidesets.begin(), total_sidesets.end());
+      int sideset_max = *max_sideset;
+      for (size_t i = 1; i <= sideset_max; i++)
+      {
+        sidesets.push_back(i);
+      }
+    }
+  } else {
+    return;
+  }
+
+  this->update_result(increments, nodes, blocks, sidesets);
 }
 
 void JobsMonitorFRD::result_block_clicked(QListWidgetItem* item)
