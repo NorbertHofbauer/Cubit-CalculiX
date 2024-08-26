@@ -5,6 +5,9 @@
 #include "loadUserOptions.hpp"
 #include "StopWatch.hpp"
 
+#include "ThreadPool.hpp"
+#include <functional>
+
 #include <fstream>
 #include <cmath>
 #include <iostream>
@@ -57,6 +60,7 @@ bool CoreResultsFrd::clear()
   result_block_node_data.clear();
   
   keys.clear();
+  frd_arrays.clear();
 
   return true;
 }
@@ -213,21 +217,35 @@ bool CoreResultsFrd::read_single()
   frd.close();
 
   // sorting for faster search
+  std::vector<int> tmp_node_ids;
+  std::vector<int> tmp_node_data_ids;
+
+  for (size_t i = 0; i < nodes.size(); i++)
+  {
+    tmp_node_ids.push_back(nodes[i][0]);
+    tmp_node_data_ids.push_back(i);
+  }  
+  auto p = sort_permutation(tmp_node_ids);
+  this->apply_permutation(tmp_node_ids, p);
+  this->apply_permutation(tmp_node_data_ids, p);
+  sorted_node_ids = tmp_node_ids;
+  sorted_node_data_ids = tmp_node_data_ids;
+
   for (size_t i = 0; i < result_block_node_data.size(); i++)
   {
-    std::vector<int> tmp_node_ids;
-    std::vector<int> tmp_node_data_ids;
+    std::vector<int> tmp_result_node_ids;
+    std::vector<int> tmp_result_node_data_ids;
 
     for (size_t ii = 0; ii < result_block_node_data[i].size(); ii++)
     {
-      tmp_node_ids.push_back(result_block_node_data[i][ii][0]);
-      tmp_node_data_ids.push_back(result_block_node_data[i][ii][1]);
+      tmp_result_node_ids.push_back(result_block_node_data[i][ii][0]);
+      tmp_result_node_data_ids.push_back(result_block_node_data[i][ii][1]);
     }  
-    auto p = sort_permutation(tmp_node_ids);
-    this->apply_permutation(tmp_node_ids, p);
-    this->apply_permutation(tmp_node_data_ids, p);
-    sorted_node_ids.push_back(tmp_node_ids);
-    sorted_node_data_ids.push_back(tmp_node_data_ids);
+    auto p = sort_permutation(tmp_result_node_ids);
+    this->apply_permutation(tmp_result_node_ids, p);
+    this->apply_permutation(tmp_result_node_data_ids, p);
+    sorted_result_node_ids.push_back(tmp_result_node_ids);
+    sorted_result_node_data_ids.push_back(tmp_result_node_data_ids);
   }
 
   progressbar->end();
@@ -582,8 +600,6 @@ bool CoreResultsFrd::read_parallel()
     progressbar->start(0,100,"Reading Headers of Result Blocks FRD");
     //auto t_start = std::chrono::high_resolution_clock::now();
     
-    std::vector<std::vector<int>> result_block_range;
-
     log = "";
     int currentline = -1;
     int last_element_line = thread_ranges[max_threads-1][1];
@@ -622,10 +638,12 @@ bool CoreResultsFrd::read_parallel()
             if (new_result_block)
             {
               new_result_block = false;
-              result_block_range.push_back({currentline,currentline});
               this->read_nodal_result_block_add_components(frd_array);
+
+              std::vector<std::vector<std::string>> tmp_frd_array;
+              frd_arrays.push_back(tmp_frd_array);
             }
-            result_block_range[result_block_range.size()-1][1] = currentline;
+            frd_arrays[frd_arrays.size()-1].push_back(frd_array);
           }
         } else if ((current_read_mode == 9999)||(frd.eof()))
         {
@@ -633,45 +651,32 @@ bool CoreResultsFrd::read_parallel()
         }
       }
     }
-    /*
-    for (size_t i = 0; i < result_block_range.size(); i++)
-    {
-      log = "range no " + std::to_string(i) + "-" + std::to_string(result_block_range[i][0]) + "-" + std::to_string(result_block_range[i][1]) +  " \n";
-      PRINT_INFO("%s", log.c_str());
-    }
-    */
-
+    
     int loop_c = 0;
-    int number_of_result_blocks = result_block_range.size();
-    int max_number_of_result_blocks = result_block_range.size();
+    int number_of_result_blocks = frd_arrays.size();
+    int max_number_of_result_blocks = frd_arrays.size();
     
     progressbar->start(0,100,"Reading Result Blocks Data FRD");
     t_start = std::chrono::high_resolution_clock::now();
 
     this->progress = std::vector<int>(max_threads + 1, 0);
-    progress[max_threads] = get_result_block_lines(result_block_range);
-
+    progress[max_threads] = get_result_block_lines();
+    /* 
     while (number_of_result_blocks > 0)
     {
       if (number_of_result_blocks > max_threads)
       {
         for (size_t i = 0; i < max_threads; i++)
         { 
-          ReadThreads.push_back(std::thread(&CoreResultsFrd::read_nodal_result_block_thread, this,int(loop_c*max_threads+i), result_block_range[loop_c*max_threads+i][0], result_block_range[loop_c*max_threads+i][1],i));
+          ReadThreads.push_back(std::thread(&CoreResultsFrd::read_nodal_result_block_thread, this,int(loop_c*max_threads+i),i));
         }
       }else{
         for (size_t i = 0; i < number_of_result_blocks; i++)
         { 
-          ReadThreads.push_back(std::thread(&CoreResultsFrd::read_nodal_result_block_thread, this,int(loop_c*max_threads+i), result_block_range[loop_c*max_threads+i][0], result_block_range[loop_c*max_threads+i][1],i));
+          ReadThreads.push_back(std::thread(&CoreResultsFrd::read_nodal_result_block_thread, this,int(loop_c*max_threads+i),i));
         }
       }
       // wait till all threads are finished
-      /*
-      for (size_t i = 0; i < ReadThreads.size(); i++)
-      { 
-        ReadThreads[i].join();
-      }
-      */
       it=0;
       while (ReadThreads.size()>0)
       {
@@ -689,22 +694,49 @@ bool CoreResultsFrd::read_parallel()
         update_progressbar();
         ++it;
       }
-      //number_of_result_blocks = number_of_result_blocks - ReadThreads.size();
-      //ReadThreads.clear();
       ++loop_c;      
     }
+    */
+
+    ThreadPool tp;
+    tp.start(max_threads);
+    for (size_t i = 0; i < number_of_result_blocks; i++)
+    {
+        std::function<void()> f = std::bind(&CoreResultsFrd::read_nodal_result_block_thread, this,int(i),0);
+        tp.queueJob(f);
+    }
+    while(tp.busy())
+    {
+      update_progressbar();
+    }
+    tp.stop();
+
   }
   frd.close();
 
   // sorting for faster search
+  std::vector<int> tmp_node_ids;
+  std::vector<int> tmp_node_data_ids;
+
+  for (size_t i = 0; i < nodes.size(); i++)
+  {
+    tmp_node_ids.push_back(nodes[i][0]);
+    tmp_node_data_ids.push_back(i);
+  }  
+  auto p = sort_permutation(tmp_node_ids);
+  this->apply_permutation(tmp_node_ids, p);
+  this->apply_permutation(tmp_node_data_ids, p);
+  sorted_node_ids = tmp_node_ids;
+  sorted_node_data_ids = tmp_node_data_ids;
+
   int loop_c = 0;
   int number_of_result_blocks = result_block_node_data.size();
   for (size_t i = 0; i < result_block_node_data.size(); i++)
   {
-    std::vector<int> tmp_node_ids;
-    std::vector<int> tmp_node_data_ids;
-    sorted_node_ids.push_back(tmp_node_ids);
-    sorted_node_data_ids.push_back(tmp_node_data_ids);
+    std::vector<int> tmp_result_node_ids;
+    std::vector<int> tmp_result_node_data_ids;
+    sorted_result_node_ids.push_back(tmp_result_node_ids);
+    sorted_result_node_data_ids.push_back(tmp_result_node_data_ids);
   }
 
   while (number_of_result_blocks > 0)
@@ -1330,98 +1362,71 @@ bool CoreResultsFrd::read_nodal_result_block_add_components(std::vector<std::str
   return true;
 }
 
-bool CoreResultsFrd::read_nodal_result_block_thread(int result_block_data_id,int start,int end, int thread_id)
+bool CoreResultsFrd::read_nodal_result_block_thread(int result_block_data_id, int thread_id)
 {
   std::string frdline = "";
-  int ic = 0;
-  int id = -1;
+  
+  for (size_t ib = 0; ib < frd_arrays[result_block_data_id].size(); ib++)
+  {    
+    std::vector<std::string> line = this->frd_arrays[result_block_data_id][ib];
 
-  std::ifstream frd;
-  frd.open(this->filepath);
-  while (std::getline(frd,frdline))
-  { 
-    if ((ic>=start)&&(ic<=end))
+    if (line[0] == "-1")
     {
-      std::vector<std::string> line = this->split_line(frdline);
+      int node_id;
+      int n_comp = 0;
+      int result_block_node_data_id = -1;
 
-      if (line[0] == "-1")
-      {
-        int node_id;
-        int n_comp = 0;
-        int result_block_node_data_id = -1;
-
-        node_id = std::stoi(line[1]);
-        
-        n_comp = result_block_components[result_block_data_id].size();
-        std::vector<double> result_comp(n_comp);
-        
-        for (size_t i = 0; i < n_comp; i++)
-        {          
-          if ((result_block_type[result_blocks[result_block_data_id][5]] == "STRESS") && (i > 5))
+      node_id = std::stoi(line[1]);
+      
+      n_comp = result_block_components[result_block_data_id].size();
+      std::vector<double> result_comp(n_comp);
+      
+      for (size_t i = 0; i < n_comp; i++)
+      {          
+        if ((result_block_type[result_blocks[result_block_data_id][5]] == "STRESS") && (i > 5))
+        {
+          if (i == 6)
           {
-            if (i == 6)
-            {
-              result_comp[i] = ccx_iface->compute_von_mises_stress({result_comp[0],result_comp[1],result_comp[2],result_comp[3],result_comp[4],result_comp[5]});
-            }
-            // compute principal stress
-            if (i == 7) 
-            {
-              std::vector<double> ps = ccx_iface->compute_principal_stresses({result_comp[0],result_comp[1],result_comp[2],result_comp[3],result_comp[4],result_comp[5]});
-              result_comp[i] = ps[0];
-              result_comp[i+1] = ps[1];
-              result_comp[i+2] = ps[2];
-              result_comp[i+3] = ps[3];
-              result_comp[i+4] = 0.5 * std::max({ps[0]-ps[2],ps[0]-ps[1],ps[1]-ps[2]});
-            }
-          }else if ((result_block_type[result_blocks[result_block_data_id][5]] == "TOSTRAIN") && (i > 5))
-          {
-            if (i == 6)
-            {
-              result_comp[i] = ccx_iface->compute_von_mises_strain({result_comp[0],result_comp[1],result_comp[2],result_comp[3],result_comp[4],result_comp[5]});
-            }
-            // compute principal strains
-            if (i == 7) 
-            {
-              std::vector<double> pe = ccx_iface->compute_principal_strains({result_comp[0],result_comp[1],result_comp[2],result_comp[3],result_comp[4],result_comp[5]});
-              result_comp[i] = pe[0];
-              result_comp[i+1] = pe[1];
-              result_comp[i+2] = pe[2];
-              result_comp[i+3] = pe[3];
-              result_comp[i+4] = 0.5 * std::max({pe[0]-pe[2],pe[0]-pe[1],pe[1]-pe[2]});
-            }
-          }else{
-            /*
-            if ((i==0)&&(ic==start))
-            {
-              std::string log;
-              log = "result_block_data_id " + std::to_string(result_block_data_id) + "-" + std::to_string(start) + "-" + std::to_string(end) +  " \n";
-              PRINT_INFO("%s", log.c_str());
-              log = "n_comp " + std::to_string(n_comp) +  " \n";
-              PRINT_INFO("%s", log.c_str());
-              log = "line comp " + std::to_string(line.size()-2) +  " \n";
-              PRINT_INFO("%s", log.c_str());
-            }
-            */
-            result_comp[i] = ccx_iface->string_scientific_to_double(line[i+2]);
+            result_comp[i] = ccx_iface->compute_von_mises_stress({result_comp[0],result_comp[1],result_comp[2],result_comp[3],result_comp[4],result_comp[5]});
           }
+          // compute principal stress
+          if (i == 7) 
+          {
+            std::vector<double> ps = ccx_iface->compute_principal_stresses({result_comp[0],result_comp[1],result_comp[2],result_comp[3],result_comp[4],result_comp[5]});
+            result_comp[i] = ps[0];
+            result_comp[i+1] = ps[1];
+            result_comp[i+2] = ps[2];
+            result_comp[i+3] = ps[3];
+            result_comp[i+4] = 0.5 * std::max({ps[0]-ps[2],ps[0]-ps[1],ps[1]-ps[2]});
+          }
+        }else if ((result_block_type[result_blocks[result_block_data_id][5]] == "TOSTRAIN") && (i > 5))
+        {
+          if (i == 6)
+          {
+            result_comp[i] = ccx_iface->compute_von_mises_strain({result_comp[0],result_comp[1],result_comp[2],result_comp[3],result_comp[4],result_comp[5]});
+          }
+          // compute principal strains
+          if (i == 7) 
+          {
+            std::vector<double> pe = ccx_iface->compute_principal_strains({result_comp[0],result_comp[1],result_comp[2],result_comp[3],result_comp[4],result_comp[5]});
+            result_comp[i] = pe[0];
+            result_comp[i+1] = pe[1];
+            result_comp[i+2] = pe[2];
+            result_comp[i+3] = pe[3];
+            result_comp[i+4] = 0.5 * std::max({pe[0]-pe[2],pe[0]-pe[1],pe[1]-pe[2]});
+          }
+        }else{
+          result_comp[i] = ccx_iface->string_scientific_to_double(line[i+2]);
         }
-        
-        result_block_data[result_block_data_id].push_back(result_comp);
-        result_block_node_data_id = int(result_block_data[result_block_data_id].size())-1;
-        result_block_node_data[result_block_data_id].push_back({node_id,result_block_node_data_id});
-        
       }
-      this->progress[thread_id] = this->progress[thread_id] + 1;
-    }else if (ic>end)
-    {
-      break;
+      
+      result_block_data[result_block_data_id].push_back(result_comp);
+      result_block_node_data_id = int(result_block_data[result_block_data_id].size())-1;
+      result_block_node_data[result_block_data_id].push_back({node_id,result_block_node_data_id});
+      
     }
-    if((frd.eof())){
-      break;
-    }
-    ++ic;
+    this->progress[thread_id] = this->progress[thread_id] + 1;
   }
-  frd.close();
 
   return true;
 }
@@ -1629,29 +1634,29 @@ void CoreResultsFrd::set_element_range_data_start(std::vector<std::vector<int>> 
 bool CoreResultsFrd::sort_result_block_node_data(int data_id)
 {
   // sorting for faster search
-  std::vector<int> tmp_node_ids;
-  std::vector<int> tmp_node_data_ids;
+  std::vector<int> tmp_result_node_ids;
+  std::vector<int> tmp_result_node_data_ids;
 
   for (size_t i = 0; i < result_block_node_data[data_id].size(); i++)
   {
-    tmp_node_ids.push_back(result_block_node_data[data_id][i][0]);
-    tmp_node_data_ids.push_back(result_block_node_data[data_id][i][1]);
+    tmp_result_node_ids.push_back(result_block_node_data[data_id][i][0]);
+    tmp_result_node_data_ids.push_back(result_block_node_data[data_id][i][1]);
   }  
-  auto p = sort_permutation(tmp_node_ids);
-  this->apply_permutation(tmp_node_ids, p);
-  this->apply_permutation(tmp_node_data_ids, p);
-  sorted_node_ids[data_id] = tmp_node_ids;
-  sorted_node_data_ids[data_id] = tmp_node_data_ids;
+  auto p = sort_permutation(tmp_result_node_ids);
+  this->apply_permutation(tmp_result_node_ids, p);
+  this->apply_permutation(tmp_result_node_data_ids, p);
+  sorted_result_node_ids[data_id] = tmp_result_node_ids;
+  sorted_result_node_data_ids[data_id] = tmp_result_node_data_ids;
 
   return true;
 }
 
-int CoreResultsFrd::get_result_block_lines(std::vector<std::vector<int>> result_block_range)
+int CoreResultsFrd::get_result_block_lines()
 {
   int lines = 0;
-  for (size_t i = 0; i < result_block_range.size(); i++)
+  for (size_t i = 0; i < frd_arrays.size(); i++)
   {
-    lines = lines + result_block_range[i][1] - result_block_range[i][0] + 1;
+    lines = lines + frd_arrays[i].size();
   }
   return lines;
 }
