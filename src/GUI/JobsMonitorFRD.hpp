@@ -22,6 +22,9 @@
 #include <QTableWidgetItem>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
+#include <algorithm>
+#include <QComboBox>
+#include <QObject>
 
 class CalculiXCoreInterface;
 
@@ -40,8 +43,9 @@ public:
   void clear(); // remove all data
   void update();
   void update_component(std::string result_block);
-  void update_increment(std::string result_block);
-  void update_result(std::vector<int> increment_ids, std::vector<int> node_ids, std::vector<int> block_ids, std::vector<int> sideset_ids);
+  void update_increment();
+  void update_filter(int index);
+  void update_result();
   void set_current_job_id(int job_id);
 
   void addListItem(std::string item_name, QListWidget* parent_list); // adds a new item to the list
@@ -50,22 +54,19 @@ public:
 
   void createListItems(); // creates the list items for selected material
   void removeListItems(); // removes current list items
-  void removeListItems_from_List(QListWidget* list); // removes current list items from list
-  void removeTableItems_from_Table(QTableWidget* table); // removes current table items from table
   void selectListItem(QListWidgetItem* item); // unselect all list items except the given
 
 private slots:
   void on_pushButton_refresh_clicked(bool);
   void on_pushButton_plot_clicked(bool);
   void on_pushButton_apply_filter_clicked(bool);
+  void on_pushButton_previous_clicked(bool);
+  void on_pushButton_next_clicked(bool);
   void result_block_clicked(QListWidgetItem* item);
   void result_block_changed(QListWidgetItem* current_item, QListWidgetItem* prev_item);
   void component_clicked(QListWidgetItem* item);
   void component_changed(QListWidgetItem* current_item, QListWidgetItem* prev_item);
 
-  QListWidgetItem* get_current_block() const;
-  QListWidgetItem* get_current_component() const;
-  
 private:
   std::string log;
   QGridLayout* gridLayout;
@@ -73,43 +74,41 @@ private:
   QVBoxLayout* boxLayout_result_block;
   QVBoxLayout* boxLayout_component;
   QVBoxLayout* boxLayout_increment;
+  QVBoxLayout* boxLayout_filter;
   QVBoxLayout* boxLayout_widget;
-  QVBoxLayout* boxLayout_filter1;
-  QVBoxLayout* boxLayout_filter2;
+  QHBoxLayout* boxLayout_pages;
   QPushButton* pushButton_refresh;
   QPushButton* pushButton_plot;
   QPushButton* pushButton_apply_filter;
+  QPushButton* pushButton_prev;
+  QPushButton* pushButton_next;
   QLabel* label_result_block;
   QLabel* label_component;
   QLabel* label_increment;
-  QLabel* label_filter1;
-  QLabel* label_filter2;
-  QLabel* label_result;
-  QLabel* label_increment1;
-  QLabel* label_increment2;
-  QLabel* label_node1;
-  QLabel* label_node2;
-  QLabel* label_block1;
-  QLabel* label_block2;
-  QLabel* label_sideset1;
-  QLabel* label_sideset2;
+  QLabel* label_filter;
+  QLabel* label_filter_lower;
+  QLabel* label_filter_upper;
   QListWidget* list_result_block;
   QListWidget* list_component;
+  QListWidget* list_increment;
   QListWidget* list_filter;
   QTableWidget* table_increment;
+  QLabel* table_counter;
   QSpinBox* textField1;
   QSpinBox* textField2;
-  QSpinBox* textField3;
-  QSpinBox* textField4;
-  QSpinBox* textField5;
-  QSpinBox* textField6;
-  QSpinBox* textField7;
-  QSpinBox* textField8;
+  QComboBox* combobox_filter1;
+  QComboBox* combobox_filter2;
+  QListWidgetItem* current_increment;
  
   // results
   QTableWidget* table_result;
-  QListWidgetItem* current_block = nullptr;  //store the current block
-  QListWidgetItem* current_component = nullptr;  //store the current component
+
+  //storage
+  QListWidgetItem* current_block = nullptr; //stores the current block
+  QListWidgetItem* current_component = nullptr; //stores the current component
+  int current_page; //stores the current result page
+  std::vector<int> filter;
+  int results_size;
 };
 
 #endif // JOBSMONITORFRD_HPP
