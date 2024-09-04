@@ -12,6 +12,7 @@ public:
   CalculiXCoreInterface();
   ~CalculiXCoreInterface();
 	
+  bool cmd(std::string cmd); // executes a cubit command with appending to the history
   bool set_use_ccx_autocleanup(bool bool_use);
   bool set_use_ccx_logfile(bool bool_use);
   bool init_pythoninterface();
@@ -135,6 +136,8 @@ public:
   bool set_job_conversion(int job_id, int conversion); // sets the paraview conversion value for the job
   bool result_cgx_job(int job_id); // opens the results with cgx
   bool result_paraview_job(int job_id); // opens the results with paraview
+  bool result_plot_job_frd(int job_id,int x_node_id, std::string x_block_type, std::string x_block_component, bool x_increment,bool x_time,int y_node_id, std::string y_block_type, std::string y_block_component, bool y_increment, bool y_time,QString title,QString x_axis,QString y_axis,bool save, QString save_filepath); // plots the results
+  bool result_plot_job_dat(int job_id); // plots the results
   std::vector<std::string> get_job_data(int job_id);
   std::vector<std::string> get_job_console_output(int job_id);
   std::vector<std::string> get_job_cvg(int job_id);
@@ -186,6 +189,8 @@ public:
 
   //QUERY results
   //FRD results
+  std::vector<int> frd_get_nodes(int job_id); // returns a list of all nodes
+  bool frd_check_node_exists(int job_id,int node_id); // returns if a node in the frd exists
   std::vector<std::string> frd_get_result_block_types(int job_id); // returns a list of all result block types
   std::vector<std::string> frd_get_result_block_components(int job_id, std::string result_block_type); // returns a list of all result block components for a block type
   std::vector<int> frd_get_total_increments(int job_id); // returns a list of the total increments

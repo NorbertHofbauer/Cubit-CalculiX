@@ -1,6 +1,5 @@
 #include "CalculiXCore.hpp"
 #ifdef WIN32
- //#include <windows.h>
  #include <io.h>
 #else
  #include <unistd.h>
@@ -13,6 +12,10 @@
 #include <algorithm>
 #include <cmath>
 
+#ifdef WIN32
+#else
+  #include "CubitGuiUtil.hpp"
+#endif
 #include "CubitInterface.hpp"
 #include "CubitCoreformInterface.hpp"
 #include "CubitMessage.hpp"
@@ -47,6 +50,7 @@
 #include "CoreCustomLines.hpp"
 #include "loadUserOptions.hpp"
 #include "CoreDraw.hpp"
+#include "PlotChart.hpp"
 
 #include <Utility/Eigen/Eigenvalues>
 
@@ -113,6 +117,18 @@ CalculiXCore::~CalculiXCore()
     delete customlines;
   if(draw)
     delete draw;
+}
+
+bool CalculiXCore::cmd(std::string cmd)
+{
+  #ifdef WIN32
+    CubitInterface::cmd(cmd.c_str());
+  #else
+  // all commands send with CubitGuiUtil will get listed in the history
+    CubitGuiUtil::send_cubit_command(cmd.c_str());
+  #endif
+  
+  return true;
 }
 
 bool CalculiXCore::print_to_log(std::string str_log)
@@ -2540,6 +2556,133 @@ bool CalculiXCore::result_paraview_job(int job_id)
   return jobs->result_paraview_job(job_id);
 }
 
+bool CalculiXCore::result_plot_job_frd(int job_id,int x_node_id, std::string x_block_type, std::string x_block_component, bool x_increment,bool x_time,int y_node_id, std::string y_block_type, std::string y_block_component, bool y_increment, bool y_time,QString title,QString x_axis,QString y_axis,bool save, QString save_filepath)
+{ 
+  bool plot_possible = false;
+  std::vector<int> increments;
+  std::vector<double> times;
+  QString windowtitle = "FRD Plot";
+  std::vector<double> x_data;
+  std::vector<double> y_data;
+
+  //std::string log;
+  //log = "plotting job "+ std::to_string(job_id) + "\n";
+  //PRINT_INFO("%s", log.c_str());
+
+  increments = frd_get_total_increments(job_id);
+  for (size_t i = 0; i < increments.size(); i++)
+  {
+    times.push_back(frd_get_time_from_total_increment(job_id,increments[i]));
+  }
+
+  //x data
+  if (x_increment)
+  {
+    for (size_t i = 0; i < increments.size(); i++)
+    {
+      x_data.push_back(increments[i]);
+    }
+  }
+  if (x_time)
+  {
+    for (size_t i = 0; i < times.size(); i++)
+    {
+      x_data.push_back(times[i]);
+    }
+  }
+  if (x_node_id!=-1)
+  {
+    for (size_t i = 0; i < increments.size(); i++)
+    {
+      x_data.push_back(frd_get_node_value(job_id,x_node_id, increments[i], x_block_type,x_block_component));
+    }
+  }
+
+  //y data
+  if (y_increment)
+  {
+    for (size_t i = 0; i < increments.size(); i++)
+    {
+      y_data.push_back(increments[i]);
+    }
+  }
+  if (y_time)
+  {
+    for (size_t i = 0; i < times.size(); i++)
+    {
+      y_data.push_back(times[i]);
+    }
+  }
+  if (y_node_id!=-1)
+  {
+    for (size_t i = 0; i < increments.size(); i++)
+    {
+      y_data.push_back(frd_get_node_value(job_id,y_node_id, increments[i], y_block_type,y_block_component));
+    }
+  }
+
+  if (x_axis=="")
+  {
+    std::string tmp;
+    if (x_increment)
+    {
+      tmp = "Increment";
+    }
+    if (x_time)
+    {
+      tmp = "Time";
+    }
+    if (x_node_id!=-1)
+    {
+      tmp = "Node ID " + std::to_string(x_node_id) + ", " + x_block_type + "[" + x_block_component + "]";
+    }
+    x_axis = QString::fromStdString(tmp);
+  }
+  if (y_axis=="")
+  {
+    std::string tmp;
+    if (y_increment)
+    {
+      tmp = "Increment";
+    }
+    if (y_time)
+    {
+      tmp = "Time";
+    }
+    if (y_node_id!=-1)
+    {
+      tmp = "Node ID " + std::to_string(y_node_id) + ", " + y_block_type + "[" + y_block_component + "]";
+    }
+    y_axis = QString::fromStdString(tmp);
+  }
+  
+
+  if ((x_data.size()>0)&&(y_data.size()>0)&&(x_data.size()==y_data.size()))
+  {
+    plot_possible = true;
+  }
+    
+  if (plot_possible)
+  {
+    plotchart = new PlotChart(nullptr,windowtitle, title, x_axis, y_axis, x_data, y_data,save,save_filepath);
+    plotchart->show();
+    if (save)
+    {
+      plotchart->close();
+    }
+  }  
+
+  return plot_possible;
+}
+
+bool CalculiXCore::result_plot_job_dat(int job_id)
+{
+  bool plot_possible = false;
+  
+
+  return plot_possible;
+}
+
 std::vector<std::string> CalculiXCore::get_job_data(int job_id)
 {
   return jobs->get_job_data(job_id);
@@ -3409,6 +3552,44 @@ bool CalculiXCore::draw_bc_displacements(double size)
 bool CalculiXCore::draw_bc_temperatures(double size)
 {
   return draw->draw_bc_temperatures(size);
+}
+
+std::vector<int> CalculiXCore::frd_get_nodes(int job_id)
+{
+  std::vector<int> tmp;
+
+  int results_data_id = results->get_results_data_id_from_job_id(job_id);
+  int frd_data_id = results->get_frd_data_id_from_job_id(job_id);
+
+  if (results_data_id == -1)
+  {
+    return tmp;
+  }
+
+  tmp = results->frd_data[frd_data_id].sorted_node_ids;
+      
+  return tmp;
+}
+
+bool CalculiXCore::frd_check_node_exists(int job_id,int node_id)
+{
+  bool node_exists = false;
+
+  int results_data_id = results->get_results_data_id_from_job_id(job_id);
+  int frd_data_id = results->get_frd_data_id_from_job_id(job_id);
+
+  if (results_data_id == -1)
+  {
+    return node_exists;
+  }
+
+  if (std::binary_search(results->frd_data[frd_data_id].sorted_node_ids.begin(), results->frd_data[frd_data_id].sorted_node_ids.end(), node_id))
+  { 
+    node_exists = true;
+    return node_exists;  
+  }
+
+  return node_exists;
 }
 
 std::vector<std::string> CalculiXCore::frd_get_result_block_types(int job_id)
