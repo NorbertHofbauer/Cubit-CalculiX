@@ -261,6 +261,10 @@ public:
   std::vector<std::vector<std::string>> get_customlines_tree_data(); // gets the data from core to build the tree
   std::vector<std::vector<std::string>> get_jobs_tree_data(); // gets the data from core to build the tree
 
+
+  void export_to_csv(std::string path_and_name, std::vector<std::string> header, std::vector<std::vector<double>> data); // exports the data to a .csv file, with the header
+
+
   MeshExportInterface *me_iface;
 };
 

@@ -1224,3 +1224,8 @@ std::vector<int> CalculiXCoreInterface::get_steps_ids() //gets the step ids from
 {
   return ccx_core.get_steps_ids();
 }
+
+void CalculiXCoreInterface::export_to_csv(std::string path, std::vector<std::string> header, std::vector<std::vector<double>> data)
+{
+  return ccx_core.export_to_csv(path, header, data);
+}

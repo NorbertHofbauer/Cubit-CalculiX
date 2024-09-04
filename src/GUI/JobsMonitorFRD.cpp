@@ -19,19 +19,12 @@ JobsMonitorFRD::JobsMonitorFRD()
   boxLayout_result_block = new QVBoxLayout();
   boxLayout_component = new QVBoxLayout();
   boxLayout_increment = new QVBoxLayout();
-<<<<<<< HEAD
-  boxLayout_filter = new QVBoxLayout();
-  boxLayout_widget = new QVBoxLayout();
-  boxLayout_pages = new QHBoxLayout();
-  gridLayout->addLayout(boxLayout_window,2,4, Qt::AlignRight);
-=======
   boxLayout_filter =  new  QVBoxLayout() ;
   boxLayout_filter_by_set = new QVBoxLayout();
   boxLayout_filter_by_node = new QHBoxLayout();
   boxLayout_result_buttons = new QHBoxLayout();
   boxLayout_widget = new QVBoxLayout();
   boxLayout_pages = new QHBoxLayout();
->>>>>>> upstream/main
   gridLayout->addLayout(boxLayout_result_block,0,0, Qt::AlignTop);
   gridLayout->addLayout(boxLayout_component,0,1, Qt::AlignTop);
   gridLayout->addLayout(boxLayout_increment,0,2, Qt::AlignTop);
@@ -40,25 +33,16 @@ JobsMonitorFRD::JobsMonitorFRD()
   gridLayout->addLayout(boxLayout_pages,2,0,1,4, Qt::AlignTop);
 
   // buttons
-<<<<<<< HEAD
-  pushButton_refresh = new QPushButton();
-  pushButton_refresh->setText("Refresh");
-  boxLayout_window->addWidget(pushButton_refresh);
-
-  pushButton_plot = new QPushButton();
-  pushButton_plot->setText("Plot");
-  boxLayout_window->addWidget(pushButton_plot);
-=======
   pushButton_reset = new QPushButton();
   pushButton_reset->setText("Reset");
   pushButton_plot = new QPushButton();
   pushButton_plot->setText("Plot");
   pushButton_query_results = new QPushButton("Get Results");
+  pushButton_query_results->setStyleSheet("background-color: lightgrey; color: black;");
 
   boxLayout_result_buttons->addWidget(pushButton_reset);
   boxLayout_result_buttons->addWidget(pushButton_query_results);
   boxLayout_result_buttons->addWidget(pushButton_plot);
->>>>>>> upstream/main
 
   // labels
   label_result_block = new QLabel();
@@ -73,11 +57,6 @@ JobsMonitorFRD::JobsMonitorFRD()
   label_increment->setText("Increments");
   boxLayout_increment->addWidget(label_increment);
 
-<<<<<<< HEAD
-  label_filter = new QLabel();
-  label_filter->setText("Filter");
-  boxLayout_filter->addWidget(label_filter);
-=======
   label_filter_by_set = new QLabel();
   label_filter_by_set->setText("Filter by Set");
   boxLayout_filter_by_set->addWidget(label_filter_by_set);
@@ -88,7 +67,6 @@ JobsMonitorFRD::JobsMonitorFRD()
   label_filter_node_id->setText("Node ID");
   boxLayout_filter_by_node->addWidget(label_filter_node_id);
 
->>>>>>> upstream/main
 
   // lists
   list_result_block = new QListWidget();
@@ -97,28 +75,6 @@ JobsMonitorFRD::JobsMonitorFRD()
   list_component = new QListWidget();
   boxLayout_component->addWidget(list_component);
 
-<<<<<<< HEAD
-  list_filter = new QListWidget();
-  list_filter->setFrameShape(QFrame::Box);
-  list_filter->setFrameShadow(QFrame::Raised);
-
-  list_increment = new QListWidget();
-  list_increment->setFrameShape(QFrame::Box);
-  list_increment->setFrameShadow(QFrame::Raised);
-  boxLayout_increment->addWidget(list_increment);
-
-  combobox_filter1 = new QComboBox();
-  combobox_filter1->addItem(" ");
-  combobox_filter1->addItem("Block");
-  combobox_filter1->addItem("Sideset");
-  combobox_filter1->addItem("Nodeset");
-  combobox_filter1->addItem("Node");
-  combobox_filter2 = new QComboBox();
-  boxLayout_filter->addWidget(combobox_filter1);
-
-  pushButton_apply_filter = new QPushButton("Apply Filter");
-  boxLayout_filter->addWidget(pushButton_apply_filter);
-=======
   list_increment = new QListWidget();
   list_increment->setFrameShape(QFrame::Box);
   list_increment->setFrameShadow(QFrame::Raised);
@@ -147,7 +103,6 @@ JobsMonitorFRD::JobsMonitorFRD()
   boxLayout_filter->addWidget(label_filter_by_node);
   boxLayout_filter->addLayout(boxLayout_filter_by_node);
   boxLayout_filter->addLayout(boxLayout_result_buttons);
->>>>>>> upstream/main
 
   //table
   table_result = new QTableWidget();
@@ -156,50 +111,35 @@ JobsMonitorFRD::JobsMonitorFRD()
   table_result->setMidLineWidth(0);
   table_result->setFrameStyle(QFrame::Box | QFrame::Raised);
   table_counter = new QLabel;
-<<<<<<< HEAD
-  pushButton_prev = new QPushButton("Previous Results");
-  pushButton_next = new QPushButton("Next Results");
-=======
   table_counter->setText("");
   pushButton_prev = new QPushButton("Previous Results");
   pushButton_next = new QPushButton("Next Results");
+  pushButton_export = new QPushButton("Export to CSV");
   pushButton_prev->setDisabled(true);
   pushButton_next->setDisabled(true);
->>>>>>> upstream/main
   boxLayout_widget->addWidget(table_result);
   boxLayout_pages->addWidget(pushButton_prev);
   boxLayout_pages->addWidget(table_counter);
   boxLayout_pages->addWidget(pushButton_next);
-<<<<<<< HEAD
-=======
+  boxLayout_pages->addWidget(pushButton_export);
 
   PlotWidget = new JobsMonitorFRDPlot();
   PlotWidget->hide();
->>>>>>> upstream/main
 
   // Signals
   QObject::connect(pushButton_reset, SIGNAL(clicked(bool)),this,  SLOT(on_pushButton_reset_clicked(bool)));
   QObject::connect(pushButton_plot, SIGNAL(clicked(bool)),this,  SLOT(on_pushButton_plot_clicked(bool)));
-<<<<<<< HEAD
-  QObject::connect(pushButton_apply_filter, SIGNAL(clicked(bool)),this,  SLOT(on_pushButton_apply_filter_clicked(bool)));
-=======
   QObject::connect(pushButton_query_results, SIGNAL(clicked(bool)),this,  SLOT(on_pushButton_query_results_clicked(bool)));
->>>>>>> upstream/main
   QObject::connect(list_result_block, SIGNAL(itemClicked(QListWidgetItem*)),this,  SLOT(result_block_clicked(QListWidgetItem*)));
   QObject::connect(list_result_block, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),this,  SLOT(result_block_changed(QListWidgetItem*,QListWidgetItem*)));
   QObject::connect(list_component, SIGNAL(itemClicked(QListWidgetItem*)),this,  SLOT(component_clicked(QListWidgetItem*)));
   QObject::connect(list_component, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),this,  SLOT(component_changed(QListWidgetItem*,QListWidgetItem*)));
-<<<<<<< HEAD
-  QObject::connect(pushButton_prev, SIGNAL(clicked(bool)), this, SLOT(on_pushButton_previous_clicked(bool)));
-  QObject::connect(pushButton_next, SIGNAL(clicked(bool)), this, SLOT(on_pushButton_next_clicked(bool)));
-  QObject::connect(combobox_filter1, SIGNAL(currentIndexChanged(int)), this, SLOT(update_filter(int)));
-=======
   QObject::connect(list_increment, SIGNAL(itemClicked(QListWidgetItem*)),this,  SLOT(increment_clicked(QListWidgetItem*)));
   QObject::connect(list_increment, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),this,  SLOT(increment_changed(QListWidgetItem*,QListWidgetItem*)));
   QObject::connect(pushButton_prev, SIGNAL(clicked(bool)), this, SLOT(on_pushButton_previous_clicked(bool)));
   QObject::connect(pushButton_next, SIGNAL(clicked(bool)), this, SLOT(on_pushButton_next_clicked(bool)));
   QObject::connect(combobox_filter_by_set, SIGNAL(currentIndexChanged(int)), this, SLOT(update_filter_by_set(int)));
->>>>>>> upstream/main
+  QObject::connect(pushButton_export, SIGNAL(clicked(bool)),this, SLOT(on_pushButton_export_clicked(bool)));
 
   // Update list items and data
   this->update();
@@ -224,17 +164,6 @@ void JobsMonitorFRD::update()
   {
     return;
   }
-<<<<<<< HEAD
-
-  list_result_block->clear();
-  list_component->clear();
-  list_increment->clear();
-  table_result->setRowCount(0);
-  table_result->setColumnCount(0);
-  this->current_block = nullptr;
-  this->current_component = nullptr;
-=======
->>>>>>> upstream/main
 
   list_result_block->clear();
   list_component->clear();
@@ -245,11 +174,13 @@ void JobsMonitorFRD::update()
   this->current_result_component = nullptr;
   pushButton_prev->setDisabled(true);
   pushButton_next->setDisabled(true);
+  pushButton_export->setDisabled(true);
   table_counter->setText("");
   combobox_filter_by_set->setCurrentIndex(0);
   table_filter_by_set->setRowCount(0);
   table_filter_by_set->setColumnCount(0);
   PickWidget_filter_node_id->setText("");
+  results_cvg.clear();
     
   std::vector<std::string> result_block_types = ccx_iface->frd_get_result_block_types(current_job_id);
   
@@ -267,10 +198,7 @@ void JobsMonitorFRD::update_component(std::string result_block)
   }
   
   list_component->clear();
-<<<<<<< HEAD
-=======
   list_increment->clear();
->>>>>>> upstream/main
 
   std::vector<std::string> components = ccx_iface->frd_get_result_block_components(current_job_id, result_block);
   components.insert(components.begin(), "all");
@@ -279,12 +207,9 @@ void JobsMonitorFRD::update_component(std::string result_block)
   {
     this->addListItem(components[i],list_component);
   }
-<<<<<<< HEAD
-=======
 
   list_component->item(0)->setSelected(true);
   this->component_clicked(list_component->item(0));
->>>>>>> upstream/main
 }
 
 void JobsMonitorFRD::update_increment()
@@ -297,102 +222,6 @@ void JobsMonitorFRD::update_increment()
   list_increment->clear();
 
   std::vector<int> increments = ccx_iface->frd_get_total_increments(current_job_id);
-<<<<<<< HEAD
-  std::vector<std::variant<int, std::string>> total_increments;
-  total_increments.push_back("all");
-  for (int increment : increments)
-  {
-    total_increments.push_back(increment);
-  }
-  for (const auto& item : total_increments)
-  {
-    if (std::holds_alternative<int>(item))
-    {
-      this->addListItem(QString::number(std::get<int>(item)).toStdString(), list_increment);
-    } else {
-      this->addListItem(std::get<std::string>(item), list_increment);
-    }
-  }
-}
-
-void JobsMonitorFRD::update_filter(int index) //Clemens updatet nicht, wenn filter geändert wird 
-{
-  /* if (this->combobox2_exists==true)
-  {
-    this->combobox2_exists = false;
-    this->textFields_exists = false;
-    removeWidgetFromLayout(boxLayout_filter, combobox_filter2);
-  } else if (this->textFields_exists==true)
-  {
-    this->combobox2_exists = false;
-    this->textFields_exists = false;
-    removeWidgetFromLayout(boxLayout_filter, combobox_filter2);
-    removeWidgetFromLayout(boxLayout_filter, textField1);
-    removeWidgetFromLayout(boxLayout_filter, textField2);
-    removeWidgetFromLayout(boxLayout_filter, label_filter_lower);
-    removeWidgetFromLayout(boxLayout_filter, label_filter_upper);
-  } else {
-    return;
-  } */
-
-  std::string applied_filter = combobox_filter1->currentText().toStdString();
-  if (applied_filter==" ")
-  {
-    combobox2_exists = false;
-    textFields_exists = false;
-    return;
-  } else if (applied_filter=="Block")
-  {
-    combobox2_exists = true;
-    textFields_exists = false;
-    combobox_filter2->addItem(" ");
-    std::vector<int> blocks = ccx_iface->get_blocks();
-    for (size_t i = 1; i < blocks.size(); i++)
-    {
-      QString block_name = QString::fromStdString(ccx_iface->get_block_name(i));
-      combobox_filter2->addItem(block_name);
-    }
-    boxLayout_filter->addWidget(combobox_filter2);
-  } else if (applied_filter=="Sideset")
-  {
-    combobox2_exists = true;
-    textFields_exists = false;
-    combobox_filter2->addItem(" ");
-    std::vector<int> sidesets = CubitInterface::get_sideset_id_list();
-    for (size_t i = 1; i < sidesets.size(); i++)
-    {
-      QString sideset_name = QString::fromStdString(ccx_iface->get_sideset_name(i));
-      combobox_filter2->addItem(sideset_name);
-    }
-    boxLayout_filter->addWidget(combobox_filter2);
-  } else if (applied_filter=="Nodeset")
-  {
-    combobox2_exists = true;
-    textFields_exists = false;
-    combobox_filter2->addItem(" ");
-    std::vector<int> nodesets = CubitInterface::get_nodeset_id_list();
-    for (size_t i = 1; i < nodesets.size(); i++)
-    {
-      QString nodeset_name = QString::fromStdString(ccx_iface->get_nodeset_name(i));
-      combobox_filter2->addItem(nodeset_name);
-    }
-    boxLayout_filter->addWidget(combobox_filter2);
-  } else if (applied_filter=="Node")
-  {
-    combobox2_exists = false;
-    textFields_exists = true;
-    textField1 = new QSpinBox;
-    textField2 = new QSpinBox;
-    label_filter_lower = new QLabel;
-    label_filter_lower->setText("From");
-    label_filter_upper = new QLabel;
-    label_filter_upper->setText("Until");
-    boxLayout_filter->addWidget(label_filter_lower);
-    boxLayout_filter->addWidget(textField1);
-    boxLayout_filter->addWidget(label_filter_upper);
-    boxLayout_filter->addWidget(textField2);
-  }
-=======
   
   this->addListItem("all", list_increment);
   for (size_t i = 0; i < increments.size(); i++)
@@ -467,35 +296,10 @@ void JobsMonitorFRD::update_filter_by_set(int index)
   table_filter_by_set->setHorizontalHeaderLabels(header_horizontal);
   table_filter_by_set->setSortingEnabled(true);
   table_filter_by_set->setEditTriggers(QAbstractItemView::NoEditTriggers);
-  
-      
->>>>>>> upstream/main
 }
 
 void JobsMonitorFRD::update_result()
 {
-<<<<<<< HEAD
-  if(current_job_id == -1)
-  {
-    return;
-  }
-
-  table_result->setRowCount(0);
-  table_result->setColumnCount(0);
-
-  if (this->current_block==nullptr)
-  {
-    return;
-  }
-  if(this->current_component==nullptr)
-  {
-    return;
-  }
-  
-  std::string current_result_block = this->current_block->text().toStdString();
-  std::string current_component = this->current_component->text().toStdString();
-  std::vector<int> nodes;
-=======
   std::string log;
   if(current_job_id == -1)
   {
@@ -515,7 +319,6 @@ void JobsMonitorFRD::update_result()
     PRINT_INFO("%s", log.c_str());
     return;
   }
-
   if (current_increment==nullptr)
   {
     log = "Can't update results -> no increment set \n";
@@ -527,138 +330,6 @@ void JobsMonitorFRD::update_result()
   std::vector<int> frd_nodes = ccx_iface->frd_get_nodes(current_job_id);
   table_result->setRowCount(0);
   table_result->setColumnCount(0);
-/*
->>>>>>> upstream/main
-  std::string applied_filter = combobox_filter1->currentText().toStdString();
-  
-  if (applied_filter==" ")
-  {
-<<<<<<< HEAD
-    return;
-=======
-    //return;
->>>>>>> upstream/main
-  }
-  if (this->combobox2_exists==true)
-  {
-    std::string applied_node = combobox_filter2->currentText().toStdString();
-    if (applied_node==" ")
-    {
-<<<<<<< HEAD
-      return;
-=======
-      //return;
->>>>>>> upstream/main
-    }
-    if (applied_filter=="Block")
-    {
-      std::string name = combobox_filter2->currentText().toStdString();
-      int id = CubitInterface::get_id_from_name(name);
-    } else if (applied_filter=="Sideset")
-    {
-      std::string name = combobox_filter2->currentText().toStdString();
-      int id = CubitInterface::get_id_from_name(name);
-      std::string int_list = "all in sideset " + std::to_string(id);
-      nodes = CubitInterface::parse_cubit_list("node",int_list);
-    } else if (applied_filter=="Nodeset")
-    {
-      std::string name = combobox_filter2->currentText().toStdString();
-      int id = CubitInterface::get_id_from_name(name);
-      nodes = CubitInterface::get_nodeset_nodes_inclusive(id);
-    } else {
-<<<<<<< HEAD
-      return;
-=======
-      //return;
->>>>>>> upstream/main
-    }
-  }
-  
-  if (this->textFields_exists==true)
-  {
-    QString string_filter_lower = textField1->text();
-    QString string_filter_upper = textField2->text();
-    
-    double filter_lower = string_filter_lower.toInt();
-    double filter_upper = string_filter_upper.toInt();
-
-    if ((!filter_lower==0)&&(!filter_upper==0))
-    {
-      for (size_t i = filter_lower; i <= filter_upper; i++)
-      {
-        nodes.push_back(i);
-      }
-    } else if ((filter_lower==0)&&(!filter_upper==0))
-    {
-      for (size_t i = 1; i <= filter_upper; i++)
-      {
-        nodes.push_back(i);
-      }
-    } else if ((!filter_lower==0)&&(filter_upper==0))
-    {
-      std::vector<int> total_nodes = CubitInterface::get_nodeset_id_list();
-      if(!total_nodes.empty())
-      {
-        auto max_node = std::max_element(total_nodes.begin(), total_nodes.end());
-        int node_max = *max_node;
-        for (size_t i = filter_lower; i <= node_max; i++)
-        {
-          nodes.push_back(i);
-        }
-      } else {
-<<<<<<< HEAD
-        return;
-=======
-        //return;
->>>>>>> upstream/main
-      }
-    } else if ((filter_lower==0)&&(filter_upper==0))
-    {
-      std::vector<int> total_nodes = CubitInterface::get_nodeset_id_list();
-      if(!total_nodes.empty())
-      {
-        auto max_node = std::max_element(total_nodes.begin(), total_nodes.end());
-        int node_max = *max_node;
-        for (size_t i = 1; i <= node_max; i++)
-        {
-          nodes.push_back(i);
-        }
-      } else {
-<<<<<<< HEAD
-        return;
-      }
-    } else {
-      return;
-    }
-  }
-
-  std::vector<std::vector<double>> results;
-
-  current_increment = new QListWidgetItem;
-  current_increment = list_increment->currentItem();
-  if (current_increment==nullptr)
-  {
-    return;
-  }
-  QString current_increment_text = current_increment->text();
-  std::string current_increment_string = current_increment_text.toStdString();
-  int current_increment_int = current_increment_text.toInt();
-  
-  if (current_component=="all")
-  {
-    return;
-    //Clemens components all
-
-  } else {
-    if (current_increment_string=="all")
-=======
-        //return;
-      }
-    } else {
-      //return;
-    }
-  }
-*/
 
   // check if filter was chosen
   std::string filter_set = combobox_filter_by_set->currentText().toStdString();
@@ -756,8 +427,6 @@ void JobsMonitorFRD::update_result()
     pushButton_next->setDisabled(true);
   }
   
-  
-
   if ((nodes.size()>0)&&(components.size()>0)&&(increments.size()>0)) //check if data can be queried
   {
     int ic = 0;
@@ -765,7 +434,7 @@ void JobsMonitorFRD::update_result()
     {
       for (size_t ii = 0; ii < increments.size(); ii++)
       {
-        if ((ic>=start)&&(ic<=end))// check if items are in range
+        if ((ic>=start)&&(ic<=end)) // check if items are in range
         {
           std::vector<double> tmp_result;
           double increment_time = ccx_iface->frd_get_time_from_total_increment(current_job_id, increments[ii]);
@@ -787,92 +456,6 @@ void JobsMonitorFRD::update_result()
       }
     }
   }
-  //log = "update result \n";
-  //log.append("start " + std::to_string(start) + " end " + std::to_string(end) + "\n");
-  //log.append("result size " + std::to_string(results.size()) + "\n");
-  //PRINT_INFO("%s", log.c_str());
-  /*
-  if (current_result_component->text().toStdString()=="all")
-  {
-
-  } else {
-    if (current_increment->text().toStdString()=="all")
->>>>>>> upstream/main
-    {
-      std::vector<int> increments = ccx_iface->frd_get_total_increments(current_job_id);
-      if (!increments.empty())
-      {
-        for (int i : nodes)
-        {
-          for (int j : increments)
-          {
-<<<<<<< HEAD
-            results.push_back({i,j});
-=======
-            results.push_back({double(i),double(j)});
->>>>>>> upstream/main
-          }
-        }
-
-        if (results.size()==0)
-        {
-          return;
-        }
-
-        for (size_t i = 0; i < results.size(); i++)
-        {
-          double increment_time = ccx_iface->frd_get_time_from_total_increment(current_job_id, results[i][0]);
-          results[i].push_back(increment_time);
-
-<<<<<<< HEAD
-          double node_result = ccx_iface->frd_get_node_value(current_job_id, results[i][0] , current_increment_int, current_result_block, current_component);
-=======
-          double node_result = ccx_iface->frd_get_node_value(current_job_id, results[i][0] , current_increment->text().toInt(), current_result_block->text().toStdString(), current_result_component->text().toStdString());
->>>>>>> upstream/main
-          results[i].push_back(node_result);
-        }
-      } else {
-        return;
-      }
-    } else {
-      for (size_t i = 0; i < nodes.size(); i++)
-      {
-        std::vector<double> temp;
-        temp.push_back(nodes[i]);
-        results.push_back(temp);
-      }
-
-      if (results.size()==0)
-      {
-        return;
-      }
-
-      for (size_t i = 0; i < results.size(); i++)
-      {
-<<<<<<< HEAD
-        double node_result = ccx_iface->frd_get_node_value(current_job_id, results[i][0] , current_increment_int, current_result_block, current_component);
-=======
-        double node_result = ccx_iface->frd_get_node_value(current_job_id, results[i][0] , current_increment->text().toInt(), current_result_block->text().toStdString(), current_result_component->text().toStdString());
->>>>>>> upstream/main
-        results[i].push_back(node_result);
-      }
-    }
-  }
-<<<<<<< HEAD
-
-  int items_per_page = 50; //also adjust in on_pushButton_next_clicked
-  int start = this->current_page * items_per_page;
-  this->results_size = results.size();
-  int end = std::min(start + items_per_page, results_size);
-
-  table_result->setSortingEnabled(true);
-  table_result->setRowCount(std::min(50,results_size-start));
-  table_result->setColumnCount(results[0].size());
-  table_result->setEditTriggers(QAbstractItemView::NoEditTriggers);
-  table_counter->setText(QString::fromStdString("Results " + std::to_string(start+1) + "-" + std::to_string(end) + " of " + std::to_string(results_size)));
-
-=======
-  */
 
   table_result->setSortingEnabled(true);
   table_result->setRowCount(std::min(50,int(results.size())));
@@ -919,61 +502,7 @@ void JobsMonitorFRD::update_result()
     }
   }
   
-
-/*
->>>>>>> upstream/main
-  for (size_t i = start; i < end; i++)
-  {
-    for (size_t ii = 0; ii < results[0].size(); ii++)
-    {
-<<<<<<< HEAD
-      if (current_increment_string=="all")
-=======
-      if (current_increment->text().toStdString()=="all")
->>>>>>> upstream/main
-      {
-        if (ii > 1)
-        {
-          QString formatted_result_value = QString::number(results[i][ii], 'f', 6);
-
-          QTableWidgetItem* item = new QTableWidgetItem(formatted_result_value);
-          item->setData(Qt::DisplayRole, results[i][ii]);
-          table_result->setItem(i-start, ii, item);
-        } else {
-          QTableWidgetItem* item = new QTableWidgetItem;
-          item->setData(Qt::DisplayRole, results[i][ii]);
-          table_result->setItem(i-start, ii, item);
-        }
-<<<<<<< HEAD
-        table_result->setHorizontalHeaderLabels(QStringList() << "Node Id" << "Increment Id" << "Increment Time" << QString::fromStdString(current_component));
-=======
-        table_result->setHorizontalHeaderLabels(QStringList() << "Node Id" << "Increment Id" << "Increment Time" << current_result_component->text());
->>>>>>> upstream/main
-      } else {
-        if (ii > 1)
-        {
-          QString formatted_result_value = QString::number(results[i][ii], 'f', 6);
-
-          QTableWidgetItem* item = new QTableWidgetItem(formatted_result_value);
-          item->setData(Qt::DisplayRole, results[i][ii]);
-          table_result->setItem(i-start, ii, item);
-        } else {
-          QTableWidgetItem* item = new QTableWidgetItem;
-          item->setData(Qt::DisplayRole, results[i][ii]);
-          table_result->setItem(i-start, ii, item);
-        }
-<<<<<<< HEAD
-        table_result->setHorizontalHeaderLabels(QStringList() << "Node Id" << QString::fromStdString(current_component));
-      }
-    }
-  }
-=======
-        table_result->setHorizontalHeaderLabels(QStringList() << "Node Id" << current_result_component->text());
-      }
-    }
-  }
-  */
->>>>>>> upstream/main
+  pushButton_export->setEnabled(true);
 }
 
 void JobsMonitorFRD::set_current_job_id(int job_id)
@@ -1016,53 +545,24 @@ void JobsMonitorFRD::createListItems()
   list_result_block->sortItems();
 }
 
-<<<<<<< HEAD
-void JobsMonitorFRD::selectListItem(QListWidgetItem* item)
-{
-  QListWidgetItem* temp_item;
-
-  for (size_t i = 0; i < list_result_block->count(); i++)
-  {
-    temp_item = list_result_block->item(int(i));
-    if (temp_item != item)
-    {
-      temp_item->setSelected(false);
-    }
-  }
-}
-
-void JobsMonitorFRD::on_pushButton_refresh_clicked(bool)
-=======
 void JobsMonitorFRD::on_pushButton_reset_clicked(bool)
->>>>>>> upstream/main
 {
   this->update();  
 }
 
 void JobsMonitorFRD::on_pushButton_plot_clicked(bool)
 {
-<<<<<<< HEAD
-
-}
-
-void JobsMonitorFRD::on_pushButton_apply_filter_clicked(bool)
-=======
   PlotWidget->show();
 }
 
 void JobsMonitorFRD::on_pushButton_query_results_clicked(bool)
->>>>>>> upstream/main
-{ // Clemens, dies if not everything chosen
+{
   if(current_job_id == -1)
   {
     return;
   }
 
   this->current_page = 0;
-<<<<<<< HEAD
-  filter.clear();
-=======
->>>>>>> upstream/main
 
   this->update_result();
 }
@@ -1072,11 +572,7 @@ void JobsMonitorFRD::result_block_clicked(QListWidgetItem* item)
  std::string result_block;
  result_block = item->text().toStdString();
  this->update_component(result_block);
-<<<<<<< HEAD
- this->current_block = item;
-=======
  this->current_result_block = item;
->>>>>>> upstream/main
 }
 
 void JobsMonitorFRD::result_block_changed(QListWidgetItem* current_item, QListWidgetItem* prev_item)
@@ -1087,33 +583,20 @@ void JobsMonitorFRD::result_block_changed(QListWidgetItem* current_item, QListWi
   }
 }
 
-<<<<<<< HEAD
-void JobsMonitorFRD::component_clicked(QListWidgetItem* component)
-{
-  this->update_increment();
-  this->current_component = component;
-=======
 void JobsMonitorFRD::component_clicked(QListWidgetItem* item)
 {
   this->update_increment();
   this->current_result_component = item;
->>>>>>> upstream/main
 }
 
 void JobsMonitorFRD::component_changed(QListWidgetItem* current_item, QListWidgetItem* prev_item)
 {
   if (current_item!=nullptr)
   {
-<<<<<<< HEAD
-    this->selectListItem(current_item);
-=======
->>>>>>> upstream/main
     this->component_clicked(current_item);
   }
 }
 
-<<<<<<< HEAD
-=======
 void JobsMonitorFRD::increment_clicked(QListWidgetItem* item)
 {
   this->current_increment = item;
@@ -1127,7 +610,6 @@ void JobsMonitorFRD::increment_changed(QListWidgetItem* current_item, QListWidge
   }
 }
 
->>>>>>> upstream/main
 void JobsMonitorFRD::on_pushButton_previous_clicked(bool)
 {
   if (current_page>0)
@@ -1146,14 +628,181 @@ void JobsMonitorFRD::on_pushButton_next_clicked(bool)
   }
 }
 
-void JobsMonitorFRD::removeWidgetFromLayout(QVBoxLayout* layout, QWidget* widget) {
-  for (int i = 0; i < layout->count(); ++i) {
-    QLayoutItem* item = layout->itemAt(i);
-    if (item->widget() == widget) {
-      layout->takeAt(i);
-      delete item->widget();
-      delete item;
-      break;
+void JobsMonitorFRD::on_pushButton_export_clicked(bool)
+{
+  std::vector<std::string> header;
+  std::vector<std::vector<double>> data;
+
+  for (size_t i = 0; i < table_result->columnCount(); i++)
+  {
+    std::string temp_header = table_result->horizontalHeaderItem(i)->text().toStdString();
+    header.push_back(temp_header);
+  }
+  
+  std::string log;
+  if(current_job_id == -1)
+  {
+    log = "Can't export results -> no job set \n";
+    PRINT_INFO("%s", log.c_str());
+    return;
+  }
+  if (this->current_result_block==nullptr)
+  {
+    log = "Can't export results -> no result block set \n";
+    PRINT_INFO("%s", log.c_str());
+    return;
+  }
+  if(this->current_result_component==nullptr)
+  {
+    log = "Can't export results -> no result component set \n";
+    PRINT_INFO("%s", log.c_str());
+    return;
+  }
+  if (current_increment==nullptr)
+  {
+    log = "Can't export results -> no increment set \n";
+    PRINT_INFO("%s", log.c_str());
+    return;
+  }
+
+  std::vector<int> nodes;
+  std::vector<int> frd_nodes = ccx_iface->frd_get_nodes(current_job_id);
+  
+  // check if filter was chosen
+  std::string filter_set = combobox_filter_by_set->currentText().toStdString();
+  QTableWidgetItem* filter_item = table_filter_by_set->currentItem();
+  if (filter_item!=nullptr)
+  {
+    int row = filter_item->row();
+    filter_item = table_filter_by_set->item(row,1);
+
+    if (filter_set=="Block")
+    {
+      std::vector<int> node_ids = CubitInterface::parse_cubit_list("node","all in block " + filter_item->text().toStdString());; 
+      for (size_t i = 0; i < node_ids.size(); i++)
+      {
+        if (ccx_iface->frd_check_node_exists(current_job_id, node_ids[i]))
+        {
+          nodes.push_back(node_ids[i]);
+        }
+      }
+    }else if (filter_set=="Nodeset")
+    {
+      std::vector<int> node_ids = CubitInterface::parse_cubit_list("node","all in nodeset " + filter_item->text().toStdString());; 
+      for (size_t i = 0; i < node_ids.size(); i++)
+      {
+        if (ccx_iface->frd_check_node_exists(current_job_id, node_ids[i]))
+        {
+          nodes.push_back(node_ids[i]);
+        }
+      }
+    }else if (filter_set=="Sideset")
+    {
+      std::vector<int> node_ids = CubitInterface::parse_cubit_list("node","all in sideset " + filter_item->text().toStdString());; 
+      for (size_t i = 0; i < node_ids.size(); i++)
+      {
+        if (ccx_iface->frd_check_node_exists(current_job_id, node_ids[i]))
+        {
+          nodes.push_back(node_ids[i]);
+        }
+      }
     }
   }
+  
+  int node_id = PickWidget_filter_node_id->text().toInt();
+  if (node_id > 0)
+  {
+    if (ccx_iface->frd_check_node_exists(current_job_id, node_id))
+    {
+        nodes.push_back(node_id);
+    }else
+    {
+      log = "Can't find node id " + std::to_string(node_id) + " in frd data -> reference points for example are not written into frd \n";
+      PRINT_INFO("%s", log.c_str());
+    }  
+  }
+
+  if (nodes.size()==0) // this means no filter for sets was applied
+  {
+    nodes = frd_nodes;
+  }
+  
+  //prepare components
+  std::vector<std::string> components;
+  if (current_result_component->text().toStdString()=="all")
+  {
+    components = ccx_iface->frd_get_result_block_components(current_job_id, current_result_block->text().toStdString());
+  }else{
+    components.push_back(current_result_component->text().toStdString());
+  }
+
+  //prepare increments
+  std::vector<int> increments;
+  if (current_increment->text().toStdString()=="all")
+  {
+    increments = ccx_iface->frd_get_total_increments(current_job_id);
+  }else{
+    increments.push_back(current_increment->text().toInt());
+  }
+  
+  std::vector<std::vector<double>> results;
+  std::string str_current_result_block = current_result_block->text().toStdString();
+    
+  if ((nodes.size()>0)&&(components.size()>0)&&(increments.size()>0)) //check if data can be queried
+  {
+    for (size_t i = 0; i < nodes.size(); i++)
+    {
+      for (size_t ii = 0; ii < increments.size(); ii++)
+      {
+        std::vector<double> tmp_result;
+        double increment_time = ccx_iface->frd_get_time_from_total_increment(current_job_id, increments[ii]);
+        tmp_result.push_back(double(nodes[i]));
+        tmp_result.push_back(double(increments[ii]));
+        tmp_result.push_back(increment_time);
+        for (size_t iii = 0; iii < components.size(); iii++)
+        {
+          double node_result = ccx_iface->frd_get_node_value(current_job_id, nodes[i] , increments[ii], str_current_result_block, components[iii]);
+          tmp_result.push_back(node_result);
+        }
+        results.push_back(tmp_result);
+      }
+    }
+  }
+  
+  QString fileName;
+
+  QFileDialog dialog;
+  dialog.setWindowTitle("Save CSV");
+  dialog.setDirectory(QDir::homePath());
+  dialog.setNameFilter("CSV Files (*.csv);;All Files (*)");
+  fileName = dialog.getSaveFileName();
+
+  if(fileName.isEmpty())
+  {
+    log = "File save canceled.\n";
+    PRINT_INFO("%s", log.c_str());
+    return;
+  }
+
+  if (!fileName.endsWith(".csv", Qt::CaseInsensitive)) 
+  {
+    fileName += ".csv";
+  }
+
+  if (QFileInfo::exists(fileName)) 
+  {
+    log = "Filename already existed, maybe without '.csv'. File has been overwritten.\n";
+    PRINT_INFO("%s", log.c_str());
+    return;
+    /* QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(nullptr, "File Exists", "The file already exists. Do you want to overwrite it?", QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::No)
+    {
+      return;
+    } */
+  }
+
+  this->ccx_iface->export_to_csv(fileName.toStdString(), header, results);
+  
+  return;
 }

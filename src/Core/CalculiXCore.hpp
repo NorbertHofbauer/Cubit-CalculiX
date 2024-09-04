@@ -318,6 +318,8 @@ public:
   std::string get_step_export_data(); // gets the export data from core
   std::vector<int> get_steps_ids(); //gets the step ids from core
 
+  void export_to_csv(std::string path, std::vector<std::string> header, std::vector<std::vector<double>> data);
+
   CoreBlocks *cb;
   CoreMaterials *mat;
   CoreSections *sections;
