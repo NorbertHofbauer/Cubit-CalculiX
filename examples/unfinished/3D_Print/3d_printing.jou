@@ -1,0 +1,86 @@
+#!cubit
+reset
+
+#import stl "/home/user/cubit/Ork_Veteran/Ork_Veteran.stl" feature_angle 135.00 merge
+create frustum height 8 radius 2 top 0
+
+#!python
+
+# volume id for imported stl
+vid = 1
+
+# bounding box volume ids and blocks
+cube_vids = []
+
+vector_list = cubit.get_bounding_box("volume" , vid)
+cubit.cmd(f"move volume {vid} x {-vector_list[0]} y {-vector_list[3]} z {-vector_list[6]}")
+
+# from https://forum.coreform.com/t/python-showcase-find-hexes-whose-centroids-are-inside-a-body/1265
+import time
+
+def list_to_str(input_val):
+  return " ".join([str(val) for val in input_val])
+
+def boundary_cube(volume_id,refine_level,number_of_layers):
+  #cubit.cmd(f"create brick bounding box Volume {volume_id} tight")
+  bb_list = cubit.get_bounding_box("volume" , volume_id)
+  cubit.cmd(f"create brick x {bb_list[2]} y {bb_list[5]} z {bb_list[8]}")
+  cubit.cmd(f"move volume {cubit.get_last_id('volume')} x {bb_list[2]/2} y {bb_list[5]/2} z {bb_list[8]/2}")
+  #cut into layers
+  bb_vid =  cubit.get_last_id('volume')
+  for i in range(number_of_layers):
+   if i!=0:
+    cubit.cmd(f"webcut volume {bb_vid} with plane zplane offset {bb_list[8]/(number_of_layers)*i}")
+    cube_vids.append(cubit.get_last_id('volume'))
+   if i==number_of_layers-1:
+    cube_vids.append(bb_vid)
+  cubit.cmd(f"merge vol {' '.join(str(id) for id in cube_vids)}")
+
+  for i in range(len(cube_vids)):
+   cubit.cmd(f"mesh Volume {cube_vids[i]}")
+   if refine_level > 0:
+     cubit.cmd(f'refine hex all numsplit {refine_level} bias 1.0 depth 1 ')
+  #cubit.cmd("compress")
+
+def create_nodal_coordinates_array():
+  nCoord = []
+  node_ids = cubit.get_entities("node")
+  for id in node_ids:
+    nCoord.append(cubit.get_nodal_coordinates(id))
+  return nCoord
+
+def get_hex_centroid(hex_id, global_node_coords):
+  hex_nodes = cubit.get_connectivity("hex", hex_id)
+  cx=cy=cz=0
+  count = 0
+  for node_id in hex_nodes:
+    cx += global_node_coords[node_id-1][0]
+    cy += global_node_coords[node_id-1][1]
+    cz += global_node_coords[node_id-1][2]
+    count += 1
+  cx = cx/count
+  cy = cy/count
+  cz = cz/count
+  return cx, cy, cz
+
+def vol_hexes_in_body(source_volume_id, target_body_id, block_id):
+  BODY = cubit.body(target_body_id)
+  vol_hexes = cubit.get_volume_hexes(source_volume_id)
+  block_hexes = []
+  nCoord = create_nodal_coordinates_array()
+  for hex_id in vol_hexes:
+    cx, cy, cz = get_hex_centroid(hex_id, nCoord)   
+    if BODY.point_containment([cx, cy, cz]):
+      block_hexes.append(hex_id)
+  cubit.silent_cmd(f"block {block_id} hex {list_to_str(block_hexes)}")
+
+## Script body
+boundary_cube(vid,0,10)
+
+for i in range(len(cube_vids)):
+ vol_hexes_in_body(cube_vids[i], vid, i+1)
+print("finished preparing layers")
+
+#!cubit
+draw hex all in block all
+#draw vol 1 add
