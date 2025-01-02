@@ -5,19 +5,18 @@ reset
 #import stl "/home/user/cubit/3d_print/Minotaur.stl" feature_angle 135.00 merge
 #import stl "/home/user/cubit/3d_print/Skull_Rose_-_Paintbrush_Holder-Serev3D.stl" feature_angle 135.00 merge
 #import stl "/home/user/cubit/3d_print/goku_w_base.stl" feature_angle 135.00 merge
-import acis "/home/user/cubit/3d_print/knuckle.sat" nofreesurfaces heal attributes_on  separate_bodies 
+#import acis "/home/user/cubit/3d_print/knuckle.sat" nofreesurfaces heal attributes_on  separate_bodies 
+#Volume 1  rotate 90 about x 
 
-Volume 1  rotate 90 about x 
-
-#create frustum height 80 radius 20 top 0
-#move volume 1 z -20
-#Volume 1  copy rotate 180 about x 
-#unite volume 1 2 
-#compress
+create frustum height 80 radius 20 top 0
+move volume 1 z -20
+Volume 1  copy rotate 180 about x 
+unite volume 1 2 
+compress
 
 #!python
-layers = 25
-mesh_size = 1
+layers = 50
+mesh_size = 2
 
 # volume id for imported stl
 vid = 1
@@ -119,16 +118,19 @@ cubit.silent_cmd(f"delete volume {list_to_str(cube_vids)}")
 block_ids = cubit.parse_cubit_list("block","all")
 for i in range(len(block_ids)-1):
  print(f"merge volumes in blocks {block_ids[i]} and {block_ids[i+1]}")
- status = cubit.silent_cmd(f"merge vol all in block {block_ids[i+1]} {block_ids[i]}")
+ status = cubit.cmd(f"merge surface all in vol all in block {block_ids[i+1]} {block_ids[i]}")
+
 for i in range(len(block_ids)):
  print(f"mesh volumes in block {block_ids[i]}") 
  status = cubit.silent_cmd(f"vol all in block {block_ids[i]} size {mesh_size}")
  status = cubit.silent_cmd(f"vol all in block {block_ids[i]} scheme map")
- status = cubit.silent_cmd(f"mesh vol all in block {block_ids[i]}")
-cubit.cmd(f"graphics on")
+ status = cubit.cmd(f"mesh vol all in block {block_ids[i]}")
 print("finished preparing layers")
+cubit.cmd(f"graphics on")
 
 #!cubit
 #draw vol all in block all
 draw block all
 #draw vol 1 add
+
+
