@@ -15,8 +15,8 @@ unite volume 1 2
 compress
 
 #!python
-layers = 50
-mesh_size = 2
+layers = 10
+mesh_size = 10
 
 # volume id for imported stl
 vid = 1
@@ -98,9 +98,35 @@ def create_vol_from_hexes():
     cubit.silent_cmd(f"create brick bounding box hex {block_hexes[i]} tight")
     new_vid = cubit.get_last_id('volume')
     cubit.silent_cmd(f"block {bid} add volume {new_vid}")
+    cubit.silent_cmd(f"block {bid} name 'layer_{bid}'")
    status = cubit.silent_cmd(f"block {bid} remove hex all")
    t1 = time.perf_counter()
    print(f"Time to create volumes for hexes in block {bid}: {t1 - t0} seconds")
+
+def create_sidesets_from_blocks():
+  block_ids = cubit.parse_cubit_list("block","all")
+  for bid in block_ids:
+   t0 = time.perf_counter()
+   block_volumes = cubit.parse_cubit_list("volume",f"all in block {bid}")
+   if len(block_volumes)>0:
+    bb_list = cubit.get_total_bounding_box("volume" , block_volumes)
+    #bottom
+    status = cubit.silent_cmd(f"sideset {cubit.get_sideset_count()+1} add surface all in volume all in block {bid} with z_coord={bb_list[6]}")
+    status = cubit.silent_cmd(f"sideset {cubit.get_sideset_count()} name 'layer_{bid}_bottom'")
+    #middle
+    block_surfaces = cubit.parse_cubit_list("surface",f"all in volume all in block {bid} with z_coord>{bb_list[6]} and z_coord<{bb_list[7]}")
+    block_surfaces_not_merged = []
+    for sid in block_surfaces:
+     if not cubit.is_merged("surface",sid):
+      block_surfaces_not_merged.append(sid)
+    status = cubit.silent_cmd(f"sideset {cubit.get_sideset_count()+1} add surface {list_to_str(block_surfaces_not_merged)}")
+    status = cubit.silent_cmd(f"sideset {cubit.get_sideset_count()} name 'layer_{bid}_middle'")
+    #bottom
+    status = cubit.silent_cmd(f"sideset {cubit.get_sideset_count()+1} add surface all in volume all in block {bid} with z_coord={bb_list[7]}")
+    status = cubit.silent_cmd(f"sideset {cubit.get_sideset_count()} name 'layer_{bid}_top'")
+   t1 = time.perf_counter()
+   print(f"Time to create sidesets for block {bid}: {t1 - t0} seconds")
+
 
 ## Script body
 boundary_cube(vid,mesh_size,layers)
@@ -126,11 +152,14 @@ for i in range(len(block_ids)):
  status = cubit.silent_cmd(f"vol all in block {block_ids[i]} scheme map")
  status = cubit.cmd(f"mesh vol all in block {block_ids[i]}")
 print("finished preparing layers")
+print("updating gui")
 cubit.cmd(f"graphics on")
+
+## creating sidesets for blocks
+create_sidesets_from_blocks()
 
 #!cubit
 #draw vol all in block all
 draw block all
 #draw vol 1 add
-
 
