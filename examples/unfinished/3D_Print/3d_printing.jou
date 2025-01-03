@@ -15,8 +15,8 @@ unite volume 1 2
 compress
 
 #!python
-layers = 10
-mesh_size = 10
+layers = 50
+mesh_size = 2.5
 
 # volume id for imported stl
 vid = 1
@@ -111,7 +111,7 @@ def create_sidesets_from_blocks():
    if len(block_volumes)>0:
     bb_list = cubit.get_total_bounding_box("volume" , block_volumes)
     #bottom
-    status = cubit.silent_cmd(f"sideset {cubit.get_sideset_count()+1} add surface all in volume all in block {bid} with z_coord={bb_list[6]}")
+    status = cubit.silent_cmd(f"sideset {cubit.get_sideset_count()+1} add surface all in volume all in block {bid} with z_coord>={bb_list[6]-1e-6} and z_coord<={bb_list[6]+1e-6}")
     status = cubit.silent_cmd(f"sideset {cubit.get_sideset_count()} name 'layer_{bid}_bottom'")
     #middle
     block_surfaces = cubit.parse_cubit_list("surface",f"all in volume all in block {bid} with z_coord>{bb_list[6]} and z_coord<{bb_list[7]}")
@@ -122,7 +122,7 @@ def create_sidesets_from_blocks():
     status = cubit.silent_cmd(f"sideset {cubit.get_sideset_count()+1} add surface {list_to_str(block_surfaces_not_merged)}")
     status = cubit.silent_cmd(f"sideset {cubit.get_sideset_count()} name 'layer_{bid}_middle'")
     #bottom
-    status = cubit.silent_cmd(f"sideset {cubit.get_sideset_count()+1} add surface all in volume all in block {bid} with z_coord={bb_list[7]}")
+    status = cubit.silent_cmd(f"sideset {cubit.get_sideset_count()+1} add surface all in volume all in block {bid} with z_coord>={bb_list[7]-1e-6} and z_coord<={bb_list[7]+1e-6}")
     status = cubit.silent_cmd(f"sideset {cubit.get_sideset_count()} name 'layer_{bid}_top'")
    t1 = time.perf_counter()
    print(f"Time to create sidesets for block {bid}: {t1 - t0} seconds")
@@ -163,3 +163,108 @@ create_sidesets_from_blocks()
 draw block all
 #draw vol 1 add
 
+#material
+create material "solid" property_group "CalculiX-FEA"
+modify material "solid" scalar_properties "CCX_ELASTIC_ISO_USE_CARD" 1
+modify material "solid" scalar_properties "CCX_PLASTIC_ISO_USE_CARD" 1
+modify material "solid" scalar_properties "CCX_DENSITY_USE_CARD" 1
+modify material "solid" matrix_property "CCX_DENSITY_DENSITY" 1.1 0
+modify material "solid" scalar_properties "CCX_SPECIFIC_HEAT_USE_CARD" 1
+modify material "solid" matrix_property "CCX_SPECIFIC_HEAT_SPECIFIC_HEAT" 2.13 0
+modify material "solid" scalar_properties "CCX_EXPANSION_ISO_USE_CARD" 1
+modify material "solid" scalar_properties "CCX_CONDUCTIVITY_USE_CARD" 1
+modify material "solid" scalar_properties "CCX_CONDUCTIVITY_ISO_USE_CARD" 1
+modify material "solid" matrix_property "CCX_CONDUCTIVITY_ISO_K_TEMPERATURE" 0.18 0
+modify material "solid" scalar_properties "CCX_ELASTIC_USE_CARD" 1
+modify material "solid" matrix_property "CCX_ELASTIC_ISO_MODULUS_VS_POISSON_VS_TEMPERATURE" 210000 0.3 0
+
+#section
+ccx create section solid block all material 1
+
+# field outputs
+ccx create fieldoutput name "fo_node" node
+ccx modify fieldoutput 1 node frequency 1
+ccx modify fieldoutput 1 node key_on NT
+ccx modify fieldoutput 1 node key_off CP U DEPF DEPT DTF HCRI KEQ MACH MAXU MF PNT POT PRF PS PSF PT PTF PU RF RFL SEN TS TSF TT TTF TURB V VF
+ccx create fieldoutput name "fo_element" element
+ccx modify fieldoutput 2 element frequency 1
+ccx modify fieldoutput 2 element key_on HFL
+ccx modify fieldoutput 2 element key_off CEEQ S E ECD EMFB EMFE ENER ERR HER HFLF MAXE MAXS ME PEEQ PHS SF SMID SNEG SPOS SVF SDV THE ZZS
+
+# initial conditions
+create temperature on volume all value 240
+ccx modify temperature 1 op new
+ccx create initialcondition temperature
+ccx modify initialcondition 1 temperature bc_id 1
+
+#!python
+block_ids = cubit.parse_cubit_list("block","all")
+for i in range(len(block_ids)):
+  status = cubit.cmd(f"ccx create film sideset {(i+1)*3-1} temperature 20 coefficient 0.025 name 'layer_{block_ids[i]}'")
+  status = cubit.cmd(f"create temperature on volume all in block {block_ids[i]} value 240")
+  status = cubit.cmd(f"ccx modify temperature {i+2} op new")
+
+#!python
+#create dummy steps
+status = cubit.cmd("ccx create step name 'dummy_step' heattransfer")
+status = cubit.cmd("ccx step 1 add fieldoutput 1 2")
+status = cubit.cmd("ccx step 1 add bc temperature 1")
+#status = cubit.cmd("ccx create step name 'add_layer_{block_ids[0]}' static")
+status = cubit.cmd("ccx create step name 'add_layer_1' heattransfer")
+status = cubit.cmd(f"ccx modify step 2 parameter inc 100000")  
+status = cubit.cmd(f"ccx modify step 2 heattransfer initialtimeincrement 10 timeperiodofstep 10 minimumtimeincrement 1e-5 maximumtimeincrement 10")
+status = cubit.cmd(f"ccx step 2 add bc temperature 2")
+status = cubit.cmd("ccx step 2 add fieldoutput 1 2")
+status = cubit.cmd("ccx create customline name 'step_2_top' after step_begin item_id 2 cline '*MODEL CHANGE,TYPE=ELEMENT,REMOVE'")
+block_ids = cubit.parse_cubit_list("block","all")
+for i in range(len(block_ids)):
+ if i > 0:
+  status = cubit.cmd(f"ccx create customline name 'remove_layer_{block_ids[i]}' after step_begin item_id 2 cline 'layer_{block_ids[i]}'")
+status = cubit.cmd(f"ccx create step name 'cool_layer_{block_ids[0]}' heattransfer")
+status = cubit.cmd(f"ccx modify step 3 parameter inc 100000")  
+status = cubit.cmd(f"ccx modify step 3 heattransfer initialtimeincrement 10 timeperiodofstep 20 minimumtimeincrement 1e-5 maximumtimeincrement 10")
+status = cubit.cmd(f"ccx step 3 add load film 1")
+status = cubit.cmd(f"ccx step 3 add fieldoutput 1 2")
+
+#create a step for every layer
+cs = 3
+for i in range(len(block_ids)):
+# if i > 0 and i < 2:
+ if i > 0:
+  cs = cs + 1
+  status = cubit.cmd(f"ccx create step name 'add_layer_{block_ids[i]}' heattransfer")
+  status = cubit.cmd(f"ccx modify step {cs} heattransfer initialtimeincrement 10 timeperiodofstep 10 minimumtimeincrement 1e-5 maximumtimeincrement 10")
+  status = cubit.cmd(f"ccx modify step {cs} parameter inc 100000")  
+  status = cubit.cmd(f"ccx step {cs} add load film {i+1}")
+  status = cubit.cmd(f"ccx step {cs} add bc temperature {i+2}")
+  status = cubit.cmd(f"ccx step {cs} add fieldoutput 1 2")
+  status = cubit.cmd(f"ccx create customline name 'step_{cs}_top' after step_begin item_id {cs} cline '*MODEL CHANGE,TYPE=ELEMENT,ADD'")
+  status = cubit.cmd(f"ccx create customline name 'add_layer_{block_ids[i]}' after step_begin item_id {cs} cline 'layer_{block_ids[i]}'")
+  cs = cs + 1
+  status = cubit.cmd(f"ccx create step name 'cool_layer_{block_ids[i]}' heattransfer")
+  status = cubit.cmd(f"ccx modify step {cs} parameter inc 100000")
+  if i == len(block_ids)-1:
+   status = cubit.cmd(f"ccx modify step {cs} heattransfer initialtimeincrement 10 timeperiodofstep 250 minimumtimeincrement 1e-5 maximumtimeincrement 10")
+   status = cubit.cmd(f"ccx create customline name 'remove_temp_bc' after step_begin item_id {cs} cline '*BOUNDARY,OP=NEW'")
+  else:
+   status = cubit.cmd(f"ccx modify step {cs} heattransfer initialtimeincrement 10 timeperiodofstep 20 minimumtimeincrement 1e-5 maximumtimeincrement 10")
+  status = cubit.cmd(f"ccx step {cs} add load film {i+1}")
+  status = cubit.cmd(f"ccx step {cs} add fieldoutput 1 2")
+
+cubit.cmd("ccx create job name 'model_change'")
+
+#!cubit
+delete volume 1
+ccx run job 1 no_conversion
+draw block all
+ccx wait job 1
+ccx result convert job 1 partial
+
+#!python
+print("ccx run job 1 no_conversion")
+command = ("ccx result convert job 1 block ")
+for bid in block_ids:
+ command = command + str(bid) + " "
+command = command + " partial"
+cubit.cmd(command)
+#!cubit
