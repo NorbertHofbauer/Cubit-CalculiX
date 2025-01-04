@@ -122,3 +122,6 @@
 2024-12-19 working on examples
 2024-12-20 updating readme and examples
 2024-12-20 implementing reading and linking of step and increment data from .dat
+######### ------  Release 2024.12
+
+2025-01-04 changing cubit version to 2025.1, sending silent commands needs to be updated, windows history bug is now fixed

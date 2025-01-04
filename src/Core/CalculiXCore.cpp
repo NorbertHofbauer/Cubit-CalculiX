@@ -140,21 +140,24 @@ CalculiXCore::~CalculiXCore()
 
 bool CalculiXCore::cmd(std::string cmd)
 {
-  #ifdef WIN32
-    CubitInterface::cmd(cmd.c_str());
-  #else
+  bool status = false;
+  //#ifdef WIN32
+  //  CubitInterface::cmd(cmd.c_str());
+  //#else
   // all commands send with CubitGuiUtil will get listed in the history
-    CubitGuiUtil::send_cubit_command(cmd.c_str());
-  #endif
-  
-  return true;
+  CubitGuiUtil::send_cubit_command(cmd.c_str());
+  //#endif
+  status = !CubitInterface::was_last_cmd_undoable();
+
+  return status;
 }
 
 bool CalculiXCore::silent_cmd(std::string cmd)
 {
-  CubitInterface::silent_cmd_without_running_journal_lines(cmd.c_str());
+  //CubitInterface::silent_cmd_without_running_journal_lines(cmd.c_str());
+  bool status = CubitInterface::silent_cmd(cmd.c_str());
   
-  return true;
+  return status;
 }
 
 std::string CalculiXCore::get_version()
