@@ -27,6 +27,7 @@ class CoreLoadsCentrifugal;
 class CoreLoadsTrajectory;
 class CoreLoadsFilm;
 class CoreLoadsRadiation;
+class CoreLoadsSurfaceTraction;
 class CoreBCsDisplacements;
 class CoreBCsTemperatures;
 class CoreHistoryOutputs;
@@ -427,6 +428,7 @@ public:
   CoreLoadsTrajectory *loadstrajectory;
   CoreLoadsFilm *loadsfilm;
   CoreLoadsRadiation *loadsradiation;
+  CoreLoadsSurfaceTraction *loadssurfacetraction;
   CoreBCsDisplacements *bcsdisplacements;
   CoreBCsTemperatures *bcstemperatures;
   CoreHistoryOutputs *historyoutputs;

@@ -1,0 +1,33 @@
+#!cubit
+reset
+create brick x 1
+split curve 12  fraction 0.2 from start 
+
+vol 1 size auto factor 10
+mesh vol 1
+
+block 1 add vol 1
+
+#sideset 1 add surface 5  
+sideset 1 add face 17
+sideset 1 name "top"
+#sideset 2 add surface 3  
+sideset 2 add face 11 
+sideset 2 name "bottom"
+
+ccx import materiallibrary name "EN_AW_5083_H111" groupname "Example Materials RSMITH/Aluminium" cubit_name "EN_AW_5083_H111"
+ccx create section solid block 1 material 1
+
+# surface traction hex 8
+
+#!python
+f1 = 1
+f2 = 2
+f3 = 3
+
+cubit.cmd(f"create force on node 2 force value {f1} direction 1 0 0")
+cubit.cmd(f"create force on node 2 force value {f2} direction 0 1 0")
+cubit.cmd(f"create force on node 2 force value {f3} direction 0 0 1")
+
+#!cubit
+export ccx "test.inp" overwrite
