@@ -143,6 +143,9 @@ public:
   bool create_loadsradiation(std::vector<std::string> options); // adds a new radiation load
   bool modify_loadsradiation(int radiation_id, std::vector<std::string> options, std::vector<int> options_marker); // modify a radiation
   bool delete_loadsradiation(int radiation_id); // delete radiation load
+  bool create_loadssurfacetraction(std::vector<std::string> options, std::vector<double> options2); // adds a new surfacetraction load
+  bool modify_loadssurfacetraction(int surfacetraction_id, std::vector<std::string> options, std::vector<double> options2, std::vector<int> options_marker); // modify a surface traction
+  bool delete_loadssurfacetraction(int surfacetraction_id); // delete surfacetraction load
   bool modify_bcsdisplacements(int displacement_id, std::vector<std::string> options, std::vector<int> options_marker); // modify a displacement
   bool modify_bcstemperatures(int displacement_id, std::vector<std::string> options, std::vector<int> options_marker); // modify a temperature
   bool create_historyoutput(std::vector<std::string> options); // adds a new output

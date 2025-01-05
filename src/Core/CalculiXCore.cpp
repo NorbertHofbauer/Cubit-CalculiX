@@ -277,8 +277,7 @@ bool CalculiXCore::init()
   
   loadsradiation->init();
 
-
-  if(!loadsradiation)
+  if(!loadssurfacetraction)
     loadssurfacetraction = new CoreLoadsSurfaceTraction;
   
   loadssurfacetraction->init();
@@ -3922,6 +3921,21 @@ bool CalculiXCore::delete_loadsradiation(int radiation_id)
 {
   return loadsradiation->delete_load(radiation_id);
 } 
+
+bool CalculiXCore::create_loadssurfacetraction(std::vector<std::string> options, std::vector<double> options2)
+{
+  return loadssurfacetraction->create_load(options, options2);
+}
+
+bool CalculiXCore::modify_loadssurfacetraction(int surfacetraction_id, std::vector<std::string> options, std::vector<double> options2, std::vector<int> options_marker)
+{
+  return loadssurfacetraction->modify_load(surfacetraction_id, options, options2, options_marker);
+}
+
+bool CalculiXCore::delete_loadssurfacetraction(int surfacetraction_id)
+{
+  return loadssurfacetraction->delete_load(surfacetraction_id);
+}  
 
 bool CalculiXCore::modify_bcsdisplacements(int displacement_id, std::vector<std::string> options, std::vector<int> options_marker)
 {

@@ -145,6 +145,12 @@ set(CMD_SRC
     ${CMAKE_CURRENT_LIST_DIR}/ccxLoadsRadiationModifyCommand.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ccxLoadsRadiationDeleteCommand.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ccxLoadsRadiationDeleteCommand.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/ccxLoadsSurfaceTractionCreateCommand.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/ccxLoadsSurfaceTractionCreateCommand.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/ccxLoadsSurfaceTractionModifyCommand.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/ccxLoadsSurfaceTractionModifyCommand.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/ccxLoadsSurfaceTractionDeleteCommand.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/ccxLoadsSurfaceTractionDeleteCommand.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ccxBCsDisplacementsModifyCommand.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ccxBCsDisplacementsModifyCommand.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ccxBCsTemperaturesModifyCommand.cpp

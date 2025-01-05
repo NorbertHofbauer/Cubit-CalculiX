@@ -613,7 +613,22 @@ bool CalculiXCoreInterface::modify_loadsradiation(int radiation_id, std::vector<
 bool CalculiXCoreInterface::delete_loadsradiation(int radiation_id)
 {
   return ccx_core.delete_loadsradiation(radiation_id);
-} 
+}
+
+bool CalculiXCoreInterface::create_loadssurfacetraction(std::vector<std::string> options, std::vector<double> options2)
+{
+  return ccx_core.create_loadssurfacetraction(options, options2);
+}
+
+bool CalculiXCoreInterface::modify_loadssurfacetraction(int surfacetraction_id, std::vector<std::string> options, std::vector<double> options2, std::vector<int> options_marker)
+{
+  return ccx_core.modify_loadssurfacetraction(surfacetraction_id, options, options2, options_marker);
+}
+
+bool CalculiXCoreInterface::delete_loadssurfacetraction(int surfacetraction_id)
+{
+  return ccx_core.delete_loadssurfacetraction(surfacetraction_id);
+}  
 
 bool CalculiXCoreInterface::modify_bcsdisplacements(int displacement_id, std::vector<std::string> options, std::vector<int> options_marker)
 {

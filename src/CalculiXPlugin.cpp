@@ -73,6 +73,9 @@
 #include "ccxLoadsRadiationCreateCommand.hpp"
 #include "ccxLoadsRadiationModifyCommand.hpp"
 #include "ccxLoadsRadiationDeleteCommand.hpp"
+#include "ccxLoadsSurfaceTractionCreateCommand.hpp"
+#include "ccxLoadsSurfaceTractionModifyCommand.hpp"
+#include "ccxLoadsSurfaceTractionDeleteCommand.hpp"
 #include "ccxBCsDisplacementsModifyCommand.hpp"
 #include "ccxBCsTemperaturesModifyCommand.hpp"
 #include "ccxHistoryOutputCreateCommand.hpp"
@@ -227,6 +230,9 @@ std::vector<std::string> CalculiXPlugin::get_keys()
   keys.push_back("ccxLoadsRadiationCreateCommand");
   keys.push_back("ccxLoadsRadiationModifyCommand");
   keys.push_back("ccxLoadsRadiationDeleteCommand");
+  keys.push_back("ccxLoadsSurfaceTractionCreateCommand");
+  keys.push_back("ccxLoadsSurfaceTractionModifyCommand");
+  keys.push_back("ccxLoadsSurfaceTractionDeleteCommand");
   keys.push_back("ccxBCsDisplacementsModifyCommand");
   keys.push_back("ccxBCsTemperaturesModifyCommand");
   keys.push_back("ccxHistoryOutputCreateCommand");
@@ -516,6 +522,15 @@ CubitCommand* CalculiXPlugin::create_command(const std::string &key)
 
   if(key == "ccxLoadsRadiationDeleteCommand")
     return new ccxLoadsRadiationDeleteCommand();
+
+  if(key == "ccxLoadsSurfaceTractionCreateCommand")
+    return new ccxLoadsSurfaceTractionCreateCommand();
+
+  if(key == "ccxLoadsSurfaceTractionModifyCommand")
+    return new ccxLoadsSurfaceTractionModifyCommand();
+
+  if(key == "ccxLoadsSurfaceTractionDeleteCommand")
+    return new ccxLoadsSurfaceTractionDeleteCommand();
     
   if(key == "ccxBCsDisplacementsModifyCommand")
     return new ccxBCsDisplacementsModifyCommand();
