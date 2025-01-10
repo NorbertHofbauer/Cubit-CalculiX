@@ -121,6 +121,7 @@ bool ccxLoadsSurfaceTractionCreateCommand::execute(CubitCommandData &data)
     PRINT_ERROR(output.c_str());
   }
   options.clear();
+  options2.clear();
     
   return true;
 }

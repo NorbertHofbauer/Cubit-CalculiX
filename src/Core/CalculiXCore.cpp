@@ -2320,7 +2320,7 @@ std::string CalculiXCore::autocleanup()
     {
       if (steps->loads_data[sub_data_ids[ii-1]][1]==9)
       {
-        if (!check_bc_exists(steps->loads_data[sub_data_ids[ii-1]][2],13))
+        if (!check_bc_exists(steps->loads_data[sub_data_ids[ii-1]][2],14))
         {
           log.append("Load Surface Traction ID " + std::to_string(steps->loads_data[sub_data_ids[ii-1]][2]) + " doesn't exist.\n");
           log.append("Load Surface Traction Reference from Step ID " + std::to_string(steps->steps_data[i-1][0]) + " will be deleted.\n");
@@ -3238,6 +3238,12 @@ bool CalculiXCore::check_bc_exists(int bc_id,int BCType)
     for (size_t i = 0; i < loadsradiation->loads_data.size(); i++)
     {
       ids.push_back(loadsradiation->loads_data[i][0]);
+    }
+  }else if (BCType == 14) // Surface Traction
+  {
+    for (size_t i = 0; i < loadssurfacetraction->loads_data.size(); i++)
+    {
+      ids.push_back(loadssurfacetraction->loads_data[i][0]);
     }
   }
   
@@ -7895,6 +7901,34 @@ std::string CalculiXCore::get_step_export_data() // gets the export data from co
 
           // CUSTOMLINE START
           customline = customlines->get_customline_data("AFTER","RADIATION",steps->loads_data[sub_data_ids[iii]][2]);
+          for (size_t icl = 0; icl < customline.size(); icl++)
+          {
+            steps_export_list.push_back(customline[icl]);
+          }
+          // CUSTOMLINE END
+        }
+      }
+    }
+    // SURFACE TRACTION
+    for (size_t ii = 0; ii < loadssurfacetraction->loads_data.size(); ii++)
+    {  
+      for (size_t iii = 0; iii < sub_data_ids.size(); iii++)
+      { 
+        if ((steps->loads_data[sub_data_ids[iii]][1]==9) && (steps->loads_data[sub_data_ids[iii]][2]==loadssurfacetraction->loads_data[ii][0]))
+        {
+          // CUSTOMLINE START
+          customline = customlines->get_customline_data("BEFORE","SURFACETRACTION",steps->loads_data[sub_data_ids[iii]][2]);
+          for (size_t icl = 0; icl < customline.size(); icl++)
+          {
+            steps_export_list.push_back(customline[icl]);
+          }
+          // CUSTOMLINE END
+
+          str_temp = loadssurfacetraction->get_load_export(steps->loads_data[sub_data_ids[iii]][2]);
+          steps_export_list.push_back(str_temp);
+
+          // CUSTOMLINE START
+          customline = customlines->get_customline_data("AFTER","SURFACETRACTION",steps->loads_data[sub_data_ids[iii]][2]);
           for (size_t icl = 0; icl < customline.size(); icl++)
           {
             steps_export_list.push_back(customline[icl]);

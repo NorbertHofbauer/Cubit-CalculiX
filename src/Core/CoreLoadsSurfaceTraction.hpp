@@ -53,8 +53,12 @@ public:
   int  get_time_delay_data_id_from_time_delay_id(int time_delay_id); // searches for the time_delay_id in the time_delay_data and returns the indices or -1 if it fails
   int  get_force_data_id_from_force_id(int force_id); // searches for the force_id in the force_data and returns the indices or -1 if it fails
   int  get_name_data_id_from_name_id(int name_id); // searches for the name_id in the name_data and returns the indices or -1 if it fails
+  std::vector<double> calc_consistent_load(std::vector<int> connectivity, double load);
   std::string get_load_export(int load_id); // gets the optional parameters for the export
   std::string print_data(); // prints out the loads_data
+  
+  template <typename T>  std::vector<std::size_t> sort_permutation(const std::vector<T>& vec);
+  template <typename T> void apply_permutation(std::vector<T>& vec,const std::vector<std::size_t>& p);
 
   CalculiXCoreInterface *ccx_iface;
 };

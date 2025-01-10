@@ -158,6 +158,7 @@ void CustomLinesCreatePanel::on_comboBox_index_changed(int index)
     comboBox_3->addItem("centrifugal");
     comboBox_3->addItem("film");
     comboBox_3->addItem("radiation");
+    comboBox_3->addItem("surfacetraction");
     comboBox_3->addItem("displacement");
     comboBox_3->addItem("temperature");
     comboBox_3->addItem("historyoutput");
