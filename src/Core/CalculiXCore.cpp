@@ -3601,14 +3601,14 @@ bool CalculiXCore::delete_section(int section_id)
   return sections->delete_section(section_id);
 }
 
-bool CalculiXCore::create_constraint(std::string constraint_type, std::vector<std::string> options)
+bool CalculiXCore::create_constraint(std::string constraint_type, std::vector<std::string> options,std::vector<double> options2)
 {
-  return constraints->create_constraint(constraint_type, options);
+  return constraints->create_constraint(constraint_type, options,options2);
 }
 
-bool CalculiXCore::modify_constraint(std::string constraint_type,int constraint_id, std::vector<std::string> options, std::vector<int> options_marker)
+bool CalculiXCore::modify_constraint(std::string constraint_type,int constraint_id, std::vector<std::string> options, std::vector<int> options_marker,std::vector<double> options2)
 {
-  return constraints->modify_constraint(constraint_type, constraint_id, options, options_marker);
+  return constraints->modify_constraint(constraint_type, constraint_id, options, options_marker,options2);
 }
 
 bool CalculiXCore::delete_constraint(int constraint_id)
@@ -3619,6 +3619,7 @@ bool CalculiXCore::delete_constraint(int constraint_id)
 bool CalculiXCore::create_constraint_tie_from_cubitcontactpair(std::string name, std::string position_tolerance) // create constraint tie from cubit contact pairs
 {
   std::vector<std::string> options;
+  std::vector<double> options2;
 
   std::vector<int> contact_ids;
   contact_ids = CubitInterface::get_bc_id_list(CI_BCTYPE_CONTACT_PAIR);
@@ -3654,7 +3655,7 @@ bool CalculiXCore::create_constraint_tie_from_cubitcontactpair(std::string name,
     options.push_back(std::to_string(slave_id));
     options.push_back(position_tolerance);
 
-    this->create_constraint("TIE", options);
+    this->create_constraint("TIE", options,options2);
     options.clear();
   } 
   

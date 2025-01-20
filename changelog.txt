@@ -127,4 +127,5 @@
 2025-01-04 changing cubit version to 2025.1, sending silent commands needs to be updated, windows history bug is now fixed
 2025-01-05 working on implementing surface traction load
 2025-01-09 working on implementing surface traction load
-2025-01-09 working on surface traction load
+2025-01-09 working on surface traction load in core
+2025-01-20 working on adding equations to constraints in core

@@ -30,7 +30,9 @@ bool CoreConstraints::reset()
   constraints_data.clear();
   rigidbody_constraint_data.clear();
   tie_constraint_data.clear();
-  
+  equation_constraint_data.clear();
+  equation_data.clear();
+
   init();
   return true;
 }
@@ -40,7 +42,7 @@ bool CoreConstraints::check_initialized()
   return is_initialized;
 }
 
-bool CoreConstraints::create_constraint(std::string constraint_type, std::vector<std::string> options)
+bool CoreConstraints::create_constraint(std::string constraint_type, std::vector<std::string> options, std::vector<double> options2)
 {
   int constraint_id;
   int constraint_type_value;
@@ -90,7 +92,7 @@ bool CoreConstraints::create_constraint(std::string constraint_type, std::vector
   return true;
 }
 
-bool CoreConstraints::modify_constraint(std::string constraint_type,int constraint_id, std::vector<std::string> options, std::vector<int> options_marker)
+bool CoreConstraints::modify_constraint(std::string constraint_type,int constraint_id, std::vector<std::string> options, std::vector<int> options_marker,std::vector<double> options2)
 {
   int constraint_type_value;
   if (constraint_type=="RIGIDBODY")
@@ -162,6 +164,15 @@ bool CoreConstraints::add_tie_constraint(std::string tie_constraint_id, std::str
   return true;
 }
 
+bool CoreConstraints::add_equation_constraint(std::string equation_constraint_id, std::string name)
+{
+  std::vector<std::string> v = {equation_constraint_id,name};
+      
+  equation_constraint_data.push_back(v);
+
+  return true;
+}
+
 bool CoreConstraints::delete_constraint(int constraint_id)
 {
   int sub_constraint_data_id;
@@ -218,6 +229,19 @@ int CoreConstraints::get_tie_constraint_data_id_from_tie_constraint_id(int tie_c
     if (tie_constraint_data[i][0]==std::to_string(tie_constraint_id))
     {
         return_int = int(i);
+    }  
+  }
+  return return_int;
+}
+
+int CoreConstraints::get_equation_constraint_data_id_from_equation_constraint_id(int equation_constraint_id)
+{ 
+  int return_int = -1;
+  for (size_t i = 0; i < equation_constraint_data.size(); i++)
+  {
+    if (equation_constraint_data[i][0]==std::to_string(equation_constraint_id))
+    {
+      return_int = int(i);
     }  
   }
   return return_int;
@@ -352,5 +376,21 @@ std::string CoreConstraints::print_data()
     str_return.append(tie_constraint_data[i][0] + " " + tie_constraint_data[i][1] + " " + tie_constraint_data[i][2] + " " + tie_constraint_data[i][3] + " " + tie_constraint_data[i][4] + " \n");
   }
   
+  str_return.append("\n CoreConstraints equation_constraint_data: \n");
+  str_return.append("equation_constraint_id,name\n");
+
+  for (size_t i = 0; i < equation_constraint_data.size(); i++)
+  {
+    str_return.append(equation_constraint_data[i][0] + " " + equation_constraint_data[i][1] + " \n");
+  }
+
+  str_return.append("\n CoreConstraints equation_data: \n");
+  str_return.append("equation_constraint_id,node_id,dof,coefficient\n");
+
+  for (size_t i = 0; i < equation_data.size(); i++)
+  {
+    str_return.append(std::to_string(equation_data[i][0]) + " " + std::to_string(equation_data[i][1]) + " " + std::to_string(equation_data[i][2]) + " " + std::to_string(equation_data[i][3]) + " \n");
+  }
+
   return str_return;
 }

@@ -375,14 +375,14 @@ bool CalculiXCoreInterface::delete_section(int section_id)
   return ccx_core.delete_section(section_id);
 }
 
-bool CalculiXCoreInterface::create_constraint(std::string constraint_type, std::vector<std::string> options)
+bool CalculiXCoreInterface::create_constraint(std::string constraint_type, std::vector<std::string> options,std::vector<double> options2)
 {
-  return ccx_core.create_constraint(constraint_type,options);
+  return ccx_core.create_constraint(constraint_type,options, options2);
 }
 
-bool CalculiXCoreInterface::modify_constraint(std::string constraint_type,int constraint_id, std::vector<std::string> options, std::vector<int> options_marker)
+bool CalculiXCoreInterface::modify_constraint(std::string constraint_type,int constraint_id, std::vector<std::string> options, std::vector<int> options_marker,std::vector<double> options2)
 {
-  return ccx_core.modify_constraint(constraint_type,constraint_id,options, options_marker);
+  return ccx_core.modify_constraint(constraint_type,constraint_id,options, options_marker,options2);
 }
 
 bool CalculiXCoreInterface::delete_constraint(int constraint_id)
