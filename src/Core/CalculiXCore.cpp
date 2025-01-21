@@ -3601,12 +3601,12 @@ bool CalculiXCore::delete_section(int section_id)
   return sections->delete_section(section_id);
 }
 
-bool CalculiXCore::create_constraint(std::string constraint_type, std::vector<std::string> options,std::vector<double> options2)
+bool CalculiXCore::create_constraint(std::string constraint_type, std::vector<std::string> options,std::vector<std::vector<double>> options2)
 {
   return constraints->create_constraint(constraint_type, options,options2);
 }
 
-bool CalculiXCore::modify_constraint(std::string constraint_type,int constraint_id, std::vector<std::string> options, std::vector<int> options_marker,std::vector<double> options2)
+bool CalculiXCore::modify_constraint(std::string constraint_type,int constraint_id, std::vector<std::string> options, std::vector<int> options_marker,std::vector<std::vector<double>> options2)
 {
   return constraints->modify_constraint(constraint_type, constraint_id, options, options_marker,options2);
 }
@@ -3619,7 +3619,7 @@ bool CalculiXCore::delete_constraint(int constraint_id)
 bool CalculiXCore::create_constraint_tie_from_cubitcontactpair(std::string name, std::string position_tolerance) // create constraint tie from cubit contact pairs
 {
   std::vector<std::string> options;
-  std::vector<double> options2;
+  std::vector<std::vector<double>> options2;
 
   std::vector<int> contact_ids;
   contact_ids = CubitInterface::get_bc_id_list(CI_BCTYPE_CONTACT_PAIR);
@@ -4945,6 +4945,7 @@ std::vector<std::vector<std::string>> CalculiXCore::get_entities(std::string ent
   std::vector<std::vector<std::string>> entities;
   int data_id = -1;
   int sub_data_id = -1;
+  std::vector<int> sub_data_ids;
 
   if (entity=="block")
   {
@@ -5039,6 +5040,14 @@ std::vector<std::vector<std::string>> CalculiXCore::get_entities(std::string ent
         sub_data_id = constraints->get_tie_constraint_data_id_from_tie_constraint_id(constraints->constraints_data[data_id][2]);
         entities.push_back({"sideset",constraints->tie_constraint_data[sub_data_id][2]});
         entities.push_back({"sideset",constraints->tie_constraint_data[sub_data_id][3]});
+      }else if (constraints->constraints_data[data_id][1] == 3)
+      {
+        //sub_data_id = constraints->get_equation_constraint_data_id_from_equation_constraint_id(constraints->constraints_data[data_id][2]);
+        sub_data_ids = constraints->get_equation_data_ids_from_equation_constraint_id(constraints->constraints_data[data_id][2]);
+        for (size_t i = 0; i < sub_data_ids.size(); i++)
+        {
+          entities.push_back({"node",std::to_string(int(constraints->equation_data[sub_data_ids[i]][1]))});
+        }
       }
     }
   }else if (entity=="surfaceinteraction")
@@ -8327,6 +8336,11 @@ std::vector<std::vector<std::string>> CalculiXCore::get_constraints_tree_data()
       sub_constraint_data_id = constraints->get_tie_constraint_data_id_from_tie_constraint_id(constraints->constraints_data[i][2]);
       
       constraint_name = "TIE (" + constraints->tie_constraint_data[sub_constraint_data_id][1] + ")";
+    } else if (constraints->constraints_data[i][1] == 3)
+    {
+      sub_constraint_data_id = constraints->get_equation_constraint_data_id_from_equation_constraint_id(constraints->constraints_data[i][2]);
+      
+      constraint_name = "EQUATION (" + constraints->equation_constraint_data[sub_constraint_data_id][1] + ")";
     }
     
     constraints_tree_data_set.push_back(std::to_string(constraints->constraints_data[i][0])); //constraint_id

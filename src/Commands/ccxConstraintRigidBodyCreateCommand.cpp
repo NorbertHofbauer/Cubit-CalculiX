@@ -82,7 +82,7 @@ bool ccxConstraintRigidBodyCreateCommand::execute(CubitCommandData &data)
   std::string output;
 
   std::vector<std::string> options;
-  std::vector<double> options2;
+  std::vector<std::vector<double>> options2;
   int ref_vertex_value;
   int rot_vertex_value;
   std::string ref_vertex;

@@ -146,8 +146,8 @@ public:
   bool create_section(std::string section_type,int block_id, int material_id, std::vector<std::string> options); // adds a new section
   bool modify_section(std::string section_type,int section_id, std::vector<std::string> options, std::vector<int> options_marker); // modify a section
   bool delete_section(int section_id); // adds a new section
-  bool create_constraint(std::string constraint_type, std::vector<std::string> options,std::vector<double> options2); // adds a new constraint
-  bool modify_constraint(std::string constraint_type,int constraint_id, std::vector<std::string> options, std::vector<int> options_marker,std::vector<double> options2); // modify a constraint
+  bool create_constraint(std::string constraint_type, std::vector<std::string> options,std::vector<std::vector<double>> options2); // adds a new constraint
+  bool modify_constraint(std::string constraint_type,int constraint_id, std::vector<std::string> options, std::vector<int> options_marker,std::vector<std::vector<double>> options2); // modify a constraint
   bool delete_constraint(int constraint_id); // adds a new constraint
   bool create_constraint_tie_from_cubitcontactpair(std::string name, std::string position_tolerance); // create constraint tie from cubit contact pairs
   std::vector<int> get_rigidbody_vertex_list(); // get list of rigid body vertices

@@ -129,3 +129,4 @@
 2025-01-09 working on implementing surface traction load
 2025-01-09 working on surface traction load in core
 2025-01-20 working on adding equations to constraints in core
+2025-01-21 working on equations

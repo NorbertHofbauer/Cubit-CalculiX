@@ -55,17 +55,19 @@ public:
   bool update(); // check for changes of the constraints
   bool reset(); // delete all data and initialize afterwards
   bool check_initialized(); // check if object is initialized
-  bool create_constraint(std::string constraint_type, std::vector<std::string> options, std::vector<double> options2); // adds new constraint
-  bool modify_constraint(std::string constraint_type, int constraint_id, std::vector<std::string> options, std::vector<int> options_marker, std::vector<double> options2); // modify a constraint
+  bool create_constraint(std::string constraint_type, std::vector<std::string> options, std::vector<std::vector<double>> options2); // adds new constraint
+  bool modify_constraint(std::string constraint_type, int constraint_id, std::vector<std::string> options, std::vector<int> options_marker, std::vector<std::vector<double>> options2); // modify a constraint
   bool delete_constraint(int constraint_id); // deletes constraint from constraints_data
   bool add_constraint(int constraint_id, int constraint_type, int constraint_type_id); // adds new constraint to constraints_data
   bool add_rigidbody_constraint(std::string rigid_body_constraint_id, std::string entity_type, std::string type_id,std::string vertex_ref,std::string vertex_rot); // adds new rigid_body to rigidbody_constraint_data
   bool add_tie_constraint(std::string tie_constraint_id, std::string name, std::string master,std::string slave,std::string position_tolerance); // adds new tie to tie_constraint_data
   bool add_equation_constraint(std::string equation_constraint_id, std::string name); // adds new equation to equation_constraint_data
+  bool add_equation(double equation_constraint_id, double node_id, double dof, double coefficient); // adds new equation to equation_data
   int  get_constraints_data_id_from_constraint_id(int constraint_id); // searches for the constraint_id in the constraints_data and returns the indices or -1 if it fails
   int  get_rigidbody_constraint_data_id_from_rigidbody_constraint_id(int rigidbody_constraint_id); // searches for the rigidbody_constraint_id in the rigidbody_constraint_data and returns the indices or -1 if it fails
   int  get_tie_constraint_data_id_from_tie_constraint_id(int tie_constraint_id); // searches for the tie_constraint_id in the tie_constraint_data and returns the indices or -1 if it fails
   int  get_equation_constraint_data_id_from_equation_constraint_id(int equation_constraint_id); // searches for the equation_constraint_id in the equation_constraint_data and returns the indices or -1 if it fails
+  std::vector<int> get_equation_data_ids_from_equation_constraint_id(int equation_constraint_id); // searches for the equation_data_ids in the equation_data and returns a vector with the indices or an empty vector if it fails
   int  get_node_id_from_vertex_id(int vertex_id); // get node_id for the vertex_id  and returns -1 if it fails
   std::string get_constraint_export(); // get CalculiX constraint exports
   std::vector<int> get_rigidbody_vertex_list(); // get list of rigid body vertices

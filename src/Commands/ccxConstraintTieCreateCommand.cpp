@@ -48,7 +48,7 @@ bool ccxConstraintTieCreateCommand::execute(CubitCommandData &data)
 
   std::string name;
   std::vector<std::string> options;
-  std::vector<double> options2;
+  std::vector<std::vector<double>> options2;
   double position_tolerance_value;
   std::string position_tolerance;
   int master_value;

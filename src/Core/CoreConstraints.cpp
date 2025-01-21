@@ -42,7 +42,7 @@ bool CoreConstraints::check_initialized()
   return is_initialized;
 }
 
-bool CoreConstraints::create_constraint(std::string constraint_type, std::vector<std::string> options, std::vector<double> options2)
+bool CoreConstraints::create_constraint(std::string constraint_type, std::vector<std::string> options, std::vector<std::vector<double>> options2)
 {
   int constraint_id;
   int constraint_type_value;
@@ -76,6 +76,23 @@ bool CoreConstraints::create_constraint(std::string constraint_type, std::vector
     }
     constraint_type_value = 2;
     this->add_tie_constraint(std::to_string(sub_constraint_id), options[0], options[1], options[2], options[3]);
+  } else if (constraint_type=="EQUATION")
+  {
+    if (equation_constraint_data.size()==0)
+    {
+      sub_constraint_id = 1;
+    }
+    else
+    {
+      sub_constraint_last = int(equation_constraint_data.size()) - 1;
+      sub_constraint_id = std::stoi(equation_constraint_data[sub_constraint_last][0]) + 1;
+    }
+    constraint_type_value = 3;
+    this->add_equation_constraint(std::to_string(sub_constraint_id), options[0]);
+    for (size_t i = 0; i < options2.size(); i++)
+    {
+      this->add_equation(double(sub_constraint_id), options2[i][0], options2[i][1], options2[i][2]);
+    }
   }
 
   if (constraints_data.size()==0)
@@ -92,7 +109,7 @@ bool CoreConstraints::create_constraint(std::string constraint_type, std::vector
   return true;
 }
 
-bool CoreConstraints::modify_constraint(std::string constraint_type,int constraint_id, std::vector<std::string> options, std::vector<int> options_marker,std::vector<double> options2)
+bool CoreConstraints::modify_constraint(std::string constraint_type,int constraint_id, std::vector<std::string> options, std::vector<int> options_marker,std::vector<std::vector<double>> options2)
 {
   int constraint_type_value;
   if (constraint_type=="RIGIDBODY")
@@ -101,11 +118,15 @@ bool CoreConstraints::modify_constraint(std::string constraint_type,int constrai
   }else if (constraint_type=="TIE")
   {
     constraint_type_value = 2;
+  }else if (constraint_type=="EQUATION")
+  {
+    constraint_type_value = 3;
   }
 
   int sub_constraint_data_id;
   int constraints_data_id = get_constraints_data_id_from_constraint_id(constraint_id);
-  
+  std::vector<int> sub_data_ids;
+
   if (constraints_data_id == -1)
   {
     return false;
@@ -130,6 +151,44 @@ bool CoreConstraints::modify_constraint(std::string constraint_type,int constrai
         if (options_marker[i]==1)
         {
           tie_constraint_data[sub_constraint_data_id][i+1] = options[i];
+        }
+      }
+    }
+    else if ((constraints_data[constraints_data_id][1]==3) && (constraints_data[constraints_data_id][1]==constraint_type_value))
+    {
+      sub_constraint_data_id = get_equation_constraint_data_id_from_equation_constraint_id(constraints_data[constraints_data_id][2]);
+
+      for (size_t i = 0; i < options.size(); i++)
+      {
+        if (options_marker[i]==1)
+        {
+          equation_constraint_data[sub_constraint_data_id][i+1] = options[i];
+        }
+      }
+      sub_data_ids = get_equation_data_ids_from_equation_constraint_id(std::stoi(equation_constraint_data[sub_constraint_data_id][0]));
+      if (options2.size()!=0)
+      {
+        if (options2.size()==sub_data_ids.size())
+        {
+          for (size_t i = 0; i < options2.size(); i++)
+          {
+            equation_data[sub_data_ids[i]][0] = std::stod(equation_constraint_data[sub_constraint_data_id][0]);
+            equation_data[sub_data_ids[i]][1] = options2[i][0];
+            equation_data[sub_data_ids[i]][2] = options2[i][1];
+            equation_data[sub_data_ids[i]][2] = options2[i][2];
+          }
+        }else{
+          // first delete and then make a push back
+          // delete from back to begin so that we don't have to care about mismatching id's
+          for (size_t i = sub_data_ids.size(); i > 0; i--)
+          {
+            equation_data.erase(equation_data.begin() + sub_data_ids[i-1]);
+          }
+          
+          for (size_t i = 0; i < options2.size(); i++)
+          {
+            add_equation(std::stod(equation_constraint_data[sub_constraint_data_id][0]),options2[i][0],options2[i][1],options2[i][2]);
+          }
         }
       }
     }
@@ -173,9 +232,19 @@ bool CoreConstraints::add_equation_constraint(std::string equation_constraint_id
   return true;
 }
 
+bool CoreConstraints::add_equation(double equation_constraint_id, double node_id, double dof, double coefficient)
+{
+  std::vector<double> v = {equation_constraint_id,node_id,dof,coefficient};
+      
+  equation_data.push_back(v);
+
+  return true;
+}
+
 bool CoreConstraints::delete_constraint(int constraint_id)
 {
   int sub_constraint_data_id;
+  std::vector<int> sub_data_ids;
   int constraints_data_id = get_constraints_data_id_from_constraint_id(constraint_id);
   if (constraints_data_id == -1)
   {
@@ -189,6 +258,15 @@ bool CoreConstraints::delete_constraint(int constraint_id)
     {
       sub_constraint_data_id = get_tie_constraint_data_id_from_tie_constraint_id(constraints_data[constraints_data_id][2]);
       tie_constraint_data.erase(tie_constraint_data.begin() + sub_constraint_data_id);  
+    }else if (constraints_data[constraints_data_id][1]==3)
+    {
+      sub_data_ids = get_equation_data_ids_from_equation_constraint_id(constraints_data[constraints_data_id][2]);
+      for (size_t i = sub_data_ids.size(); i > 0; i--)
+      {
+        equation_data.erase(equation_data.begin() + sub_data_ids[i-1]);
+      }
+      sub_constraint_data_id = get_equation_constraint_data_id_from_equation_constraint_id(constraints_data[constraints_data_id][2]);
+      equation_constraint_data.erase(equation_constraint_data.begin() + sub_constraint_data_id);  
     }
     constraints_data.erase(constraints_data.begin() + constraints_data_id);
     return true;
@@ -242,6 +320,19 @@ int CoreConstraints::get_equation_constraint_data_id_from_equation_constraint_id
     if (equation_constraint_data[i][0]==std::to_string(equation_constraint_id))
     {
       return_int = int(i);
+    }  
+  }
+  return return_int;
+}
+
+std::vector<int> CoreConstraints::get_equation_data_ids_from_equation_constraint_id(int equation_constraint_id)
+{ 
+  std::vector<int> return_int;
+  for (size_t i = 0; i < equation_data.size(); i++)
+  {
+    if (equation_data[i][0]==double(equation_constraint_id))
+    {
+      return_int.push_back(int(i));
     }  
   }
   return return_int;
@@ -315,6 +406,45 @@ std::string CoreConstraints::get_constraint_export() // get a list of the Calcul
       str_temp.append(ccx_iface->get_sideset_name(std::stoi(tie_constraint_data[sub_constraint_data_id][2])));
       str_temp.append(",");
       str_temp.append(ccx_iface->get_sideset_name(std::stoi(tie_constraint_data[sub_constraint_data_id][3])));
+      constraints_export_list.push_back(str_temp);
+    }
+    // EQUATION
+    if (constraints_data[i][1] == 3) 
+    {
+      sub_constraint_data_id = get_equation_constraint_data_id_from_equation_constraint_id(constraints_data[i][2]);
+      
+      str_temp = "*EQUATION";
+      constraints_export_list.push_back(str_temp);
+      
+      std::vector<int> sub_data_ids = get_equation_data_ids_from_equation_constraint_id(constraints_data[i][2]);
+      
+      // number of terms
+      str_temp = std::to_string(sub_data_ids.size());
+      constraints_export_list.push_back(str_temp);
+      
+      // equations
+      int counter = 0;
+      str_temp = "";
+      for (size_t i = 0; i < sub_data_ids.size(); i++)
+      {
+        counter = counter + 1;
+      
+        str_temp.append(std::to_string(int(equation_data[sub_data_ids[i]][1])));
+        str_temp.append(",");
+        str_temp.append(std::to_string(int(equation_data[sub_data_ids[i]][2])));
+        str_temp.append(",");
+        str_temp.append(ccx_iface->to_string_scientific(equation_data[sub_data_ids[i]][3]));
+        if (counter == 4)
+        {
+          str_temp.append("\n");
+          counter = 0;
+        }else{
+          if (i != sub_data_ids.size()-1)
+          {
+            str_temp.append(",");
+          }
+        }
+      }
       constraints_export_list.push_back(str_temp);
     }
     // CUSTOMLINE START
