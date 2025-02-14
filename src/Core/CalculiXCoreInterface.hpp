@@ -57,9 +57,11 @@ public:
   std::vector<int> get_loadstrajectory_ids(); // get all load trajectory ids
   std::vector<int> get_loadsfilm_ids(); // get all load film ids
   std::vector<int> get_loadsradiation_ids(); // get all load radiation ids
+  std::vector<int> get_loadssurfacetraction_ids(); // get all load surface traction ids
   std::vector<int> get_bcsdisplacements_ids(); // get all bc displacement ids
   std::vector<int> get_bcstemperatures_ids(); // get all bc temperature ids
   std::vector<int> get_orientations_ids(); // get all orientation ids
+  std::vector<int> get_equation_ids(); // get all equation ids
   bool check_block_exists(int block_id);
   bool check_nodeset_exists(int nodeset_id);
   bool check_sideset_exists(int sideset_id);
@@ -227,10 +229,12 @@ public:
   std::vector<std::vector<double>> get_draw_data_for_load_centrifugal(int id); // returns coord(3) and magnitude(3) std::vector<double>
   std::vector<std::vector<double>> get_draw_data_for_load_film(int id); // returns coord(3) and magnitude(3) std::vector<double>
   std::vector<std::vector<double>> get_draw_data_for_load_radiation(int id); // returns coord(3) and magnitude(3) std::vector<double>
+  std::vector<std::vector<double>> get_draw_data_for_load_surface_traction(int id); // returns coord(3) and magnitude(3) std::vector<double>
   std::vector<std::vector<double>> get_draw_data_for_bc_displacement(int id); // returns coord(3) and dof
   std::vector<std::vector<double>> get_draw_data_for_bc_temperature(int id); // returns coord(3) and dof
   std::vector<std::vector<double>> get_draw_data_for_orientation(int id); // returns pairs of 4 for {system_type,local_axis_angle}, coord(3) of section center, a_coord(3) ,b_coord(3)
-  bool draw_all(double size); // draw all loads,bcs,orientations
+  std::vector<std::vector<double>> get_draw_data_for_equation(int id); // returns coord(3) and dof
+  bool draw_all(double size); // draw all loads,bcs,orientations,equations
   bool draw_load_force(std::vector<int> force_ids,double size); // draw load force
   bool draw_load_pressure(std::vector<int> pressure_ids,double size); // draw load pressure
   bool draw_load_heatflux(std::vector<int> heatflux_ids,double size); // draw load heatflux
@@ -239,12 +243,15 @@ public:
   bool draw_load_trajectory(std::vector<int> trajectory_ids,double size); // draw load trajectory
   bool draw_load_film(std::vector<int> film_ids,double size); // draw load film
   bool draw_load_radiation(std::vector<int> radiation_ids,double size); // draw load radiation
+  bool draw_load_surface_traction(std::vector<int> surface_traction_ids,double size); // draw load surface traction
   bool draw_bc_displacement(std::vector<int> displacement_ids,double size); // draw bc displacement
   bool draw_bc_temperature(std::vector<int> temperature_ids,double size); // draw bc temperature
   bool draw_orientation(std::vector<int> orientation_ids,double size); // draw orientation
+  bool draw_equation(std::vector<int> equation_ids,double size); // draw equation
   bool draw_loads(double size); // draw all loads
   bool draw_bcs(double size); // draw all bcs
   bool draw_orientations(double size); // draw all orientations
+  bool draw_equations(double size); // draw all equations
   bool draw_load_forces(double size); //draw all forces
   bool draw_load_pressures(double size); //draw all pressures
   bool draw_load_heatfluxes(double size); //draw all heatfluxes
@@ -253,6 +260,7 @@ public:
   bool draw_load_trajectories(double size); //draw all trajectories
   bool draw_load_films(double size); //draw all films
   bool draw_load_radiations(double size); //draw all radiations
+  bool draw_load_surface_tractions(double size); //draw all surface tractions
   bool draw_bc_displacements(double size); //draw all displacements
   bool draw_bc_temperatures(double size); //draw all temperatures
 
@@ -336,6 +344,7 @@ public:
   std::vector<std::vector<std::string>> get_steps_loadstrajectory_tree_data(int step_id); // gets the data from core to build the tree
   std::vector<std::vector<std::string>> get_steps_loadsfilm_tree_data(int step_id); // gets the data from core to build the tree
   std::vector<std::vector<std::string>> get_steps_loadsradiation_tree_data(int step_id); // gets the data from core to build the tree
+  std::vector<std::vector<std::string>> get_steps_loadssurfacetraction_tree_data(int step_id); // gets the data from core to build the tree
   std::vector<std::vector<std::string>> get_steps_bcsdisplacements_tree_data(int step_id); // gets the data from core to build the tree
   std::vector<std::vector<std::string>> get_steps_bcstemperatures_tree_data(int step_id); // gets the data from core to build the tree
   std::vector<std::vector<std::string>> get_steps_historyoutputs_tree_data(int step_id); // gets the data from core to build the tree

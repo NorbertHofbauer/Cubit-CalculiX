@@ -3149,6 +3149,16 @@ std::vector<int> CalculiXCore::get_loadsradiation_ids()
   return tmp;
 }
 
+std::vector<int> CalculiXCore::get_loadssurfacetraction_ids()
+{
+  std::vector<int> tmp;
+  for (size_t i = 0; i < loadssurfacetraction->loads_data.size(); i++)
+  {
+    tmp.push_back(loadssurfacetraction->loads_data[i][0]);
+  }
+  return tmp;
+}
+
 std::vector<int> CalculiXCore::get_bcsdisplacements_ids()
 {
   std::vector<int> tmp;
@@ -3165,6 +3175,19 @@ std::vector<int> CalculiXCore::get_orientations_ids()
   for (size_t i = 0; i < orientations->orientations_data.size(); i++)
   {
     tmp.push_back(orientations->orientations_data[i][0]);
+  }
+  return tmp;
+}
+
+std::vector<int> CalculiXCore::get_equation_ids()
+{
+  std::vector<int> tmp;
+  for (size_t i = 0; i < constraints->constraints_data.size(); i++)
+  {
+    if (constraints->constraints_data[i][1]==3)
+    {
+      tmp.push_back(constraints->constraints_data[i][0]);
+    }
   }
   return tmp;
 }
@@ -5462,6 +5485,52 @@ std::vector<std::vector<double>> CalculiXCore::get_draw_data_for_load_radiation(
   return draw_data;
 }
 
+std::vector<std::vector<double>> CalculiXCore::get_draw_data_for_load_surface_traction(int id)
+{
+  std::vector<std::vector<double>> draw_data;
+  
+  for (size_t i = 0; i < loadssurfacetraction->loads_data.size(); i++)
+  {
+    // check for right id
+    if (id==loadssurfacetraction->loads_data[i][0])
+    { 
+      std::vector<std::vector<double>> coords_normals = get_sideset_entities_coords_normals(loadssurfacetraction->loads_data[i][4]);
+      int force_data_id = loadssurfacetraction->get_force_data_id_from_force_id(loadssurfacetraction->loads_data[i][5]);
+
+      for (size_t ii = 0; ii < coords_normals.size(); ii++)
+      {
+        std::vector<double> data;
+        
+        data.push_back(coords_normals[ii][0]);
+        data.push_back(coords_normals[ii][1]);
+        data.push_back(coords_normals[ii][2]);
+        data.push_back(loadssurfacetraction->force_data[force_data_id][1]);
+        data.push_back(loadssurfacetraction->force_data[force_data_id][2]);
+        data.push_back(loadssurfacetraction->force_data[force_data_id][3]);
+        draw_data.push_back(data);
+        data.clear();
+      }
+
+
+        // loads_data[0][5] force_id
+  // loads_data[0][6] name_id
+
+  std::vector<std::vector<std::string>> time_delay_data;
+  // time_delay_data[0][0] time_delay_id
+  // time_delay_data[0][1] time_delay_value
+
+  std::vector<std::vector<double>> force_data;
+  // force_data[0][0] force_id
+  // force_data[0][1] value dof 1
+  // force_data[0][2] value dof 2
+  // force_data[0][3] value dof 3
+
+
+    }
+  }
+  return draw_data;
+}
+
 std::vector<std::vector<double>> CalculiXCore::get_draw_data_for_bc_displacement(int id) // returns coord(3) and dof
 {
   int bc_set_id=-1;
@@ -5638,6 +5707,13 @@ std::vector<std::vector<double>> CalculiXCore::get_draw_data_for_orientation(int
   return draw_data;
 }
 
+std::vector<std::vector<double>> CalculiXCore::get_draw_data_for_equation(int id)
+{
+  std::vector<std::vector<double>> draw_data;
+ 
+  return draw_data;
+}
+
 bool CalculiXCore::draw_all(double size) // draw all bc and loads
 {
   return draw->draw_all(size);
@@ -5723,6 +5799,16 @@ bool CalculiXCore::draw_load_radiation(std::vector<int> radiation_ids,double siz
   return true;
 }
 
+bool CalculiXCore::draw_load_surface_traction(std::vector<int> surface_traction_ids,double size)
+{
+  for (size_t i = 0; i < surface_traction_ids.size(); i++)
+  {
+    draw->draw_load_surface_traction(surface_traction_ids[i],size);
+  }
+  
+  return true;
+}
+
 bool CalculiXCore::draw_bc_displacement(std::vector<int> displacement_ids,double size)
 {
   for (size_t i = 0; i < displacement_ids.size(); i++)
@@ -5753,6 +5839,16 @@ bool CalculiXCore::draw_orientation(std::vector<int> orientation_ids,double size
   return true;
 }
 
+bool CalculiXCore::draw_equation(std::vector<int> equation_ids,double size)
+{
+  for (size_t i = 0; i < equation_ids.size(); i++)
+  {
+    draw->draw_equation(equation_ids[i],size);
+  }
+  
+  return true;
+}
+
 bool CalculiXCore::draw_loads(double size) // draw all loads
 {
   return draw->draw_loads(size);
@@ -5766,6 +5862,11 @@ bool CalculiXCore::draw_bcs(double size) // draw all bc
 bool CalculiXCore::draw_orientations(double size) // draw all orientations
 {
   return draw->draw_orientations(size);
+}
+
+bool CalculiXCore::draw_equations(double size) // draw all equations
+{
+  return draw->draw_equations(size);
 }
 
 bool CalculiXCore::draw_load_forces(double size) // draw all forces
@@ -5806,6 +5907,11 @@ bool CalculiXCore::draw_load_films(double size)
 bool CalculiXCore::draw_load_radiations(double size)
 {
   return draw->draw_load_radiations(size);
+}
+
+bool CalculiXCore::draw_load_surface_tractions(double size)
+{
+  return draw->draw_load_surface_tractions(size);
 }
 
 bool CalculiXCore::draw_bc_displacements(double size)
@@ -9259,6 +9365,45 @@ std::vector<std::vector<std::string>> CalculiXCore::get_steps_loadsradiation_tre
   return loadsradiation_tree_data;
 }
 
+std::vector<std::vector<std::string>> CalculiXCore::get_steps_loadssurfacetraction_tree_data(int step_id)
+{ 
+  std::vector<std::vector<std::string>> loadssurfacetraction_tree_data;
+  int step_data_id;
+  std::vector<int> loads_ids;
+  step_data_id = steps->get_steps_data_id_from_step_id(step_id);
+  if (step_data_id==-1)
+  {
+    return loadssurfacetraction_tree_data;
+  }
+  loads_ids = steps->get_load_data_ids_from_loads_id(steps->steps_data[step_data_id][5]);
+
+  for (size_t i = 0; i < loads_ids.size(); i++)
+  {
+    std::vector<std::string> loadssurfacetraction_tree_data_set;
+    std::string name;
+    if (steps->loads_data[loads_ids[i]][1]==9)
+    { 
+      int loaddata_id = loadssurfacetraction->get_loads_data_id_from_load_id(steps->loads_data[loads_ids[i]][2]);
+      if (loaddata_id!=-1)
+      {
+        int subdata_id = loadssurfacetraction->get_name_data_id_from_name_id(loadssurfacetraction->loads_data[loaddata_id][6]);
+        if ((subdata_id!=-1)&&(loadssurfacetraction->name_data[subdata_id][1]!=""))
+        {
+          name = loadssurfacetraction->name_data[subdata_id][1];
+        }else{
+          name = "SurfaceTraction_" + std::to_string(steps->loads_data[loads_ids[i]][2]);
+        }
+      }else{
+        name = "SurfaceTraction_" + std::to_string(steps->loads_data[loads_ids[i]][2]);
+      }
+    
+      loadssurfacetraction_tree_data_set.push_back(std::to_string(steps->loads_data[loads_ids[i]][2])); //load_id
+      loadssurfacetraction_tree_data_set.push_back(name); 
+      loadssurfacetraction_tree_data.push_back(loadssurfacetraction_tree_data_set);  
+    }
+  }
+  return loadssurfacetraction_tree_data;
+}
 
 std::vector<std::vector<std::string>> CalculiXCore::get_steps_bcsdisplacements_tree_data(int step_id)
 { 

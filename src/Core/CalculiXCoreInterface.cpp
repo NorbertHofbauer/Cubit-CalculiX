@@ -240,6 +240,11 @@ std::vector<int> CalculiXCoreInterface::get_loadsradiation_ids()
   return ccx_core.get_loadsradiation_ids();
 }
 
+std::vector<int> CalculiXCoreInterface::get_loadssurfacetraction_ids()
+{
+  return ccx_core.get_loadssurfacetraction_ids();
+}
+
 std::vector<int> CalculiXCoreInterface::get_bcsdisplacements_ids()
 {
   return ccx_core.get_bcsdisplacements_ids();
@@ -253,6 +258,11 @@ std::vector<int> CalculiXCoreInterface::get_bcstemperatures_ids()
 std::vector<int> CalculiXCoreInterface::get_orientations_ids()
 {
   return ccx_core.get_orientations_ids();
+}
+
+std::vector<int> CalculiXCoreInterface::get_equation_ids()
+{
+  return ccx_core.get_equation_ids();
 }
 
 bool CalculiXCoreInterface::check_block_exists(int block_id)
@@ -1020,6 +1030,11 @@ std::vector<std::vector<double>> CalculiXCoreInterface::get_draw_data_for_load_r
   return ccx_core.get_draw_data_for_load_radiation(id);
 }
 
+std::vector<std::vector<double>> CalculiXCoreInterface::get_draw_data_for_load_surface_traction(int id)
+{
+  return ccx_core.get_draw_data_for_load_surface_traction(id);
+}
+
 std::vector<std::vector<double>> CalculiXCoreInterface::get_draw_data_for_bc_displacement(int id) // returns coord(3) and dof
 {
   return ccx_core.get_draw_data_for_bc_displacement(id);
@@ -1033,9 +1048,14 @@ std::vector<std::vector<double>> CalculiXCoreInterface::get_draw_data_for_bc_tem
 std::vector<std::vector<double>> CalculiXCoreInterface::get_draw_data_for_orientation(int id)
 {
   return ccx_core.get_draw_data_for_orientation(id);
-}  
+}
 
-bool CalculiXCoreInterface::draw_all(double size) // draw all bc and loads
+std::vector<std::vector<double>> CalculiXCoreInterface::get_draw_data_for_equation(int id)
+{
+  return ccx_core.get_draw_data_for_equation(id);
+}
+
+bool CalculiXCoreInterface::draw_all(double size) // draw all bc,loads,orientations, equations
 {
   return ccx_core.draw_all(size);
 }
@@ -1080,6 +1100,11 @@ bool CalculiXCoreInterface::draw_load_radiation(std::vector<int> radiation_ids,d
   return ccx_core.draw_load_radiation(radiation_ids,size);
 }
 
+bool CalculiXCoreInterface::draw_load_surface_traction(std::vector<int> surface_traction_ids,double size)
+{
+  return ccx_core.draw_load_surface_traction(surface_traction_ids,size);
+}
+
 bool CalculiXCoreInterface::draw_bc_displacement(std::vector<int> displacement_ids,double size)
 {
   return ccx_core.draw_bc_displacement(displacement_ids,size);
@@ -1095,6 +1120,11 @@ bool CalculiXCoreInterface::draw_orientation(std::vector<int> orientation_ids,do
   return ccx_core.draw_orientation(orientation_ids,size);
 }
 
+bool CalculiXCoreInterface::draw_equation(std::vector<int> equation_ids,double size)
+{
+  return ccx_core.draw_equation(equation_ids,size);
+}
+
 bool CalculiXCoreInterface::draw_loads(double size)
 {
   return ccx_core.draw_loads(size);
@@ -1108,6 +1138,11 @@ bool CalculiXCoreInterface::draw_bcs(double size)
 bool CalculiXCoreInterface::draw_orientations(double size)
 {
   return ccx_core.draw_orientations(size);
+}
+
+bool CalculiXCoreInterface::draw_equations(double size)
+{
+  return ccx_core.draw_equations(size);
 }
 
 bool CalculiXCoreInterface::draw_load_forces(double size)
@@ -1148,6 +1183,11 @@ bool CalculiXCoreInterface::draw_load_films(double size)
 bool CalculiXCoreInterface::draw_load_radiations(double size)
 {
   return ccx_core.draw_load_radiations(size);
+}
+
+bool CalculiXCoreInterface::draw_load_surface_tractions(double size)
+{
+  return ccx_core.draw_load_surface_tractions(size);
 }
 
 bool CalculiXCoreInterface::draw_bc_displacements(double size)
@@ -1533,6 +1573,11 @@ std::vector<std::vector<std::string>> CalculiXCoreInterface::get_steps_loadsfilm
 std::vector<std::vector<std::string>> CalculiXCoreInterface::get_steps_loadsradiation_tree_data(int step_id)
 { 
   return ccx_core.get_steps_loadsradiation_tree_data(step_id);
+}
+
+std::vector<std::vector<std::string>> CalculiXCoreInterface::get_steps_loadssurfacetraction_tree_data(int step_id)
+{ 
+  return ccx_core.get_steps_loadssurfacetraction_tree_data(step_id);
 }
 
 std::vector<std::vector<std::string>> CalculiXCoreInterface::get_steps_bcsdisplacements_tree_data(int step_id)

@@ -135,7 +135,7 @@ ccx create step name "load" static
 ccx modify step 2 parameter nlgeom_yes
 ccx modify step 2 static totaltimeatstart 1 initialtimeincrement 0.01 timeperiodofstep 1 minimumtimeincrement 1e-5 maximumtimeincrement 0.02
 ccx step 2 add fieldoutput 1 2 3
-ccx step 1 add historyoutput 1 2 3 4 5
+ccx step 2 add historyoutput 1 2 3 4 5
 ccx step 2 add bc displacement 3 4
 
 ccx create job name "bolted_connection"

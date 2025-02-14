@@ -45,13 +45,16 @@ public:
   bool draw_load_trajectory(int id, double size = 1); // draw trajectory load with id
   bool draw_load_film(int id, double size = 1); // draw film load with id
   bool draw_load_radiation(int id, double size = 1); // draw radiation load with id
+  bool draw_load_surface_traction(int id, double size = 1); // draw surface traction load with id
   bool draw_bc_displacement(int id, double size = 1); // draw bc displacement
   bool draw_bc_temperature(int id, double size = 1); // draw bc temperature
   bool draw_orientation(int id, double size = 1); // draw orientation for all linked section
+  bool draw_equation(int id, double size = 1); // draw equation
 
   bool draw_loads(double size = 1); // draw all loads
   bool draw_bcs(double size = 1); // draw all bcs
   bool draw_orientations(double size = 1); // draw all orientations for all linked section
+  bool draw_equations(double size = 1); // draw all equations
   bool draw_all(double size = 1); // draw all
 
   bool draw_load_forces(double size = 1); //draw all forces
@@ -62,6 +65,7 @@ public:
   bool draw_load_trajectories(double size = 1); //draw all trajectory
   bool draw_load_films(double size = 1); //draw all film
   bool draw_load_radiations(double size = 1); //draw all radiation
+  bool draw_load_surface_tractions(double size = 1); //draw all surface tractions
   bool draw_bc_displacements(double size = 1); //draw all displacements
   bool draw_bc_temperatures(double size = 1); //draw all temperatures
 
