@@ -45,6 +45,8 @@ set(SRC
     ${CMAKE_CURRENT_LIST_DIR}/LoadsFilmTree.hpp
     ${CMAKE_CURRENT_LIST_DIR}/LoadsRadiationTree.cpp
     ${CMAKE_CURRENT_LIST_DIR}/LoadsRadiationTree.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/LoadsSurfaceTractionTree.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/LoadsSurfaceTractionTree.hpp
     ${CMAKE_CURRENT_LIST_DIR}/BCsTree.cpp
     ${CMAKE_CURRENT_LIST_DIR}/BCsTree.hpp
     ${CMAKE_CURRENT_LIST_DIR}/BCsDisplacementsTree.cpp
@@ -83,6 +85,8 @@ set(SRC
     ${CMAKE_CURRENT_LIST_DIR}/StepsLoadsFilmTree.hpp
     ${CMAKE_CURRENT_LIST_DIR}/StepsLoadsRadiationTree.cpp
     ${CMAKE_CURRENT_LIST_DIR}/StepsLoadsRadiationTree.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/StepsLoadsSurfaceTractionTree.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/StepsLoadsSurfaceTractionTree.hpp
     ${CMAKE_CURRENT_LIST_DIR}/StepsBCsTree.cpp
     ${CMAKE_CURRENT_LIST_DIR}/StepsBCsTree.hpp
     ${CMAKE_CURRENT_LIST_DIR}/StepsBCsDisplacementsTree.cpp

@@ -361,7 +361,7 @@ bool CoreDraw::draw_arrow(std::vector<double> start_point, std::vector<double> d
     
     for (size_t i = 0; i < commands.size(); i++)
     {
-        CubitInterface::silent_cmd(commands[i].c_str());
+        ccx_iface->silent_cmd(commands[i]);
         //commands[i].append("\n");
         //PRINT_INFO("%s", commands[i].c_str());
     }
@@ -459,7 +459,7 @@ bool CoreDraw::draw_arrow_flat(std::vector<double> start_point, std::vector<doub
     
     for (size_t i = 0; i < commands.size(); i++)
     {
-        CubitInterface::silent_cmd(commands[i].c_str());
+        ccx_iface->silent_cmd(commands[i]);
     }
 
     return true;
@@ -633,7 +633,7 @@ bool CoreDraw::draw_dof(std::vector<double> coord, int dof, std::string color, d
     
     for (size_t i = 0; i < commands.size(); i++)
     {
-        CubitInterface::silent_cmd(commands[i].c_str());
+        ccx_iface->silent_cmd(commands[i]);
     }
 
     return true;
@@ -654,60 +654,74 @@ bool CoreDraw::draw_equation_node(std::vector<double> coord, int dof, std::strin
     {
         npolygon = 10;
     }
+
+    if (color=="")
+    {
+        if (dof==1)
+        {
+            color = "red";
+        }else if (dof==2)
+        {
+            color = "green";
+        }else if (dof==3)
+        {
+            color = "blue";
+        }else{
+            color = "yellow";
+        }
+    }
+    
     
     if (dof==1)
     {
-        //arrow tip
+        //polygon coords around global coordinate center
         for (size_t i = 0; i < npolygon; i++)
         {
             std::vector<double> tmp_coord(3);
-            tmp_coord[0]= -0.2*size;
+            tmp_coord[0]= 0;
             tmp_coord[1]= radius*cos(2*pi/npolygon*i)*size;
             tmp_coord[2]= radius*sin(2*pi/npolygon*i)*size;
             polygon_coords.push_back(tmp_coord);
         }
-        //translate arrow head to starting point
+        //translate polygon to nodal coords
         for (size_t i = 0; i < npolygon; i++)
         {
-            draw_coord[0] = coord[0] + -0.05*size;
             polygon_coords[i][0] += draw_coord[0];
             polygon_coords[i][1] += draw_coord[1];
             polygon_coords[i][2] += draw_coord[2];
         }
     }else if (dof==2)
     {
-        //arrow tip
+        //polygon coords around global coordinate center
         for (size_t i = 0; i < npolygon; i++)
         {
             std::vector<double> tmp_coord(3);
             tmp_coord[0]= radius*sin(2*pi/npolygon*i)*size;
-            tmp_coord[1]= -0.2*size;
+            tmp_coord[1]= 0;
             tmp_coord[2]= radius*cos(2*pi/npolygon*i)*size;
             polygon_coords.push_back(tmp_coord);
         }
-        //translate arrow head to starting point
+        //translate polygon to nodal coords
         for (size_t i = 0; i < npolygon; i++)
         {
-            draw_coord[1] = coord[1] + -0.05*size;
             polygon_coords[i][0] += draw_coord[0];
             polygon_coords[i][1] += draw_coord[1];
             polygon_coords[i][2] += draw_coord[2];
         }
     }else if (dof==3)
     {
-        //arrow tip
+        //polygon coords around global coordinate center
         for (size_t i = 0; i < npolygon; i++)
         {
             std::vector<double> tmp_coord(3);
             tmp_coord[0]= radius*cos(2*pi/npolygon*i)*size;
             tmp_coord[1]= radius*sin(2*pi/npolygon*i)*size;
-            tmp_coord[2]= -0.2*size;
+            tmp_coord[2]= 0;
             polygon_coords.push_back(tmp_coord);
         }
-        //translate arrow head to starting point
+        //translate polygon to nodal coords
         for (size_t i = 0; i < npolygon; i++)
         {
-            draw_coord[2] = coord[2] + -0.05*size;
             polygon_coords[i][0] += draw_coord[0];
             polygon_coords[i][1] += draw_coord[1];
             polygon_coords[i][2] += draw_coord[2];
@@ -729,23 +743,13 @@ bool CoreDraw::draw_equation_node(std::vector<double> coord, int dof, std::strin
                 commands.push_back("draw polygon location pos " + std::to_string(draw_coord[0]) + " " + std::to_string(draw_coord[1]) + " " + std::to_string(draw_coord[2]) + " location pos " + std::to_string(polygon_coords[i][0]) + " " + std::to_string(polygon_coords[i][1]) + " " + std::to_string(polygon_coords[i][2]) + " location pos " + std::to_string(polygon_coords[i+1][0]) + " " + std::to_string(polygon_coords[i+1][1]) + " " + std::to_string(polygon_coords[i+1][2]) + " color " + color + " no_flush");
             }
         }
-        cmd = "draw polygon";
-        for (size_t i = 0; i < npolygon; i++)
-        {
-            cmd = cmd + " location pos " + std::to_string(polygon_coords[i][0]) + " " + std::to_string(polygon_coords[i][1]) + " " + std::to_string(polygon_coords[i][2]);
-        }
-
-        cmd = cmd + " color " + color + " no_flush";
-        commands.push_back(cmd);
-        // draw line
-        commands.push_back("draw line location pos " + std::to_string(draw_coord[0]) + " " + std::to_string(draw_coord[1]) + " " + std::to_string(draw_coord[2]) + " location pos " + std::to_string(coord[0]) + " " + std::to_string(coord[1]) + " " + std::to_string(coord[2]) + " color " + color + " no_flush");
     }
 
     commands.push_back("graphics flush");
     
     for (size_t i = 0; i < commands.size(); i++)
     {
-        CubitInterface::silent_cmd(commands[i].c_str());
+        ccx_iface->silent_cmd(commands[i]);
     }
 
     return true;
@@ -1040,9 +1044,26 @@ bool CoreDraw::draw_equation(int id, double size)
     
     for (size_t i = 0; i < draw_data.size(); i++)
     {
-        draw_dof({draw_data[i][0],draw_data[i][1],draw_data[i][2]}, draw_data[i][3], "red", size);
+        draw_equation_node({draw_data[i][0],draw_data[i][1],draw_data[i][2]}, draw_data[i][3], "", size);
     }
 
+    // draw lines
+    std::vector<std::string> commands;
+
+    if (draw_data.size()>1)
+    {
+        for (size_t i = 1; i < draw_data.size(); i++)
+        {
+            commands.push_back("draw line location pos " + std::to_string(draw_data[0][0]) + " " + std::to_string(draw_data[0][1]) + " " + std::to_string(draw_data[0][2]) + " location pos " + std::to_string(draw_data[i][0]) + " " + std::to_string(draw_data[i][1]) + " " + std::to_string(draw_data[i][2]) + " color yellow no_flush");
+        }
+        commands.push_back("graphics flush");
+    }
+    
+    for (size_t i = 0; i < commands.size(); i++)
+    {
+        ccx_iface->silent_cmd(commands[i]);
+    }
+    
     return true;
 }
 

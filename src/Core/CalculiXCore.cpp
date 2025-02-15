@@ -8797,6 +8797,30 @@ std::vector<std::vector<std::string>> CalculiXCore::get_loadsradiation_tree_data
   return loadsradiation_tree_data;
 }
 
+std::vector<std::vector<std::string>> CalculiXCore::get_loadssurfacetraction_tree_data()
+{ 
+  std::vector<std::vector<std::string>> loadssurfacetraction_tree_data;
+  
+  for (size_t i = 0; i < loadssurfacetraction->loads_data.size(); i++)
+  {
+    std::vector<std::string> loadssurfacetraction_tree_data_set;
+    std::string name;
+    
+    int subdata_id = loadssurfacetraction->get_name_data_id_from_name_id(loadssurfacetraction->loads_data[i][6]);
+    if ((subdata_id!=-1)&&(loadssurfacetraction->name_data[subdata_id][1]!=""))
+    {
+      name = loadssurfacetraction->name_data[subdata_id][1];
+    }else{
+      name = "SurfaceTraction_" + std::to_string(loadssurfacetraction->loads_data[i][0]);
+    }
+    
+    loadssurfacetraction_tree_data_set.push_back(std::to_string(loadssurfacetraction->loads_data[i][0])); //load_id
+    loadssurfacetraction_tree_data_set.push_back(name); 
+    loadssurfacetraction_tree_data.push_back(loadssurfacetraction_tree_data_set);
+  }
+  return loadssurfacetraction_tree_data;
+}
+
 std::vector<std::vector<std::string>> CalculiXCore::get_bcsdisplacements_tree_data()
 { 
   std::vector<std::vector<std::string>> bcsdisplacements_tree_data;

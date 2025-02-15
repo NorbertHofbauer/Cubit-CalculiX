@@ -1495,6 +1495,11 @@ std::vector<std::vector<std::string>> CalculiXCoreInterface::get_loadsradiation_
   return ccx_core.get_loadsradiation_tree_data();
 }
 
+std::vector<std::vector<std::string>> CalculiXCoreInterface::get_loadssurfacetraction_tree_data()
+{ 
+  return ccx_core.get_loadssurfacetraction_tree_data();
+}
+
 std::vector<std::vector<std::string>> CalculiXCoreInterface::get_bcsdisplacements_tree_data()
 { 
   return ccx_core.get_bcsdisplacements_tree_data();
