@@ -233,7 +233,7 @@ public:
   std::vector<std::vector<double>> get_draw_data_for_bc_displacement(int id); // returns coord(3) and dof
   std::vector<std::vector<double>> get_draw_data_for_bc_temperature(int id); // returns coord(3) and dof
   std::vector<std::vector<double>> get_draw_data_for_orientation(int id); // returns pairs of 4 for {system_type,local_axis_angle}, coord(3) of section center, a_coord(3) ,b_coord(3)
-  std::vector<std::vector<double>> get_draw_data_for_equation(int id); // returns coord(3) and dof
+  std::vector<std::vector<double>> get_draw_data_for_equation(int id); // returns coord(3) and dof for each variable
   bool draw_all(double size); // draw all loads,bcs,orientations,equations
   bool draw_load_force(std::vector<int> force_ids,double size); // draw load force
   bool draw_load_pressure(std::vector<int> pressure_ids,double size); // draw load pressure

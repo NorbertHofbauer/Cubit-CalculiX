@@ -170,7 +170,8 @@ bool ccxDrawCommand::execute(CubitCommandData &data)
       (surfacetraction_id.size()==0)&&
       (displacement_id.size()==0)&&
       (temperature_id.size()==0)&&
-      (orientation_id.size()==0))
+      (orientation_id.size()==0)&&
+      (equation_id.size()==0))
   {
    if((!data.find_keyword("LOAD_ALL"))&&
    (!data.find_keyword("BC_ALL"))&&

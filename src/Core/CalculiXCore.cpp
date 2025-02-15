@@ -5510,22 +5510,6 @@ std::vector<std::vector<double>> CalculiXCore::get_draw_data_for_load_surface_tr
         draw_data.push_back(data);
         data.clear();
       }
-
-
-        // loads_data[0][5] force_id
-  // loads_data[0][6] name_id
-
-  std::vector<std::vector<std::string>> time_delay_data;
-  // time_delay_data[0][0] time_delay_id
-  // time_delay_data[0][1] time_delay_value
-
-  std::vector<std::vector<double>> force_data;
-  // force_data[0][0] force_id
-  // force_data[0][1] value dof 1
-  // force_data[0][2] value dof 2
-  // force_data[0][3] value dof 3
-
-
     }
   }
   return draw_data;
@@ -5710,7 +5694,39 @@ std::vector<std::vector<double>> CalculiXCore::get_draw_data_for_orientation(int
 std::vector<std::vector<double>> CalculiXCore::get_draw_data_for_equation(int id)
 {
   std::vector<std::vector<double>> draw_data;
- 
+  int constraint_data_id;
+  constraint_data_id = constraints->get_constraints_data_id_from_constraint_id(id);
+
+  //check if constraint exists
+  if (constraint_data_id == -1)
+  {
+    return draw_data;
+  }
+  
+  // check if its a equation constraint
+  if (constraints->constraints_data[constraint_data_id][1]!=3)
+  {
+    return draw_data;
+  }  
+
+  // get equation data ids
+  std::vector<int> equation_data_ids = constraints->get_equation_data_ids_from_equation_constraint_id(constraints->constraints_data[constraint_data_id][2]);
+
+  for (size_t i = 0; i < equation_data_ids.size(); i++)
+  {
+    std::array<double, 3> coords = CubitInterface::get_nodal_coordinates(constraints->equation_data[equation_data_ids[i]][1]);
+        
+    if (coords.size() > 0)
+    {
+      std::vector<double> data;            
+      data.push_back(coords[0]);
+      data.push_back(coords[1]);
+      data.push_back(coords[2]);
+      data.push_back(constraints->equation_data[equation_data_ids[i]][2]);
+      draw_data.push_back(data);
+      data.clear();
+    }
+  }
   return draw_data;
 }
 

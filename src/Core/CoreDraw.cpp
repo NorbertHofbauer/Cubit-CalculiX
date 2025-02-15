@@ -639,6 +639,118 @@ bool CoreDraw::draw_dof(std::vector<double> coord, int dof, std::string color, d
     return true;
 }
 
+bool CoreDraw::draw_equation_node(std::vector<double> coord, int dof, std::string color, double size)
+{
+    std::vector<std::string> commands;
+    std::string cmd;
+    int npolygon = 10;
+    double radius = 0.1;
+    double pi = 3.14159265359;
+    std::vector<std::vector<double>> polygon_coords;
+    std::vector<double> draw_coord(3);
+    draw_coord = coord;
+
+    if (dof>3)
+    {
+        npolygon = 10;
+    }
+    
+    if (dof==1)
+    {
+        //arrow tip
+        for (size_t i = 0; i < npolygon; i++)
+        {
+            std::vector<double> tmp_coord(3);
+            tmp_coord[0]= -0.2*size;
+            tmp_coord[1]= radius*cos(2*pi/npolygon*i)*size;
+            tmp_coord[2]= radius*sin(2*pi/npolygon*i)*size;
+            polygon_coords.push_back(tmp_coord);
+        }
+        //translate arrow head to starting point
+        for (size_t i = 0; i < npolygon; i++)
+        {
+            draw_coord[0] = coord[0] + -0.05*size;
+            polygon_coords[i][0] += draw_coord[0];
+            polygon_coords[i][1] += draw_coord[1];
+            polygon_coords[i][2] += draw_coord[2];
+        }
+    }else if (dof==2)
+    {
+        //arrow tip
+        for (size_t i = 0; i < npolygon; i++)
+        {
+            std::vector<double> tmp_coord(3);
+            tmp_coord[0]= radius*sin(2*pi/npolygon*i)*size;
+            tmp_coord[1]= -0.2*size;
+            tmp_coord[2]= radius*cos(2*pi/npolygon*i)*size;
+            polygon_coords.push_back(tmp_coord);
+        }
+        //translate arrow head to starting point
+        for (size_t i = 0; i < npolygon; i++)
+        {
+            draw_coord[1] = coord[1] + -0.05*size;
+            polygon_coords[i][0] += draw_coord[0];
+            polygon_coords[i][1] += draw_coord[1];
+            polygon_coords[i][2] += draw_coord[2];
+        }
+    }else if (dof==3)
+    {
+        //arrow tip
+        for (size_t i = 0; i < npolygon; i++)
+        {
+            std::vector<double> tmp_coord(3);
+            tmp_coord[0]= radius*cos(2*pi/npolygon*i)*size;
+            tmp_coord[1]= radius*sin(2*pi/npolygon*i)*size;
+            tmp_coord[2]= -0.2*size;
+            polygon_coords.push_back(tmp_coord);
+        }
+        //translate arrow head to starting point
+        for (size_t i = 0; i < npolygon; i++)
+        {
+            draw_coord[2] = coord[2] + -0.05*size;
+            polygon_coords[i][0] += draw_coord[0];
+            polygon_coords[i][1] += draw_coord[1];
+            polygon_coords[i][2] += draw_coord[2];
+        }
+    }else{
+        std::string log = "dof " + std::to_string(dof) + " not supported";
+        PRINT_INFO("%s", log.c_str());        
+    }
+        
+    if (dof < 4)
+    {    
+        // draw dof 1,2,3
+        for (size_t i = 0; i < npolygon; i++)
+        {
+            if (i==npolygon-1)
+            {
+                commands.push_back("draw polygon location pos " + std::to_string(draw_coord[0]) + " " + std::to_string(draw_coord[1]) + " " + std::to_string(draw_coord[2]) + " location pos " + std::to_string(polygon_coords[i][0]) + " " + std::to_string(polygon_coords[i][1]) + " " + std::to_string(polygon_coords[i][2]) + " location pos " + std::to_string(polygon_coords[0][0]) + " " + std::to_string(polygon_coords[0][1]) + " " + std::to_string(polygon_coords[0][2]) + " color " + color + " no_flush");
+            }else{
+                commands.push_back("draw polygon location pos " + std::to_string(draw_coord[0]) + " " + std::to_string(draw_coord[1]) + " " + std::to_string(draw_coord[2]) + " location pos " + std::to_string(polygon_coords[i][0]) + " " + std::to_string(polygon_coords[i][1]) + " " + std::to_string(polygon_coords[i][2]) + " location pos " + std::to_string(polygon_coords[i+1][0]) + " " + std::to_string(polygon_coords[i+1][1]) + " " + std::to_string(polygon_coords[i+1][2]) + " color " + color + " no_flush");
+            }
+        }
+        cmd = "draw polygon";
+        for (size_t i = 0; i < npolygon; i++)
+        {
+            cmd = cmd + " location pos " + std::to_string(polygon_coords[i][0]) + " " + std::to_string(polygon_coords[i][1]) + " " + std::to_string(polygon_coords[i][2]);
+        }
+
+        cmd = cmd + " color " + color + " no_flush";
+        commands.push_back(cmd);
+        // draw line
+        commands.push_back("draw line location pos " + std::to_string(draw_coord[0]) + " " + std::to_string(draw_coord[1]) + " " + std::to_string(draw_coord[2]) + " location pos " + std::to_string(coord[0]) + " " + std::to_string(coord[1]) + " " + std::to_string(coord[2]) + " color " + color + " no_flush");
+    }
+
+    commands.push_back("graphics flush");
+    
+    for (size_t i = 0; i < commands.size(); i++)
+    {
+        CubitInterface::silent_cmd(commands[i].c_str());
+    }
+
+    return true;
+}  
+
 bool CoreDraw::draw_label(std::vector<double> coord, std::string color, double size)
 {
     //locate location 0 0 0 "test"
@@ -817,8 +929,8 @@ bool CoreDraw::draw_load_radiation(int id, double size)
 
 bool CoreDraw::draw_load_surface_traction(int id, double size)
 {
-    std::string log = "Surface Traction ID " + std::to_string(id) + "  drawn with size " + std::to_string(size) +"\n";
-    PRINT_INFO("%s", log.c_str());
+    //std::string log = "Surface Traction ID " + std::to_string(id) + "  drawn with size " + std::to_string(size) +"\n";
+    //PRINT_INFO("%s", log.c_str());
     
     std::vector<std::vector<double>> draw_data;
     draw_data = ccx_iface->get_draw_data_for_load_surface_traction(id);
@@ -920,9 +1032,17 @@ bool CoreDraw::draw_orientation(int id, double size)
 
 bool CoreDraw::draw_equation(int id, double size)
 {
-    std::string log = "Equation ID " + std::to_string(id) + "  drawn with size " + std::to_string(size) +"\n";
-    PRINT_INFO("%s", log.c_str());
+    //std::string log = "Equation ID " + std::to_string(id) + "  drawn with size " + std::to_string(size) +"\n";
+    //PRINT_INFO("%s", log.c_str());
     
+    std::vector<std::vector<double>> draw_data;
+    draw_data = ccx_iface->get_draw_data_for_equation(id);
+    
+    for (size_t i = 0; i < draw_data.size(); i++)
+    {
+        draw_dof({draw_data[i][0],draw_data[i][1],draw_data[i][2]}, draw_data[i][3], "red", size);
+    }
+
     return true;
 }
 
