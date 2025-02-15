@@ -1,5 +1,5 @@
-#ifndef CONSTRAINTSMODIFYTIEPANEL_HPP
-#define CONSTRAINTSMODIFYTIEPANEL_HPP
+#ifndef LOADSSURFACETRACTIONDELETEPANEL_HPP
+#define LOADSSURFACETRACTIONDELETEPANEL_HPP
 
 #include <QWidget>
 #include <QList>
@@ -17,13 +17,13 @@
 
 class CalculiXCoreInterface;
 
-class ConstraintsModifyTiePanel : public QWidget
+class LoadsSurfaceTractionDeletePanel : public QWidget
 {
   Q_OBJECT
   
 public:
-  explicit ConstraintsModifyTiePanel(QWidget *parent = 0);
-  ~ConstraintsModifyTiePanel();
+  explicit LoadsSurfaceTractionDeletePanel(QWidget *parent = 0);
+  ~LoadsSurfaceTractionDeletePanel();
 
   bool isInitialized;
   CalculiXCoreInterface *ccx_iface;
@@ -40,21 +40,9 @@ private:
   QPushButton* pushButton_apply;
   QHBoxLayout* HBoxLayout_pushButton_apply;
   QSpacerItem* horizontal_spacer_pushButton_apply;
-  QHBoxLayout* HBoxLayout_0;
   QHBoxLayout* HBoxLayout_1;
-  QHBoxLayout* HBoxLayout_2;
-  QHBoxLayout* HBoxLayout_3;
-  QHBoxLayout* HBoxLayout_4;
-  QLabel* label_0;
   QLabel* label_1;
-  QLabel* label_2;
-  QLabel* label_3;
-  QLabel* label_4;
-  QLineEdit* lineEdit_0;
   QLineEdit* lineEdit_1;
-  QLineEdit* lineEdit_2;
-  QLineEdit* lineEdit_3;
-  QLineEdit* lineEdit_4;
 };
 
-#endif // CONSTRAINTSMODIFYTIEPANEL_HPP
+#endif // LOADSSURFACETRACTIONDELETEPANEL_HPP

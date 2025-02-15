@@ -33,15 +33,15 @@ std::vector<std::string> ccxLoadsSurfaceTractionModifyCommand::get_syntax_help()
 {
   std::vector<std::string> help(1);
   help[0] = "ccx "; 
-  help[0].append("modify surfacetraction <value:label='surfacetraction id',help='<surfacetraction id>'> ");
-  help[0].append("[sideset <value:label='sideset id',help='<sideset id>'>] ");
-  help[0].append("[force_dof_1 <value:label='force_dof_1_value',help='<force_dof_1_value>'>] ");
-  help[0].append("[force_dof_2 <value:label='force_dof_2_value',help='<force_dof_2_value>'>] ");
-  help[0].append("[force_dof_3 <value:label='force_dof_3_value',help='<force_dof_3_value>'>] ");
+  help[0].append("modify surfacetraction <surfacetraction id> ");
+  help[0].append("[sideset <sideset id>] ");
+  help[0].append("[force_dof_1 <force_dof_1_value>] ");
+  help[0].append("[force_dof_2 <force_dof_2_value>] ");
+  help[0].append("[force_dof_3 <force_dof_3_value>] ");
   help[0].append("[op {mod | new}] " );
-  help[0].append("[amplitude <value:label='amplitude id',help='<amplitude id>'>] ");
-  help[0].append("[timedelay <value:label='timedelay',help='<timedelay>'>] ");
-  help[0].append("[name <string:type='unquoted', number='1', label='name', help='<name>'>] " );
+  help[0].append("[amplitude <amplitude id>] ");
+  help[0].append("[timedelay <timedelay>] ");
+  help[0].append("[name <name>] " );
   
   return help;
 }

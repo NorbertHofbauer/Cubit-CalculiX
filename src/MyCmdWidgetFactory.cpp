@@ -27,8 +27,10 @@
 #include "SectionsDeletePanel.hpp"
 #include "ConstraintsCreateRigidBodyPanel.hpp"
 #include "ConstraintsCreateTiePanel.hpp"
+#include "ConstraintsCreateEquationPanel.hpp"
 #include "ConstraintsModifyRigidBodyPanel.hpp"
 #include "ConstraintsModifyTiePanel.hpp"
+#include "ConstraintsModifyEquationPanel.hpp"
 #include "ConstraintsDeletePanel.hpp"
 #include "SurfaceInteractionsCreatePanel.hpp"
 #include "SurfaceInteractionsModifyPanel.hpp"
@@ -64,6 +66,9 @@
 #include "LoadsRadiationCreatePanel.hpp"
 #include "LoadsRadiationModifyPanel.hpp"
 #include "LoadsRadiationDeletePanel.hpp"
+#include "LoadsSurfaceTractionCreatePanel.hpp"
+#include "LoadsSurfaceTractionModifyPanel.hpp"
+#include "LoadsSurfaceTractionDeletePanel.hpp"
 #include "BCsDisplacementsModifyPanel.hpp"
 #include "BCsTemperaturesModifyPanel.hpp"
 #include "HistoryOutputsCreatePanel.hpp"
@@ -222,10 +227,14 @@ QWidget* MyCmdWidgetFactory::createWidget(const QString &name)
     return new ConstraintsCreateRigidBodyPanel();
   if(name == "CCXConstraintsCreateTie")
     return new ConstraintsCreateTiePanel();
+  if(name == "CCXConstraintsCreateEquation")
+    return new ConstraintsCreateEquationPanel();
   if(name == "CCXConstraintsModifyRigidBody")
     return new ConstraintsModifyRigidBodyPanel();
   if(name == "CCXConstraintsModifyTie")
     return new ConstraintsModifyTiePanel();
+  if(name == "CCXConstraintsModifyEquation")
+    return new ConstraintsModifyEquationPanel();
   if(name == "CCXConstraintsDelete")
     return new ConstraintsDeletePanel();
   if(name == "CCXSurfaceInteractionsCreate")
@@ -296,6 +305,12 @@ QWidget* MyCmdWidgetFactory::createWidget(const QString &name)
     return new LoadsRadiationModifyPanel();
   if(name == "CCXLoadsRadiationDelete")
     return new LoadsRadiationDeletePanel();
+  if(name == "CCXLoadsSurfaceTractionCreate")
+    return new LoadsSurfaceTractionCreatePanel();
+  if(name == "CCXLoadsSurfaceTractionModify")
+    return new LoadsSurfaceTractionModifyPanel();
+  if(name == "CCXLoadsSurfaceTractionDelete")
+    return new LoadsSurfaceTractionDeletePanel();
   if(name == "CCXBCsDisplacementsModify")
     return new BCsDisplacementsModifyPanel();
   if(name == "CCXBCsTemperaturesModify")

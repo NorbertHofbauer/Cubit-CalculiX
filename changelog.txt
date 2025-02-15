@@ -132,5 +132,5 @@
 2025-01-21 working on equations
 2025-02-14 working on draw surface traction and equation
 2025-02-15 working on draw surface traction and equation
-2025-02-15 working on gui for surface traction and equation
+2025-02-15 added gui for surface traction and equation
 

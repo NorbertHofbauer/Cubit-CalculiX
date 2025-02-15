@@ -1,5 +1,5 @@
-#ifndef CONSTRAINTSMODIFYTIEPANEL_HPP
-#define CONSTRAINTSMODIFYTIEPANEL_HPP
+#ifndef CONSTRAINTSCREATEEQUATIONPANEL_HPP
+#define CONSTRAINTSCREATEEQUATIONPANEL_HPP
 
 #include <QWidget>
 #include <QList>
@@ -16,14 +16,15 @@
 #include <QLineEdit>
 
 class CalculiXCoreInterface;
+class PanelTable;
 
-class ConstraintsModifyTiePanel : public QWidget
+class ConstraintsCreateEquationPanel : public QWidget
 {
   Q_OBJECT
   
 public:
-  explicit ConstraintsModifyTiePanel(QWidget *parent = 0);
-  ~ConstraintsModifyTiePanel();
+  explicit ConstraintsCreateEquationPanel(QWidget *parent = 0);
+  ~ConstraintsCreateEquationPanel();
 
   bool isInitialized;
   CalculiXCoreInterface *ccx_iface;
@@ -34,27 +35,20 @@ private slots:
 private:
   std::string log;
 
+  std::vector<std::vector<double>> matrix;
+
+  QFrame*      frame_2;
   QGridLayout* GridLayout;
   QVBoxLayout* VBoxLayout;
   QSpacerItem* vertical_spacer;
   QPushButton* pushButton_apply;
   QHBoxLayout* HBoxLayout_pushButton_apply;
   QSpacerItem* horizontal_spacer_pushButton_apply;
-  QHBoxLayout* HBoxLayout_0;
   QHBoxLayout* HBoxLayout_1;
   QHBoxLayout* HBoxLayout_2;
-  QHBoxLayout* HBoxLayout_3;
-  QHBoxLayout* HBoxLayout_4;
-  QLabel* label_0;
   QLabel* label_1;
-  QLabel* label_2;
-  QLabel* label_3;
-  QLabel* label_4;
-  QLineEdit* lineEdit_0;
   QLineEdit* lineEdit_1;
-  QLineEdit* lineEdit_2;
-  QLineEdit* lineEdit_3;
-  QLineEdit* lineEdit_4;
+  PanelTable* widget_2;
 };
 
-#endif // CONSTRAINTSMODIFYTIEPANEL_HPP
+#endif // CONSTRAINTSCREATEEQUATIONPANEL_HPP

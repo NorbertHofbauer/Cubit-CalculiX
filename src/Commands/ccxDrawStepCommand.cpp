@@ -204,7 +204,7 @@ bool ccxDrawStepCommand::execute(CubitCommandData &data)
       trajectory_id = convert_tree_data(step_loadtrajectory_tree_data);
       film_id = convert_tree_data(step_loadfilm_tree_data);
       radiation_id = convert_tree_data(step_loadradiation_tree_data);
-      radiation_id = convert_tree_data(step_loadsurfacetraction_tree_data);
+      surfacetraction_id = convert_tree_data(step_loadsurfacetraction_tree_data);
 
       displacement_id = convert_tree_data(step_bcdisplacements_tree_data);
       temperature_id = convert_tree_data(step_bctemperatures_tree_data);

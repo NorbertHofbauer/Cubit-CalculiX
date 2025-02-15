@@ -1,5 +1,5 @@
-#ifndef CONSTRAINTSMODIFYTIEPANEL_HPP
-#define CONSTRAINTSMODIFYTIEPANEL_HPP
+#ifndef LOADSSURFACETRACTIONCREATEPANEL_HPP
+#define LOADSSURFACETRACTIONCREATEPANEL_HPP
 
 #include <QWidget>
 #include <QList>
@@ -17,13 +17,13 @@
 
 class CalculiXCoreInterface;
 
-class ConstraintsModifyTiePanel : public QWidget
+class LoadsSurfaceTractionCreatePanel : public QWidget
 {
   Q_OBJECT
   
 public:
-  explicit ConstraintsModifyTiePanel(QWidget *parent = 0);
-  ~ConstraintsModifyTiePanel();
+  explicit LoadsSurfaceTractionCreatePanel(QWidget *parent = 0);
+  ~LoadsSurfaceTractionCreatePanel();
 
   bool isInitialized;
   CalculiXCoreInterface *ccx_iface;
@@ -40,21 +40,30 @@ private:
   QPushButton* pushButton_apply;
   QHBoxLayout* HBoxLayout_pushButton_apply;
   QSpacerItem* horizontal_spacer_pushButton_apply;
-  QHBoxLayout* HBoxLayout_0;
   QHBoxLayout* HBoxLayout_1;
   QHBoxLayout* HBoxLayout_2;
   QHBoxLayout* HBoxLayout_3;
   QHBoxLayout* HBoxLayout_4;
-  QLabel* label_0;
+  QHBoxLayout* HBoxLayout_5;
+  QHBoxLayout* HBoxLayout_6;
+  QHBoxLayout* HBoxLayout_7;
+  QHBoxLayout* HBoxLayout_8;
   QLabel* label_1;
   QLabel* label_2;
   QLabel* label_3;
   QLabel* label_4;
-  QLineEdit* lineEdit_0;
+  QLabel* label_5;
+  QLabel* label_6;
+  QLabel* label_7;
+  QLabel* label_8;
   QLineEdit* lineEdit_1;
   QLineEdit* lineEdit_2;
   QLineEdit* lineEdit_3;
   QLineEdit* lineEdit_4;
+  QLineEdit* lineEdit_5;
+  QComboBox* comboBox_6;
+  QLineEdit* lineEdit_7;
+  QLineEdit* lineEdit_8;
 };
 
-#endif // CONSTRAINTSMODIFYTIEPANEL_HPP
+#endif // LOADSSURFACETRACTIONCREATEPANEL_HPP

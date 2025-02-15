@@ -167,10 +167,14 @@ set(SRC
     ${CMAKE_CURRENT_LIST_DIR}/ConstraintsCreateRigidBodyPanel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ConstraintsCreateTiePanel.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ConstraintsCreateTiePanel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/ConstraintsCreateEquationPanel.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/ConstraintsCreateEquationPanel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ConstraintsModifyRigidBodyPanel.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ConstraintsModifyRigidBodyPanel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ConstraintsModifyTiePanel.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ConstraintsModifyTiePanel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/ConstraintsModifyEquationPanel.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/ConstraintsModifyEquationPanel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ConstraintsDeletePanel.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ConstraintsDeletePanel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/SurfaceInteractionsCreatePanel.hpp
@@ -241,6 +245,12 @@ set(SRC
     ${CMAKE_CURRENT_LIST_DIR}/LoadsRadiationModifyPanel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/LoadsRadiationDeletePanel.hpp
     ${CMAKE_CURRENT_LIST_DIR}/LoadsRadiationDeletePanel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/LoadsSurfaceTractionCreatePanel.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/LoadsSurfaceTractionCreatePanel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/LoadsSurfaceTractionModifyPanel.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/LoadsSurfaceTractionModifyPanel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/LoadsSurfaceTractionDeletePanel.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/LoadsSurfaceTractionDeletePanel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/BCsDisplacementsModifyPanel.hpp
     ${CMAKE_CURRENT_LIST_DIR}/BCsDisplacementsModifyPanel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/BCsTemperaturesModifyPanel.hpp

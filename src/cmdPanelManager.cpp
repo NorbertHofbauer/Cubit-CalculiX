@@ -59,8 +59,10 @@ void cmdPanelManager::clear()
     my_markers.push_back("CCXSectionsDelete");
     my_markers.push_back("CCXConstraintsCreateRigidBody");
     my_markers.push_back("CCXConstraintsCreateTie");
+    my_markers.push_back("CCXConstraintsCreateEquation");
     my_markers.push_back("CCXConstraintsModifyRigidBody");
     my_markers.push_back("CCXConstraintsModifyTie");
+    my_markers.push_back("CCXConstraintsModifyEquation");
     my_markers.push_back("CCXConstraintsDelete");
     my_markers.push_back("CCXSurfaceInteractionsCreate");
     my_markers.push_back("CCXSurfaceInteractionsModify");
@@ -96,6 +98,9 @@ void cmdPanelManager::clear()
     my_markers.push_back("CCXLoadsRadiationCreate");
     my_markers.push_back("CCXLoadsRadiationModify");
     my_markers.push_back("CCXLoadsRadiationDelete");
+    my_markers.push_back("CCXLoadsSurfaceTractionCreate");
+    my_markers.push_back("CCXLoadsSurfaceTractionModify");
+    my_markers.push_back("CCXLoadsSurfaceTractionDelete");
     my_markers.push_back("CCXBCsDisplacementsModify");
     my_markers.push_back("CCXBCsTemperaturesModify");
     my_markers.push_back("CCXHistoryOutputsCreate");
@@ -264,6 +269,9 @@ void cmdPanelManager::initialize_from_code()
   node = model->addNode("Tie", root_node);
   model->setNodeMarker(node, "CCXConstraintsCreateTie");
   node->setIcon(ccx_iface->getIcon("CCXConstraintsCreateTie"));
+  node = model->addNode("Equation", root_node);
+  model->setNodeMarker(node, "CCXConstraintsCreateEquation");
+  node->setIcon(ccx_iface->getIcon("CCXConstraintsCreateEquation"));
   root_node = model->getMarkedNode("CCXConstraintsModify");
   node = model->addNode("Rigid Body", root_node);
   model->setNodeMarker(node, "CCXConstraintsModifyRigidBody");
@@ -271,6 +279,9 @@ void cmdPanelManager::initialize_from_code()
   node = model->addNode("Tie", root_node);
   model->setNodeMarker(node, "CCXConstraintsModifyTie");
   node->setIcon(ccx_iface->getIcon("CCXConstraintsModifyTie"));
+  node = model->addNode("Equation", root_node);
+  model->setNodeMarker(node, "CCXConstraintsModifyEquation");
+  node->setIcon(ccx_iface->getIcon("CCXConstraintsModifyEquation"));
   /*root_node = model->getMarkedNode("CCXConstraintsDelete");
   node = model->addNode("Delete", root_node);
   model->setNodeMarker(node, "CCXConstraintsDelete");
@@ -505,6 +516,23 @@ void cmdPanelManager::initialize_from_code()
   node->setIcon(ccx_iface->getIcon("CCXLoadsRadiationDelete"));
 
   //##############################
+  // add LoadsSurfaceTraction Nodes
+  root_node = model->getMarkedNode("CCXLoads");
+  node = model->addNode("Surface Traction", root_node);
+  model->setNodeMarker(node, "CCXLoadsSurfaceTraction");
+  node->setIcon(ccx_iface->getIcon("CCXLoadsSurfaceTraction"));
+  root_node = model->getMarkedNode("CCXLoadsSurfaceTraction");
+  node = model->addNode("Create", root_node);
+  model->setNodeMarker(node, "CCXLoadsSurfaceTractionCreate");
+  node->setIcon(ccx_iface->getIcon("CCXLoadsSurfaceTractionCreate"));
+  node = model->addNode("Modify", root_node);
+  model->setNodeMarker(node, "CCXLoadsSurfaceTractionModify");
+  node->setIcon(ccx_iface->getIcon("CCXLoadsSurfaceTractionModify"));
+  node = model->addNode("Delete", root_node);
+  model->setNodeMarker(node, "CCXLoadsSurfaceTractionDelete");
+  node->setIcon(ccx_iface->getIcon("CCXLoadsSurfaceTractionDelete"));
+
+  //##############################
   // add BCs Nodes
   root_node = model->getMarkedNode("CCX");
   node = model->addNode("BCs", root_node);
@@ -732,8 +760,10 @@ void cmdPanelManager::associate_panels_with_nodes()
   my_markers.push_back("CCXSectionsDelete");
   my_markers.push_back("CCXConstraintsCreateRigidBody");
   my_markers.push_back("CCXConstraintsCreateTie");
+  my_markers.push_back("CCXConstraintsCreateEquation");
   my_markers.push_back("CCXConstraintsModifyRigidBody");
   my_markers.push_back("CCXConstraintsModifyTie");
+  my_markers.push_back("CCXConstraintsModifyEquation");
   my_markers.push_back("CCXConstraintsDelete");
   my_markers.push_back("CCXSurfaceInteractionsCreate");
   my_markers.push_back("CCXSurfaceInteractionsModify");
@@ -769,6 +799,9 @@ void cmdPanelManager::associate_panels_with_nodes()
   my_markers.push_back("CCXLoadsRadiationCreate");
   my_markers.push_back("CCXLoadsRadiationModify");
   my_markers.push_back("CCXLoadsRadiationDelete");
+  my_markers.push_back("CCXLoadsSurfaceTractionCreate");
+  my_markers.push_back("CCXLoadsSurfaceTractionModify");
+  my_markers.push_back("CCXLoadsSurfaceTractionDelete");
   my_markers.push_back("CCXBCsDisplacementsModify");
   my_markers.push_back("CCXBCsTemperaturesModify");
   my_markers.push_back("CCXHistoryOutputsCreate");

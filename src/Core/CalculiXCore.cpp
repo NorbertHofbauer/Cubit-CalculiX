@@ -5714,17 +5714,20 @@ std::vector<std::vector<double>> CalculiXCore::get_draw_data_for_equation(int id
 
   for (size_t i = 0; i < equation_data_ids.size(); i++)
   {
-    std::array<double, 3> coords = CubitInterface::get_nodal_coordinates(constraints->equation_data[equation_data_ids[i]][1]);
-        
-    if (coords.size() > 0)
+    if (CubitInterface::get_node_exists(int(constraints->equation_data[equation_data_ids[i]][1])))
     {
-      std::vector<double> data;            
-      data.push_back(coords[0]);
-      data.push_back(coords[1]);
-      data.push_back(coords[2]);
-      data.push_back(constraints->equation_data[equation_data_ids[i]][2]);
-      draw_data.push_back(data);
-      data.clear();
+      std::array<double, 3> coords = CubitInterface::get_nodal_coordinates(int(constraints->equation_data[equation_data_ids[i]][1]));
+        
+      if (coords.size() > 0)
+      {
+        std::vector<double> data;            
+        data.push_back(coords[0]);
+        data.push_back(coords[1]);
+        data.push_back(coords[2]);
+        data.push_back(constraints->equation_data[equation_data_ids[i]][2]);
+        draw_data.push_back(data);
+        data.clear();
+      }
     }
   }
   return draw_data;
