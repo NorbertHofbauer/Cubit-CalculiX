@@ -4007,6 +4007,11 @@ std::vector<std::string> CalculiXCore::get_historyoutput_contact_keys()
   return  historyoutputs->contact_keys;
 }
 
+std::vector<std::string> CalculiXCore::get_historyoutput_section_keys()
+{
+  return  historyoutputs->section_keys;
+}
+
 bool CalculiXCore::create_fieldoutput(std::vector<std::string> options)
 {
   return fieldoutputs->create_output(options);
@@ -8890,6 +8895,9 @@ std::vector<std::vector<std::string>> CalculiXCore::get_historyoutputs_tree_data
     }else if (historyoutputs->outputs_data[i][2]==3)
     {
       output_name = output_name + " (contact)";
+    }else if (historyoutputs->outputs_data[i][2]==4)
+    {
+      output_name = output_name + " (section)";
     }
 
     outputs_tree_data_set.push_back(std::to_string(historyoutputs->outputs_data[i][0])); //output_id
@@ -9544,6 +9552,9 @@ std::vector<std::vector<std::string>> CalculiXCore::get_steps_historyoutputs_tre
     }else if (historyoutputs->outputs_data[output_data_id][2]==3)
     {
       output_name = output_name + " (contact)";
+    }else if (historyoutputs->outputs_data[output_data_id][2]==4)
+    {
+      output_name = output_name + " (section)";
     }
 
     outputs_tree_data_set.push_back(std::to_string(historyoutputs->outputs_data[output_data_id][0])); //output_id

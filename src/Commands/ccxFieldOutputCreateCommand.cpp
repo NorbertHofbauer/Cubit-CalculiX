@@ -24,7 +24,7 @@ std::vector<std::string> ccxFieldOutputCreateCommand::get_syntax()
 
 std::vector<std::string> ccxFieldOutputCreateCommand::get_syntax_help()
 {
-  std::vector<std::string> help(5);
+  std::vector<std::string> help(1);
   help[0] = "ccx create fieldoutput name <name> {node|element|contact}"; 
 
   return help;

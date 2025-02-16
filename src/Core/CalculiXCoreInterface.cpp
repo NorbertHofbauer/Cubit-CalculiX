@@ -680,6 +680,11 @@ std::vector<std::string> CalculiXCoreInterface::get_historyoutput_contact_keys()
   return  ccx_core.get_historyoutput_contact_keys();
 }
 
+std::vector<std::string> CalculiXCoreInterface::get_historyoutput_section_keys()
+{
+  return  ccx_core.get_historyoutput_section_keys();
+}
+
 bool CalculiXCoreInterface::create_fieldoutput(std::vector<std::string> options)
 {
   return ccx_core.create_fieldoutput(options);

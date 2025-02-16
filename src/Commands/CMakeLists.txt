@@ -167,6 +167,8 @@ set(CMD_SRC
     ${CMAKE_CURRENT_LIST_DIR}/ccxHistoryOutputElementModifyCommand.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ccxHistoryOutputContactModifyCommand.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ccxHistoryOutputContactModifyCommand.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/ccxHistoryOutputSectionModifyCommand.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/ccxHistoryOutputSectionModifyCommand.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ccxHistoryOutputDeleteCommand.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ccxHistoryOutputDeleteCommand.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ccxFieldOutputCreateCommand.cpp

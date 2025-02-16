@@ -208,6 +208,7 @@ public:
   std::vector<std::string> get_historyoutput_node_keys();
   std::vector<std::string> get_historyoutput_element_keys();
   std::vector<std::string> get_historyoutput_contact_keys();
+  std::vector<std::string> get_historyoutput_section_keys();
   bool create_fieldoutput(std::vector<std::string> options); // adds a new output
   bool modify_fieldoutput(int output_id, int modify_type, std::vector<std::string> options, std::vector<int> options_marker); // modify a output
   bool delete_fieldoutput(int output_id); // delete output

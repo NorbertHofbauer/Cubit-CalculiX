@@ -133,4 +133,4 @@
 2025-02-14 working on draw surface traction and equation
 2025-02-15 working on draw surface traction and equation
 2025-02-15 added gui for surface traction and equation
-
+2025-02-16 working on section print

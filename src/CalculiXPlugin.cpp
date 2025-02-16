@@ -84,6 +84,7 @@
 #include "ccxHistoryOutputNodeModifyCommand.hpp"
 #include "ccxHistoryOutputElementModifyCommand.hpp"
 #include "ccxHistoryOutputContactModifyCommand.hpp"
+#include "ccxHistoryOutputSectionModifyCommand.hpp"
 #include "ccxHistoryOutputDeleteCommand.hpp"
 #include "ccxFieldOutputCreateCommand.hpp"
 #include "ccxFieldOutputNodeModifyCommand.hpp"
@@ -243,6 +244,7 @@ std::vector<std::string> CalculiXPlugin::get_keys()
   keys.push_back("ccxHistoryOutputNodeModifyCommand");
   keys.push_back("ccxHistoryOutputElementModifyCommand");
   keys.push_back("ccxHistoryOutputContactModifyCommand");
+  keys.push_back("ccxHistoryOutputSectionModifyCommand");
   keys.push_back("ccxHistoryOutputDeleteCommand");
   keys.push_back("ccxFieldOutputCreateCommand");
   keys.push_back("ccxFieldOutputNodeModifyCommand");
@@ -559,6 +561,9 @@ CubitCommand* CalculiXPlugin::create_command(const std::string &key)
   
   if(key == "ccxHistoryOutputContactModifyCommand")
     return new ccxHistoryOutputContactModifyCommand();
+
+  if(key == "ccxHistoryOutputSectionModifyCommand")
+    return new ccxHistoryOutputSectionModifyCommand();
 
   if(key == "ccxHistoryOutputDeleteCommand")
     return new ccxHistoryOutputDeleteCommand();
