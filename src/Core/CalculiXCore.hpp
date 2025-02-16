@@ -93,6 +93,7 @@ public:
   std::vector<int> extractIntegers(std::string str);
   std::vector<std::string> get_ccx_element_types(); // returns all supported ccx element types;
   std::string get_ccx_element_type(int block_id); // gets the ccx element type for a block
+  int get_ccx_element_type_integration_points(int block_id); // gets the number of integration points for the ccx element type for a block
   std::string get_cubit_element_type_entity(std::string cubit_element_type); // gets the string for a cubit element type
   std::vector<std::vector<int>> get_element_id_type_connectivity(); // gets the element id , type and connectivity all elements
   std::string get_block_name(int block_id); // gets the block name

@@ -154,7 +154,7 @@ bool CoreInitialConditions::add_initialcondition_stress(int initialcondition_id,
     if ((initialconditions_data[initialconditions_data_id][1]==3) && (modify_type==1))
     {
       this->add_stress_element(double(initialconditions_data[initialconditions_data_id][2]), options[0], options[1], options[2], options[3], options[4], options[5], options[6], options[7]);
-    } else if ((initialconditions_data[initialconditions_data_id][1]==3) && (modify_type==1))
+    } else if ((initialconditions_data[initialconditions_data_id][1]==3) && (modify_type==2))
     {
       this->add_stress_block(double(initialconditions_data[initialconditions_data_id][2]), options[0], options[1], options[2], options[3], options[4], options[5], options[6]);
     }

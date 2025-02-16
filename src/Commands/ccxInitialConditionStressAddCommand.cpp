@@ -19,11 +19,11 @@ std::vector<std::string> ccxInitialConditionStressAddCommand::get_syntax()
   syntax.append("element <value:label='element_id',help='<element_id>'> ");
   syntax.append("integration_point <value:label='integration_point',help='<integration_point>'> ");
   syntax.append("sxx <value:label='sxx',help='<sxx>'> ");
-  syntax.append("syy <value:label='sxx',help='<syy>'> ");
-  syntax.append("szz <value:label='sxx',help='<szz>'> ");
-  syntax.append("sxy <value:label='sxx',help='<sxy>'> ");
-  syntax.append("sxz <value:label='sxx',help='<sxz>'> ");
-  syntax.append("syz <value:label='sxx',help='<syz>'> ");
+  syntax.append("syy <value:label='syy',help='<syy>'> ");
+  syntax.append("szz <value:label='szz',help='<szz>'> ");
+  syntax.append("sxy <value:label='sxy',help='<sxy>'> ");
+  syntax.append("sxz <value:label='sxz',help='<sxz>'> ");
+  syntax.append("syz <value:label='syz',help='<syz>'> ");
   syntax_list.push_back(syntax);
 
   syntax = "ccx ";
@@ -31,11 +31,11 @@ std::vector<std::string> ccxInitialConditionStressAddCommand::get_syntax()
   syntax.append("stress add ");
   syntax.append("block <value:label='block_id',help='<block_id>'> ");
   syntax.append("sxx <value:label='sxx',help='<sxx>'> ");
-  syntax.append("syy <value:label='sxx',help='<syy>'> ");
-  syntax.append("szz <value:label='sxx',help='<szz>'> ");
-  syntax.append("sxy <value:label='sxx',help='<sxy>'> ");
-  syntax.append("sxz <value:label='sxx',help='<sxz>'> ");
-  syntax.append("syz <value:label='sxx',help='<syz>'> ");
+  syntax.append("syy <value:label='syy',help='<syy>'> ");
+  syntax.append("szz <value:label='szz',help='<szz>'> ");
+  syntax.append("sxy <value:label='sxy',help='<sxy>'> ");
+  syntax.append("sxz <value:label='sxz',help='<sxz>'> ");
+  syntax.append("syz <value:label='syz',help='<syz>'> ");
   syntax_list.push_back(syntax);
 
   return syntax_list;

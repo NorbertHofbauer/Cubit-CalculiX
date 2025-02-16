@@ -2552,6 +2552,11 @@ std::string CalculiXCore::get_ccx_element_type(int block_id)
   return cb->get_ccx_element_type_name(block_id);
 }
 
+int CalculiXCore::get_ccx_element_type_integration_points(int block_id)
+{
+  return cb->get_ccx_element_type_integration_points(block_id);
+}
+
 std::string CalculiXCore::get_cubit_element_type_entity(std::string cubit_element_type)
 {
   return cb->get_cubit_element_type_entity_name(cubit_element_type);
@@ -5188,6 +5193,18 @@ std::vector<std::vector<std::string>> CalculiXCore::get_entities(std::string ent
       {
         entities.push_back({"temperature",initialconditions->temperature_data[sub_data_id][1]});
       }
+    }else if (initialconditions->initialconditions_data[data_id][1]==3)
+    {
+      sub_data_ids = initialconditions->get_stress_block_data_ids_from_stress_id(initialconditions->initialconditions_data[data_id][2]);
+      for (size_t i = 0; i < sub_data_ids.size(); i++)
+      {
+        entities.push_back({"block",std::to_string(int(initialconditions->stress_block_data[sub_data_ids[i]][1]))});
+      }
+      sub_data_ids = initialconditions->get_stress_element_data_ids_from_stress_id(initialconditions->initialconditions_data[data_id][2]);
+      for (size_t i = 0; i < sub_data_ids.size(); i++)
+      {
+        entities.push_back({CubitInterface::get_element_type(int(initialconditions->stress_element_data[sub_data_ids[i]][1])),std::to_string(int(initialconditions->stress_element_data[sub_data_ids[i]][1]))});
+      }
     }
   }else if (entity=="hbcsdisplacement")
   {
@@ -7530,6 +7547,7 @@ std::string CalculiXCore::get_initialcondition_export_data() // gets the export 
   std::string str_temp;
   std::string log;
   int sub_data_id;
+  std::vector<int> sub_data_ids;
   std::string command;
   int bc_set_id=-1;
   BCSetHandle bc_set;
@@ -7599,6 +7617,39 @@ std::string CalculiXCore::get_initialcondition_export_data() // gets the export 
       }
       bc_attribs.clear();
     }
+    if (initialconditions->initialconditions_data[i][1]==3)
+    {
+      str_temp = "*INITIAL CONDITIONS,TYPE=STRESS";
+      initialconditions_export_list.push_back(str_temp);
+
+      sub_data_ids = initialconditions->get_stress_element_data_ids_from_stress_id(initialconditions->initialconditions_data[i][2]);
+      for (size_t ii = 0; ii < sub_data_ids.size(); ii++)
+      {
+        std::vector<double> data = initialconditions->stress_element_data[sub_data_ids[ii]];
+        str_temp = std::to_string(int(data[1])) + "," + std::to_string(int(data[2])) + "," + to_string_scientific(data[3]) + "," + to_string_scientific(data[4]) + "," + to_string_scientific(data[5]) + "," + to_string_scientific(data[7]) + "," + to_string_scientific(data[8]);
+        initialconditions_export_list.push_back(str_temp);
+      }
+
+      sub_data_ids = initialconditions->get_stress_block_data_ids_from_stress_id(initialconditions->initialconditions_data[i][2]);
+      for (size_t ii = 0; ii < sub_data_ids.size(); ii++)
+      {
+        std::vector<double> data = initialconditions->stress_block_data[sub_data_ids[ii]];
+        
+        std::string element_type = CubitInterface::get_block_element_type(int(data[1]));
+        int ip = this->get_ccx_element_type_integration_points(int(data[1]));
+        std::vector<int> ids = this->get_block_element_ids(int(data[1]));
+        
+        for (size_t iii = 0; iii < ids.size(); iii++)
+        {
+          for (size_t iv = 0; iv < ip; iv++)
+          {
+            str_temp = std::to_string(ids[iii]) + "," + std::to_string(iv+1) + "," +  to_string_scientific(data[2]) + "," + to_string_scientific(data[3]) + "," + to_string_scientific(data[4]) + "," + to_string_scientific(data[5]) + "," + to_string_scientific(data[6]) + "," + to_string_scientific(data[7]);
+            initialconditions_export_list.push_back(str_temp);
+          }
+        }      
+      }
+    }
+    
     // CUSTOMLINE START
     customline = customlines->get_customline_data("AFTER","INITIALCONDITION",initialconditions->initialconditions_data[i][0]);
     for (size_t icl = 0; icl < customline.size(); icl++)
@@ -8999,6 +9050,11 @@ std::vector<std::vector<std::string>> CalculiXCore::get_initialconditions_tree_d
       }
       initialcondition_name = initialcondition_name + " (Temperature)";
       
+    }else if (initialconditions->initialconditions_data[i][1]==3)
+    { 
+      sub_id = initialconditions->initialconditions_data[i][2];
+      
+      initialcondition_name = "Stress_" + std::to_string(sub_id);
     }
 
     initialconditions_tree_data_set.push_back(std::to_string(initialconditions->initialconditions_data[i][0])); //initialcondition_id
