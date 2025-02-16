@@ -725,6 +725,11 @@ bool CalculiXCoreInterface::modify_initialcondition(int initialcondition_id, int
   return ccx_core.modify_initialcondition(initialcondition_id, modify_type, options, options_marker);
 }
 
+bool CalculiXCoreInterface::add_initialcondition_stress(int initialcondition_id, int modify_type, std::vector<double> options)
+{
+  return ccx_core.add_initialcondition_stress(initialcondition_id, modify_type, options);
+}
+
 bool CalculiXCoreInterface::delete_initialcondition(int initialcondition_id)
 {
   return ccx_core.delete_initialcondition(initialcondition_id);

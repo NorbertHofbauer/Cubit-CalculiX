@@ -4052,6 +4052,11 @@ bool CalculiXCore::modify_initialcondition(int initialcondition_id, int modify_t
   return initialconditions->modify_initialcondition(initialcondition_id, modify_type, options, options_marker);
 }
 
+bool CalculiXCore::add_initialcondition_stress(int initialcondition_id, int modify_type, std::vector<double> options)
+{
+  return initialconditions->add_initialcondition_stress(initialcondition_id, modify_type, options);
+}
+
 bool CalculiXCore::delete_initialcondition(int initialcondition_id)
 {
   return initialconditions->delete_initialcondition(initialcondition_id);

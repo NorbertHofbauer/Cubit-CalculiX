@@ -187,6 +187,8 @@ set(CMD_SRC
     ${CMAKE_CURRENT_LIST_DIR}/ccxInitialConditionDisplacementModifyCommand.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ccxInitialConditionTemperatureModifyCommand.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ccxInitialConditionTemperatureModifyCommand.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/ccxInitialConditionStressAddCommand.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/ccxInitialConditionStressAddCommand.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ccxInitialConditionDeleteCommand.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ccxInitialConditionDeleteCommand.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ccxHBCAddBCCommand.cpp

@@ -94,6 +94,7 @@
 #include "ccxInitialConditionCreateCommand.hpp"
 #include "ccxInitialConditionDisplacementModifyCommand.hpp"
 #include "ccxInitialConditionTemperatureModifyCommand.hpp"
+#include "ccxInitialConditionStressAddCommand.hpp"
 #include "ccxInitialConditionDeleteCommand.hpp"
 #include "ccxHBCAddBCCommand.hpp"
 #include "ccxHBCRemoveBCCommand.hpp"
@@ -254,6 +255,7 @@ std::vector<std::string> CalculiXPlugin::get_keys()
   keys.push_back("ccxInitialConditionCreateCommand");
   keys.push_back("ccxInitialConditionDisplacementModifyCommand");
   keys.push_back("ccxInitialConditionTemperatureModifyCommand");
+  keys.push_back("ccxInitialConditionStressAddCommand");
   keys.push_back("ccxInitialConditionDeleteCommand");
   keys.push_back("ccxHBCAddBCCommand");
   keys.push_back("ccxHBCRemoveBCCommand");
@@ -591,6 +593,9 @@ CubitCommand* CalculiXPlugin::create_command(const std::string &key)
 
   if(key == "ccxInitialConditionTemperatureModifyCommand")
     return new ccxInitialConditionTemperatureModifyCommand();
+
+  if(key == "ccxInitialConditionStressAddCommand")
+    return new ccxInitialConditionStressAddCommand();
 
   if(key == "ccxInitialConditionDeleteCommand")
     return new ccxInitialConditionDeleteCommand();

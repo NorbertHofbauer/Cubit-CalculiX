@@ -217,6 +217,7 @@ public:
   std::vector<std::string> get_fieldoutput_contact_keys();
   bool create_initialcondition(std::vector<std::string> options); // adds a new initialcondition
   bool modify_initialcondition(int initialcondition_id, int modify_type, std::vector<std::string> options, std::vector<int> options_marker); // modify a initialcondition
+  bool add_initialcondition_stress(int initialcondition_id, int modify_type, std::vector<double> options); // adds stress values to a initialcondition stress
   bool delete_initialcondition(int initialcondition_id); // delete initialcondition
   bool hbc_add_bcs(int bcs_id, int bc_type, std::vector<int> bc_ids); // adds bcs to bcs_data
   bool hbc_remove_bcs(int bcs_id, int bc_type, std::vector<int> bc_ids); // removes bcs from bcs_data
