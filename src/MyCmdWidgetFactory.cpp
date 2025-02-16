@@ -75,6 +75,7 @@
 #include "HistoryOutputsModifyNodePanel.hpp"
 #include "HistoryOutputsModifyElementPanel.hpp"
 #include "HistoryOutputsModifyContactPanel.hpp"
+#include "HistoryOutputsModifySectionPanel.hpp"
 #include "HistoryOutputsDeletePanel.hpp"
 #include "FieldOutputsCreatePanel.hpp"
 #include "FieldOutputsModifyNodePanel.hpp"
@@ -323,6 +324,8 @@ QWidget* MyCmdWidgetFactory::createWidget(const QString &name)
     return new HistoryOutputsModifyElementPanel();
   if(name == "CCXHistoryOutputsModifyContact")
     return new HistoryOutputsModifyContactPanel();
+  if(name == "CCXHistoryOutputsModifySection")
+    return new HistoryOutputsModifySectionPanel();
   if(name == "CCXHistoryOutputsDelete")
     return new HistoryOutputsDeletePanel();
   if(name == "CCXFieldOutputsCreate")

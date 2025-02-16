@@ -32,6 +32,7 @@ HistoryOutputsCreatePanel::HistoryOutputsCreatePanel(QWidget *parent) :
   comboBox_2->addItem("Node");
   comboBox_2->addItem("Element");
   comboBox_2->addItem("Contact");
+  comboBox_2->addItem("Section");
   //lineEdit_1->setPlaceholderText("Optional");
   //lineEdit_2->setPlaceholderText("Optional");
 
@@ -81,6 +82,9 @@ void HistoryOutputsCreatePanel::on_pushButton_apply_clicked(bool)
     }else if (comboBox_2->currentIndex()==2)
     {
       command.append(" contact");
+    }else if (comboBox_2->currentIndex()==3)
+    {
+      command.append(" section");
     }
   }
   

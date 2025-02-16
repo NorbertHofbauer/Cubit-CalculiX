@@ -263,6 +263,8 @@ set(SRC
     ${CMAKE_CURRENT_LIST_DIR}/HistoryOutputsModifyElementPanel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/HistoryOutputsModifyContactPanel.hpp
     ${CMAKE_CURRENT_LIST_DIR}/HistoryOutputsModifyContactPanel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/HistoryOutputsModifySectionPanel.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/HistoryOutputsModifySectionPanel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/HistoryOutputsDeletePanel.hpp
     ${CMAKE_CURRENT_LIST_DIR}/HistoryOutputsDeletePanel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/FieldOutputsCreatePanel.hpp

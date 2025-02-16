@@ -107,6 +107,7 @@ void cmdPanelManager::clear()
     my_markers.push_back("CCXHistoryOutputsModifyNode");
     my_markers.push_back("CCXHistoryOutputsModifyElement");
     my_markers.push_back("CCXHistoryOutputsModifyContact");
+    my_markers.push_back("CCXHistoryOutputsModifySection");
     my_markers.push_back("CCXHistoryOutputsDelete");
     my_markers.push_back("CCXFieldOutputsCreate");
     my_markers.push_back("CCXFieldOutputsModifyNode");
@@ -591,6 +592,9 @@ void cmdPanelManager::initialize_from_code()
   node = model->addNode("Contact", root_node);
   model->setNodeMarker(node, "CCXHistoryOutputsModifyContact");
   node->setIcon(ccx_iface->getIcon("CCXHistoryOutputsModifyContact"));
+  node = model->addNode("Section", root_node);
+  model->setNodeMarker(node, "CCXHistoryOutputsModifySection");
+  node->setIcon(ccx_iface->getIcon("CCXHistoryOutputsModifySection"));
   
   //##############################
   // add Field Outputs Nodes
@@ -808,6 +812,7 @@ void cmdPanelManager::associate_panels_with_nodes()
   my_markers.push_back("CCXHistoryOutputsModifyNode");
   my_markers.push_back("CCXHistoryOutputsModifyElement");
   my_markers.push_back("CCXHistoryOutputsModifyContact");
+  my_markers.push_back("CCXHistoryOutputsModifySection");
   my_markers.push_back("CCXHistoryOutputsDelete");
   my_markers.push_back("CCXFieldOutputsCreate");
   my_markers.push_back("CCXFieldOutputsModifyNode");
