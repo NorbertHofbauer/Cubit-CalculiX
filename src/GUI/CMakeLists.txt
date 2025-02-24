@@ -281,6 +281,10 @@ set(SRC
     ${CMAKE_CURRENT_LIST_DIR}/InitialConditionsCreatePanel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/InitialConditionsModifyPanel.hpp
     ${CMAKE_CURRENT_LIST_DIR}/InitialConditionsModifyPanel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/InitialConditionsStressAddElementPanel.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/InitialConditionsStressAddElementPanel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/InitialConditionsStressAddBlockPanel.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/InitialConditionsStressAddBlockPanel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/InitialConditionsDeletePanel.hpp
     ${CMAKE_CURRENT_LIST_DIR}/InitialConditionsDeletePanel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/InitialConditionsCreatePanel.hpp

@@ -135,4 +135,5 @@
 2025-02-15 added gui for surface traction and equation
 2025-02-16 working on section print
 2025-02-17 working on initial condition stress
+2025-02-24 working on gui for initial condition stress
 

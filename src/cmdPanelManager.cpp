@@ -116,6 +116,8 @@ void cmdPanelManager::clear()
     my_markers.push_back("CCXFieldOutputsDelete");
     my_markers.push_back("CCXInitialConditionsCreate");
     my_markers.push_back("CCXInitialConditionsModify");
+    my_markers.push_back("CCXInitialConditionsStressAddBlock");
+    my_markers.push_back("CCXInitialConditionsStressAddElement");
     my_markers.push_back("CCXInitialConditionsDelete");
     my_markers.push_back("CCXStepsCreate");
     my_markers.push_back("CCXStepsModifyParameter");
@@ -641,9 +643,20 @@ void cmdPanelManager::initialize_from_code()
   node = model->addNode("Modify", root_node);
   model->setNodeMarker(node, "CCXInitialConditionsModify");
   node->setIcon(ccx_iface->getIcon("CCXInitialConditionsModify"));
+  node = model->addNode("Add", root_node);
+  model->setNodeMarker(node, "CCXInitialConditionsAdd");
+  node->setIcon(ccx_iface->getIcon("CCXInitialConditionsAdd"));
   node = model->addNode("Delete", root_node);
   model->setNodeMarker(node, "CCXInitialConditionsDelete");
   node->setIcon(ccx_iface->getIcon("CCXInitialConditionsDelete"));
+
+  root_node = model->getMarkedNode("CCXInitialConditionsAdd");
+  node = model->addNode("Stress for Block", root_node);
+  model->setNodeMarker(node, "CCXInitialConditionsStressAddBlock");
+  node->setIcon(ccx_iface->getIcon("CCXInitialConditionsStressAddBlock"));
+  node = model->addNode("Stress for Element", root_node);
+  model->setNodeMarker(node, "CCXInitialConditionsStressAddElement");
+  node->setIcon(ccx_iface->getIcon("CCXInitialConditionsStressAddElement"));
 
   //##############################
   // add Steps Nodes
@@ -821,6 +834,8 @@ void cmdPanelManager::associate_panels_with_nodes()
   my_markers.push_back("CCXFieldOutputsDelete");
   my_markers.push_back("CCXInitialConditionsCreate");
   my_markers.push_back("CCXInitialConditionsModify");
+  my_markers.push_back("CCXInitialConditionsStressAddBlock");
+  my_markers.push_back("CCXInitialConditionsStressAddElement");
   my_markers.push_back("CCXInitialConditionsDelete");
   my_markers.push_back("CCXStepsCreate");
   my_markers.push_back("CCXStepsModifyParameter");

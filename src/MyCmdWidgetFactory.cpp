@@ -84,6 +84,8 @@
 #include "FieldOutputsDeletePanel.hpp"
 #include "InitialConditionsCreatePanel.hpp"
 #include "InitialConditionsModifyPanel.hpp"
+#include "InitialConditionsStressAddBlockPanel.hpp"
+#include "InitialConditionsStressAddElementPanel.hpp"
 #include "InitialConditionsDeletePanel.hpp"
 #include "StepsCreatePanel.hpp"
 #include "StepsModifyParameterPanel.hpp"
@@ -342,6 +344,10 @@ QWidget* MyCmdWidgetFactory::createWidget(const QString &name)
     return new InitialConditionsCreatePanel();
   if(name == "CCXInitialConditionsModify")
     return new InitialConditionsModifyPanel();
+  if(name == "CCXInitialConditionsStressAddBlock")
+    return new InitialConditionsStressAddBlockPanel();
+  if(name == "CCXInitialConditionsStressAddElement")
+    return new InitialConditionsStressAddElementPanel();
   if(name == "CCXInitialConditionsDelete")
     return new InitialConditionsDeletePanel();
   if(name == "CCXStepsCreate")
