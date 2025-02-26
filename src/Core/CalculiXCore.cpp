@@ -1221,6 +1221,7 @@ bool CalculiXCore::save_cub(std::string filename)
     progressbar.step();
     progressbar.check_interrupt();
     //LoadsSurfaceTraction
+    cubTool.createGroup("Cubit-CalculiX/Loads/SurfaceTraction");
     cubTool.write_dataset_int_rank_2("loads_data","Cubit-CalculiX/Loads/SurfaceTraction", loadssurfacetraction->loads_data);
     cubTool.write_dataset_string_rank_2("time_delay_data","Cubit-CalculiX/Loads/SurfaceTraction", loadssurfacetraction->time_delay_data);
     cubTool.write_dataset_double_rank_2("force_data","Cubit-CalculiX/Loads/SurfaceTraction", loadssurfacetraction->force_data);
