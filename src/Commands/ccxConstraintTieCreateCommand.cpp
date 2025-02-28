@@ -48,6 +48,7 @@ bool ccxConstraintTieCreateCommand::execute(CubitCommandData &data)
 
   std::string name;
   std::vector<std::string> options;
+  std::vector<std::vector<double>> options2;
   double position_tolerance_value;
   std::string position_tolerance;
   int master_value;
@@ -75,7 +76,7 @@ bool ccxConstraintTieCreateCommand::execute(CubitCommandData &data)
   options.push_back(slave_id);
   options.push_back(position_tolerance);
 
-  if (!ccx_iface.create_constraint("TIE",options))
+  if (!ccx_iface.create_constraint("TIE",options,options2))
   {
     output = "Failed!\n";
     PRINT_ERROR(output.c_str());

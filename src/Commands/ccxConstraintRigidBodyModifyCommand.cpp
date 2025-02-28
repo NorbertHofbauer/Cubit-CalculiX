@@ -45,6 +45,7 @@ bool ccxConstraintRigidBodyModifyCommand::execute(CubitCommandData &data)
   std::string output;
 
   std::vector<std::string> options;
+  std::vector<std::vector<double>> options2;
   std::vector<int> options_marker;
   int ref_vertex_value;
   int rot_vertex_value;
@@ -108,7 +109,7 @@ bool ccxConstraintRigidBodyModifyCommand::execute(CubitCommandData &data)
   options.push_back(ref_vertex);
   options.push_back(rot_vertex);
 
-  if (!ccx_iface.modify_constraint("RIGIDBODY",constraint_id,options,options_marker))
+  if (!ccx_iface.modify_constraint("RIGIDBODY",constraint_id,options,options_marker,options2))
   {
     output = "Failed with ID " + std::to_string(constraint_id) + "!\n";
     PRINT_ERROR(output.c_str());

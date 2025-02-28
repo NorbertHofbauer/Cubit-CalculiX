@@ -35,6 +35,7 @@ public:
   std::vector<std::string> get_ccx_element_types(); // returns all supported ccx element types
   bool set_ccx_element_type(int block_id, std::string ccx_element_type); // sets the ccx element type for a block
   std::string get_ccx_element_type(int block_id); // gets the ccx element type for a block
+  int get_ccx_element_type_integration_points(int block_id); // gets the number of integration points for the ccx element type for a block
   std::string get_cubit_element_type_entity(std::string cubit_element_type); // gets the string for a cubit element type
   std::vector<std::vector<int>> get_element_id_type_connectivity(); // gets the element id , type and connectivity all elements
   std::string get_block_name(int block_id); // gets the block name
@@ -57,9 +58,11 @@ public:
   std::vector<int> get_loadstrajectory_ids(); // get all load trajectory ids
   std::vector<int> get_loadsfilm_ids(); // get all load film ids
   std::vector<int> get_loadsradiation_ids(); // get all load radiation ids
+  std::vector<int> get_loadssurfacetraction_ids(); // get all load surface traction ids
   std::vector<int> get_bcsdisplacements_ids(); // get all bc displacement ids
   std::vector<int> get_bcstemperatures_ids(); // get all bc temperature ids
   std::vector<int> get_orientations_ids(); // get all orientation ids
+  std::vector<int> get_equation_ids(); // get all equation ids
   bool check_block_exists(int block_id);
   bool check_nodeset_exists(int nodeset_id);
   bool check_sideset_exists(int sideset_id);
@@ -95,8 +98,8 @@ public:
   bool create_section(std::string section_type,int block_id, int material_id, std::vector<std::string> options); // adds a new section
   bool modify_section(std::string section_type,int section_id, std::vector<std::string> options, std::vector<int> options_marker); // modify a section  
   bool delete_section(int section_id); // delete section
-  bool create_constraint(std::string constraint_type, std::vector<std::string> options); // adds a new constraint
-  bool modify_constraint(std::string constraint_type,int constraint_id, std::vector<std::string> options, std::vector<int> options_marker); // modify a constraint  
+  bool create_constraint(std::string constraint_type, std::vector<std::string> options, std::vector<std::vector<double>> options2); // adds a new constraint
+  bool modify_constraint(std::string constraint_type,int constraint_id, std::vector<std::string> options, std::vector<int> options_marker, std::vector<std::vector<double>> options2); // modify a constraint  
   bool delete_constraint(int constraint_id); // delete constraint
   bool create_constraint_tie_from_cubitcontactpair(std::string name, std::string position_tolerance); // create constraint tie from cubit contact pairs
   bool create_surfaceinteraction(std::string surfacebehavior_type, std::vector<std::string> options, std::vector<std::vector<std::string>> options2); // adds a new surfaceinteraction
@@ -143,6 +146,9 @@ public:
   bool create_loadsradiation(std::vector<std::string> options); // adds a new radiation load
   bool modify_loadsradiation(int radiation_id, std::vector<std::string> options, std::vector<int> options_marker); // modify a radiation
   bool delete_loadsradiation(int radiation_id); // delete radiation load
+  bool create_loadssurfacetraction(std::vector<std::string> options, std::vector<double> options2); // adds a new surfacetraction load
+  bool modify_loadssurfacetraction(int surfacetraction_id, std::vector<std::string> options, std::vector<double> options2, std::vector<int> options_marker); // modify a surface traction
+  bool delete_loadssurfacetraction(int surfacetraction_id); // delete surfacetraction load
   bool modify_bcsdisplacements(int displacement_id, std::vector<std::string> options, std::vector<int> options_marker); // modify a displacement
   bool modify_bcstemperatures(int displacement_id, std::vector<std::string> options, std::vector<int> options_marker); // modify a temperature
   bool create_historyoutput(std::vector<std::string> options); // adds a new output
@@ -151,6 +157,7 @@ public:
   std::vector<std::string> get_historyoutput_node_keys();
   std::vector<std::string> get_historyoutput_element_keys();
   std::vector<std::string> get_historyoutput_contact_keys();
+  std::vector<std::string> get_historyoutput_section_keys();
   bool create_fieldoutput(std::vector<std::string> options); // adds a new output
   bool modify_fieldoutput(int output_id, int modify_type, std::vector<std::string> options, std::vector<int> options_marker); // modify a output
   bool delete_fieldoutput(int output_id); // delete output
@@ -159,6 +166,7 @@ public:
   std::vector<std::string> get_fieldoutput_contact_keys();
   bool create_initialcondition(std::vector<std::string> options); // adds a new initialcondition
   bool modify_initialcondition(int initialcondition_id, int modify_type, std::vector<std::string> options, std::vector<int> options_marker); // modify a initialcondition
+  bool add_initialcondition_stress(int initialcondition_id, int modify_type, std::vector<double> options); // adds stress values to a initialcondition stress
   bool delete_initialcondition(int initialcondition_id); // delete initialcondition
   bool hbc_add_bcs(int bcs_id, int bc_type, std::vector<int> bc_ids); // adds bcs to bcs_data
   bool hbc_remove_bcs(int bcs_id, int bc_type, std::vector<int> bc_ids); // removes bcs from bcs_data
@@ -224,10 +232,12 @@ public:
   std::vector<std::vector<double>> get_draw_data_for_load_centrifugal(int id); // returns coord(3) and magnitude(3) std::vector<double>
   std::vector<std::vector<double>> get_draw_data_for_load_film(int id); // returns coord(3) and magnitude(3) std::vector<double>
   std::vector<std::vector<double>> get_draw_data_for_load_radiation(int id); // returns coord(3) and magnitude(3) std::vector<double>
+  std::vector<std::vector<double>> get_draw_data_for_load_surface_traction(int id); // returns coord(3) and magnitude(3) std::vector<double>
   std::vector<std::vector<double>> get_draw_data_for_bc_displacement(int id); // returns coord(3) and dof
   std::vector<std::vector<double>> get_draw_data_for_bc_temperature(int id); // returns coord(3) and dof
   std::vector<std::vector<double>> get_draw_data_for_orientation(int id); // returns pairs of 4 for {system_type,local_axis_angle}, coord(3) of section center, a_coord(3) ,b_coord(3)
-  bool draw_all(double size); // draw all loads,bcs,orientations
+  std::vector<std::vector<double>> get_draw_data_for_equation(int id); // returns coord(3) and dof for each variable
+  bool draw_all(double size); // draw all loads,bcs,orientations,equations
   bool draw_load_force(std::vector<int> force_ids,double size); // draw load force
   bool draw_load_pressure(std::vector<int> pressure_ids,double size); // draw load pressure
   bool draw_load_heatflux(std::vector<int> heatflux_ids,double size); // draw load heatflux
@@ -236,12 +246,15 @@ public:
   bool draw_load_trajectory(std::vector<int> trajectory_ids,double size); // draw load trajectory
   bool draw_load_film(std::vector<int> film_ids,double size); // draw load film
   bool draw_load_radiation(std::vector<int> radiation_ids,double size); // draw load radiation
+  bool draw_load_surface_traction(std::vector<int> surface_traction_ids,double size); // draw load surface traction
   bool draw_bc_displacement(std::vector<int> displacement_ids,double size); // draw bc displacement
   bool draw_bc_temperature(std::vector<int> temperature_ids,double size); // draw bc temperature
   bool draw_orientation(std::vector<int> orientation_ids,double size); // draw orientation
+  bool draw_equation(std::vector<int> equation_ids,double size); // draw equation
   bool draw_loads(double size); // draw all loads
   bool draw_bcs(double size); // draw all bcs
   bool draw_orientations(double size); // draw all orientations
+  bool draw_equations(double size); // draw all equations
   bool draw_load_forces(double size); //draw all forces
   bool draw_load_pressures(double size); //draw all pressures
   bool draw_load_heatfluxes(double size); //draw all heatfluxes
@@ -250,6 +263,7 @@ public:
   bool draw_load_trajectories(double size); //draw all trajectories
   bool draw_load_films(double size); //draw all films
   bool draw_load_radiations(double size); //draw all radiations
+  bool draw_load_surface_tractions(double size); //draw all surface tractions
   bool draw_bc_displacements(double size); //draw all displacements
   bool draw_bc_temperatures(double size); //draw all temperatures
 
@@ -317,6 +331,7 @@ public:
   std::vector<std::vector<std::string>> get_loadstrajectory_tree_data(); // gets the data from core to build the tree
   std::vector<std::vector<std::string>> get_loadsfilm_tree_data(); // gets the data from core to build the tree
   std::vector<std::vector<std::string>> get_loadsradiation_tree_data(); // gets the data from core to build the tree
+  std::vector<std::vector<std::string>> get_loadssurfacetraction_tree_data(); // gets the data from core to build the tree
   std::vector<std::vector<std::string>> get_bcsdisplacements_tree_data(); // gets the data from core to build the tree
   std::vector<std::vector<std::string>> get_bcstemperatures_tree_data(); // gets the data from core to build the tree
   std::vector<std::vector<std::string>> get_historyoutputs_tree_data(); // gets the data from core to build the tree
@@ -333,6 +348,7 @@ public:
   std::vector<std::vector<std::string>> get_steps_loadstrajectory_tree_data(int step_id); // gets the data from core to build the tree
   std::vector<std::vector<std::string>> get_steps_loadsfilm_tree_data(int step_id); // gets the data from core to build the tree
   std::vector<std::vector<std::string>> get_steps_loadsradiation_tree_data(int step_id); // gets the data from core to build the tree
+  std::vector<std::vector<std::string>> get_steps_loadssurfacetraction_tree_data(int step_id); // gets the data from core to build the tree
   std::vector<std::vector<std::string>> get_steps_bcsdisplacements_tree_data(int step_id); // gets the data from core to build the tree
   std::vector<std::vector<std::string>> get_steps_bcstemperatures_tree_data(int step_id); // gets the data from core to build the tree
   std::vector<std::vector<std::string>> get_steps_historyoutputs_tree_data(int step_id); // gets the data from core to build the tree

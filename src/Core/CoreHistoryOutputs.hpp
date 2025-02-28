@@ -18,11 +18,12 @@ public:
   // NODE PRINT
   // EL PRINT
   // CONTACT PRINT
+  // SECTION PRINT
 
   std::vector<std::vector<int>> outputs_data; // used to store the connection between a output id and output parameter id
   // outputs_data[0][0] output_id
   // outputs_data[0][1] name_id           option 0
-  // outputs_data[0][2] output_type 1 node print, 2 el print, 3 contact print       option 1
+  // outputs_data[0][2] output_type 1 node print, 2 el print, 3 contact print, 4 section print       option 1
   // outputs_data[0][3] output_type_id         
 
   std::vector<std::vector<std::string>> name_data;
@@ -96,7 +97,19 @@ public:
   // contact_data[0][10] KEY: CF // needs contact pair
   // contact_data[0][11] KEY: CFN // needs contact pair
   // contact_data[0][12] KEY: CFS // needs contact pair 
-    
+
+  std::vector<std::string> section_keys;
+  std::vector<std::vector<std::string>> section_data;
+  // section_data[0][0] section_id              
+  // section_data[0][1] sideset    option[0]...
+  // section_data[0][2] FREQUENCYF
+  // section_data[0][3] TIME POINTS
+  // section_data[0][4] KEY: SOF
+  // section_data[0][5] KEY: SOM
+  // section_data[0][6] KEY: SOAREA
+  // section_data[0][7] KEY: FLUX
+  // section_data[0][8] KEY: DRAG
+
   bool is_initialized = false;
 
   bool init(); // initialize
@@ -111,11 +124,13 @@ public:
   bool add_node(std::string node_id); // adds new node to node_data with empty data
   bool add_element(std::string element_id); // adds new element to element_data with empty data
   bool add_contact(std::string contact_id); // adds new contact to contact_data with empty data
+  bool add_section(std::string section_id); // adds new section to section_data with empty data
   int  get_outputs_data_id_from_output_id(int output_id); // searches for the output_id in the outputs_data and returns the indices or -1 if it fails
   int  get_name_data_id_from_name_id(int name_id); // searches for the name_id in the name_data and returns the indices or -1 if it fails
   int  get_node_data_id_from_node_id(int node_id); // searches for the node_id in the node_data and returns the indices or -1 if it fails
   int  get_element_data_id_from_element_id(int element_id); // searches for the element_id in the element_data and returns the indices or -1 if it fails
   int  get_contact_data_id_from_contact_id(int contact_id); // searches for the contact_id in the contact_data and returns the indices or -1 if it fails
+  int  get_section_data_id_from_section_id(int contact_id); // searches for the contact_id in the contact_data and returns the indices or -1 if it fails
   std::string get_output_export(int output_id); // get CalculiX output export
   std::string print_data(); // prints out the data
 

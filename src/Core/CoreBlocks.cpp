@@ -64,6 +64,67 @@ CoreBlocks::CoreBlocks()
   // special elements
   //ccx_element_types.push_back("SPRINGA");
 
+  // define the ccx element types
+  // volume
+  ccx_element_ip.push_back(1);//"C3D4");
+  ccx_element_ip.push_back(2);//"C3D6"); //wedge 6
+  ccx_element_ip.push_back(8);//"C3D8");
+  ccx_element_ip.push_back(1);//"C3D8R");
+  ccx_element_ip.push_back(8);//"C3D8I");
+  ccx_element_ip.push_back(4);//"C3D10");
+  ccx_element_ip.push_back(4);//"C3D10T");
+  ccx_element_ip.push_back(9);//"C3D15"); //wedge 15
+  ccx_element_ip.push_back(27);//"C3D20");
+  ccx_element_ip.push_back(8);//"C3D20R");
+  //shell
+  ccx_element_ip.push_back(2);//"S3");
+  ccx_element_ip.push_back(8);//"S4");
+  ccx_element_ip.push_back(1);//"S4R");
+  ccx_element_ip.push_back(9);//"S6");
+  ccx_element_ip.push_back(27);//"S8");
+  ccx_element_ip.push_back(8);//"S8R");
+  //membrane
+  ccx_element_ip.push_back(2);//"M3D3");
+  ccx_element_ip.push_back(8);//"M3D4");
+  ccx_element_ip.push_back(1);//"M3D4R");
+  ccx_element_ip.push_back(9);//"M3D6");
+  ccx_element_ip.push_back(27);//"M3D8");
+  ccx_element_ip.push_back(8);//"M3D8R");
+  
+  // plane stress
+  ccx_element_ip.push_back(2);//"CPS3");
+  ccx_element_ip.push_back(8);//"CPS4");
+  ccx_element_ip.push_back(1);//"CPS4R");
+  ccx_element_ip.push_back(9);//"CPS6");
+  ccx_element_ip.push_back(27);//"CPS8");
+  ccx_element_ip.push_back(8);//"CPS8R");
+  // plane strain
+  ccx_element_ip.push_back(2);//"CPE3");
+  ccx_element_ip.push_back(8);//"CPE4");
+  ccx_element_ip.push_back(1);//"CPE4R");
+  ccx_element_ip.push_back(9);//"CPE6");
+  ccx_element_ip.push_back(27);//"CPE8");
+  ccx_element_ip.push_back(8);//"CPE8R");
+  // axisymetric elements
+  ccx_element_ip.push_back(2);//"CAX3");
+  ccx_element_ip.push_back(8);//"CAX4");
+  ccx_element_ip.push_back(1);//"CAX4R");
+  ccx_element_ip.push_back(9);//"CAX6");
+  ccx_element_ip.push_back(27);//"CAX8");
+  ccx_element_ip.push_back(8);//"CAX8R");
+  // beam elements
+  ccx_element_ip.push_back(8);//"B21");
+  ccx_element_ip.push_back(8);//"B31");
+  ccx_element_ip.push_back(1);//"B31R");
+  ccx_element_ip.push_back(27);//"B32");
+  ccx_element_ip.push_back(8);//"B32R");
+  // truss elements
+  ccx_element_ip.push_back(8);//"T2D2");
+  ccx_element_ip.push_back(8);//"T3D2");
+  ccx_element_ip.push_back(27);//"T3D3");
+  // special elements
+  //ccx_element_types.push_back("SPRINGA");
+
   // define the cubit element types
   cubit_element_types.push_back("SPHERE");// 0
   cubit_element_types.push_back("SPRING");// 1
@@ -427,4 +488,32 @@ std::string CoreBlocks::get_cubit_element_type_entity_name(std::string cubit_ele
     }  
   }
   return return_str;
+}
+
+int CoreBlocks::get_ccx_element_type_integration_points(int block_id)
+{
+  int ip_return;
+  ip_return = 0;
+  int standard_id = -1;
+  int cubit_element_types_id = -1;
+  
+  int blocks_data_id = get_blocks_data_id_from_block_id(block_id);
+  if (blocks_data_id != -1)
+  {
+    if (blocks_data[blocks_data_id][2] != -1)
+    {
+      ip_return = ccx_element_ip[blocks_data[blocks_data_id][2]];
+    }else{
+      cubit_element_types_id = blocks_data[blocks_data_id][1];
+      if (cubit_element_types_id != -1)
+      {
+        standard_id = get_standard_ccx_element_type_id(cubit_element_types[cubit_element_types_id]);
+        if (standard_id != -1){
+          ip_return = ccx_element_ip[standard_id];
+        }
+      }
+    }
+  }
+  
+  return ip_return;
 }

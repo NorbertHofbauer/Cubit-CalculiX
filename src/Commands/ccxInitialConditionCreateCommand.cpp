@@ -15,7 +15,7 @@ std::vector<std::string> ccxInitialConditionCreateCommand::get_syntax()
 
   std::string syntax = "ccx ";
   syntax.append("create initialcondition ");
-  syntax.append("{displacement|temperature}" );
+  syntax.append("{displacement|temperature|stress}" );
   syntax_list.push_back(syntax);
   
   return syntax_list;
@@ -24,7 +24,7 @@ std::vector<std::string> ccxInitialConditionCreateCommand::get_syntax()
 std::vector<std::string> ccxInitialConditionCreateCommand::get_syntax_help()
 {
   std::vector<std::string> help(5);
-  help[0] = "ccx create initialcondition {displacement|temperature}"; 
+  help[0] = "ccx create initialcondition {displacement|temperature|stress}"; 
 
   return help;
 }
@@ -49,6 +49,9 @@ bool ccxInitialConditionCreateCommand::execute(CubitCommandData &data)
   } else if (data.find_keyword("TEMPERATURE"))
   {
     options.push_back("2");
+  } else if (data.find_keyword("STRESS"))
+  {
+    options.push_back("3");
   }
   
   if (!ccx_iface.create_initialcondition(options))

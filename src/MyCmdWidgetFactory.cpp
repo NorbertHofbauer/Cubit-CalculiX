@@ -27,8 +27,10 @@
 #include "SectionsDeletePanel.hpp"
 #include "ConstraintsCreateRigidBodyPanel.hpp"
 #include "ConstraintsCreateTiePanel.hpp"
+#include "ConstraintsCreateEquationPanel.hpp"
 #include "ConstraintsModifyRigidBodyPanel.hpp"
 #include "ConstraintsModifyTiePanel.hpp"
+#include "ConstraintsModifyEquationPanel.hpp"
 #include "ConstraintsDeletePanel.hpp"
 #include "SurfaceInteractionsCreatePanel.hpp"
 #include "SurfaceInteractionsModifyPanel.hpp"
@@ -64,12 +66,16 @@
 #include "LoadsRadiationCreatePanel.hpp"
 #include "LoadsRadiationModifyPanel.hpp"
 #include "LoadsRadiationDeletePanel.hpp"
+#include "LoadsSurfaceTractionCreatePanel.hpp"
+#include "LoadsSurfaceTractionModifyPanel.hpp"
+#include "LoadsSurfaceTractionDeletePanel.hpp"
 #include "BCsDisplacementsModifyPanel.hpp"
 #include "BCsTemperaturesModifyPanel.hpp"
 #include "HistoryOutputsCreatePanel.hpp"
 #include "HistoryOutputsModifyNodePanel.hpp"
 #include "HistoryOutputsModifyElementPanel.hpp"
 #include "HistoryOutputsModifyContactPanel.hpp"
+#include "HistoryOutputsModifySectionPanel.hpp"
 #include "HistoryOutputsDeletePanel.hpp"
 #include "FieldOutputsCreatePanel.hpp"
 #include "FieldOutputsModifyNodePanel.hpp"
@@ -78,6 +84,8 @@
 #include "FieldOutputsDeletePanel.hpp"
 #include "InitialConditionsCreatePanel.hpp"
 #include "InitialConditionsModifyPanel.hpp"
+#include "InitialConditionsStressAddBlockPanel.hpp"
+#include "InitialConditionsStressAddElementPanel.hpp"
 #include "InitialConditionsDeletePanel.hpp"
 #include "StepsCreatePanel.hpp"
 #include "StepsModifyParameterPanel.hpp"
@@ -222,10 +230,14 @@ QWidget* MyCmdWidgetFactory::createWidget(const QString &name)
     return new ConstraintsCreateRigidBodyPanel();
   if(name == "CCXConstraintsCreateTie")
     return new ConstraintsCreateTiePanel();
+  if(name == "CCXConstraintsCreateEquation")
+    return new ConstraintsCreateEquationPanel();
   if(name == "CCXConstraintsModifyRigidBody")
     return new ConstraintsModifyRigidBodyPanel();
   if(name == "CCXConstraintsModifyTie")
     return new ConstraintsModifyTiePanel();
+  if(name == "CCXConstraintsModifyEquation")
+    return new ConstraintsModifyEquationPanel();
   if(name == "CCXConstraintsDelete")
     return new ConstraintsDeletePanel();
   if(name == "CCXSurfaceInteractionsCreate")
@@ -296,6 +308,12 @@ QWidget* MyCmdWidgetFactory::createWidget(const QString &name)
     return new LoadsRadiationModifyPanel();
   if(name == "CCXLoadsRadiationDelete")
     return new LoadsRadiationDeletePanel();
+  if(name == "CCXLoadsSurfaceTractionCreate")
+    return new LoadsSurfaceTractionCreatePanel();
+  if(name == "CCXLoadsSurfaceTractionModify")
+    return new LoadsSurfaceTractionModifyPanel();
+  if(name == "CCXLoadsSurfaceTractionDelete")
+    return new LoadsSurfaceTractionDeletePanel();
   if(name == "CCXBCsDisplacementsModify")
     return new BCsDisplacementsModifyPanel();
   if(name == "CCXBCsTemperaturesModify")
@@ -308,6 +326,8 @@ QWidget* MyCmdWidgetFactory::createWidget(const QString &name)
     return new HistoryOutputsModifyElementPanel();
   if(name == "CCXHistoryOutputsModifyContact")
     return new HistoryOutputsModifyContactPanel();
+  if(name == "CCXHistoryOutputsModifySection")
+    return new HistoryOutputsModifySectionPanel();
   if(name == "CCXHistoryOutputsDelete")
     return new HistoryOutputsDeletePanel();
   if(name == "CCXFieldOutputsCreate")
@@ -324,6 +344,10 @@ QWidget* MyCmdWidgetFactory::createWidget(const QString &name)
     return new InitialConditionsCreatePanel();
   if(name == "CCXInitialConditionsModify")
     return new InitialConditionsModifyPanel();
+  if(name == "CCXInitialConditionsStressAddBlock")
+    return new InitialConditionsStressAddBlockPanel();
+  if(name == "CCXInitialConditionsStressAddElement")
+    return new InitialConditionsStressAddElementPanel();
   if(name == "CCXInitialConditionsDelete")
     return new InitialConditionsDeletePanel();
   if(name == "CCXStepsCreate")

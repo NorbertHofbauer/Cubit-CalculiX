@@ -142,6 +142,10 @@ bool PanelTable::checkRowEmtpy(int row)
       {
         bool_empty = false;
       }
+      if ((item->text().toDouble()==0.)&&(item->text()!="")&&(this->panel_type=="equation"))
+      {
+        bool_empty = false;
+      }
     }
   }
   

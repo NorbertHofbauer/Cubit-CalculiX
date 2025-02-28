@@ -122,3 +122,20 @@
 2024-12-19 working on examples
 2024-12-20 updating readme and examples
 2024-12-20 implementing reading and linking of step and increment data from .dat
+######### ------  Release 2024.12
+
+2025-01-04 changing cubit version to 2025.1, sending silent commands needs to be updated, windows history bug is now fixed
+2025-01-05 working on implementing surface traction load
+2025-01-09 working on implementing surface traction load
+2025-01-09 working on surface traction load in core
+2025-01-20 working on adding equations to constraints in core
+2025-01-21 working on equations
+2025-02-14 working on draw surface traction and equation
+2025-02-15 working on draw surface traction and equation
+2025-02-15 added gui for surface traction and equation
+2025-02-16 working on section print
+2025-02-17 working on initial condition stress
+2025-02-24 working on gui for initial condition stress
+2025-02-26 adding .cub5 save and read for surface traction, equations, section print, initial condition stress
+2025-02-26 working on .dat reader to read section print data
+

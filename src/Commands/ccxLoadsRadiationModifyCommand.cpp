@@ -127,7 +127,7 @@ bool ccxLoadsRadiationModifyCommand::execute(CubitCommandData &data)
   
   if (!data.get_value("sideset id", sideset_id_value))
   {
-    amplitude_id = "-1";
+    sideset_id = "-1";
     options_marker.push_back(0);
   }
   else

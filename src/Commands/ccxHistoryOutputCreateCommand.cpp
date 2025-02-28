@@ -16,7 +16,7 @@ std::vector<std::string> ccxHistoryOutputCreateCommand::get_syntax()
   std::string syntax = "ccx ";
   syntax.append("create historyoutput ");
   syntax.append("name <string:type='unquoted', number='1', label='name', help='<name>'> " );
-  syntax.append("{node|element|contact}" );
+  syntax.append("{node|element|contact|section}" );
   syntax_list.push_back(syntax);
   
   return syntax_list;
@@ -24,8 +24,8 @@ std::vector<std::string> ccxHistoryOutputCreateCommand::get_syntax()
 
 std::vector<std::string> ccxHistoryOutputCreateCommand::get_syntax_help()
 {
-  std::vector<std::string> help(5);
-  help[0] = "ccx create historyoutput name <name> {node|element|contact}"; 
+  std::vector<std::string> help(1);
+  help[0] = "ccx create historyoutput name <name> {node|element|contact|section}"; 
 
   return help;
 }
@@ -56,6 +56,9 @@ bool ccxHistoryOutputCreateCommand::execute(CubitCommandData &data)
   } else if (data.find_keyword("CONTACT"))
   {
     options.push_back("3");
+  } else if (data.find_keyword("SECTION"))
+  {
+    options.push_back("4");
   }
   
   if (!ccx_iface.create_historyoutput(options))

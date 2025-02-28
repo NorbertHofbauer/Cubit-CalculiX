@@ -48,6 +48,7 @@ bool ccxConstraintTieModifyCommand::execute(CubitCommandData &data)
 
   std::string name;
   std::vector<std::string> options;
+  std::vector<std::vector<double>> options2;
   std::vector<int> options_marker;
   double position_tolerance_value;
   std::string position_tolerance;
@@ -104,7 +105,7 @@ bool ccxConstraintTieModifyCommand::execute(CubitCommandData &data)
   options.push_back(slave_id);
   options.push_back(position_tolerance);
 
-  if (!ccx_iface.modify_constraint("TIE",constraint_id,options,options_marker))
+  if (!ccx_iface.modify_constraint("TIE",constraint_id,options,options_marker,options2))
   {
     output = "Failed with ID " + std::to_string(constraint_id) + "!\n";
     PRINT_ERROR(output.c_str());

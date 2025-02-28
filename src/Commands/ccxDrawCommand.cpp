@@ -25,12 +25,14 @@ std::vector<std::string> ccxDrawCommand::get_syntax()
   syntax.append(" [trajectory <value:label='trajectory_id',help='<trajectory_id>'>...]");
   syntax.append(" [film <value:label='film_id',help='<film_id>'>...]");
   syntax.append(" [radiation <value:label='radiation_id',help='<radiation_id>'>...]");
+  syntax.append(" [surfacetraction <value:label='surfacetraction_id',help='<surfacetraction_id>'>...]");
   syntax.append("]");
   syntax.append(" [bc ");
   syntax.append(" [displacement <value:label='displacement_id',help='<displacement_id>'>...]");
   syntax.append(" [temperature <value:label='temperature_id',help='<temperature_id>'>...]");
   syntax.append("]");
   syntax.append(" [orientation <value:label='orientation_id',help='<orientation_id>'>...]");
+  syntax.append(" [equation <value:label='equation_id',help='<equation_id>'>...]");
   syntax.append(" [load_all]");
   syntax.append(" [load_force_all]");
   syntax.append(" [load_pressure_all]");
@@ -40,10 +42,12 @@ std::vector<std::string> ccxDrawCommand::get_syntax()
   syntax.append(" [load_trajectory_all]");
   syntax.append(" [load_film_all]");
   syntax.append(" [load_radiation_all]");
+  syntax.append(" [load_surfacetraction_all]");
   syntax.append(" [bc_all]");
   syntax.append(" [bc_displacement_all]");
   syntax.append(" [bc_temperature_all]");
   syntax.append(" [orientation_all]");
+  syntax.append(" [equation_all]");
   
   syntax_list.push_back(syntax);
 
@@ -64,9 +68,11 @@ std::vector<std::string> ccxDrawCommand::get_syntax_help()
   help[0].append(" [trajectory <trajectory_id>...]]");
   help[0].append(" [film <film_id>...]]");
   help[0].append(" [radiation <radiation_id>...]]");
+  help[0].append(" [surfacetraction <surfacetraction_id>...]]");
   help[0].append(" [bc [displacement <displacement_id>...]");
   help[0].append(" [temperature <temperature_id>...]]");
   help[0].append(" [orientation <orientation_id>...]");
+  help[0].append(" [equation <equation_id>...]");
   help[0].append(" [load_all]");
   help[0].append(" [load_force_all]");
   help[0].append(" [load_pressure_all]");
@@ -76,10 +82,12 @@ std::vector<std::string> ccxDrawCommand::get_syntax_help()
   help[0].append(" [load_trajectory_all]");
   help[0].append(" [load_film_all]");
   help[0].append(" [load_radiation_all]");
+  help[0].append(" [load_surfacetraction_all]");
   help[0].append(" [bc_all]");
   help[0].append(" [bc_displacement_all]");
   help[0].append(" [bc_temperature_all]");
   help[0].append(" [orientation_all]");
+  help[0].append(" [equation_all]");
 
   return help;
 }
@@ -105,9 +113,11 @@ bool ccxDrawCommand::execute(CubitCommandData &data)
   std::vector<int> trajectory_id;
   std::vector<int> film_id;
   std::vector<int> radiation_id;
+  std::vector<int> surfacetraction_id;
   std::vector<int> displacement_id;
   std::vector<int> temperature_id;
   std::vector<int> orientation_id;
+  std::vector<int> equation_id;
   
   if (!data.get_value("size_value", size_value))
   {
@@ -137,6 +147,7 @@ bool ccxDrawCommand::execute(CubitCommandData &data)
     data.get_values("trajectory_id", trajectory_id);
     data.get_values("film_id", film_id);
     data.get_values("radiation_id", radiation_id);
+    data.get_values("surfacetraction_id", surfacetraction_id);
   }
 
   if (data.find_keyword("BC"))
@@ -146,11 +157,37 @@ bool ccxDrawCommand::execute(CubitCommandData &data)
   }
 
   data.get_values("orientation_id", orientation_id);
+  data.get_values("equation_id", equation_id);
 
-
-  if ((force_id.size()==0)&&(pressure_id.size()==0)&&(heatflux_id.size()==0)&&(gravity_id.size()==0)&&(centrifugal_id.size()==0)&&(trajectory_id.size()==0)&&(film_id.size()==0)&&(radiation_id.size()==0)&&(displacement_id.size()==0)&&(temperature_id.size()==0)&&(orientation_id.size()==0))
+  if ((force_id.size()==0)&&
+      (pressure_id.size()==0)&&
+      (heatflux_id.size()==0)&&
+      (gravity_id.size()==0)&&
+      (centrifugal_id.size()==0)&&
+      (trajectory_id.size()==0)&&
+      (film_id.size()==0)&&
+      (radiation_id.size()==0)&&
+      (surfacetraction_id.size()==0)&&
+      (displacement_id.size()==0)&&
+      (temperature_id.size()==0)&&
+      (orientation_id.size()==0)&&
+      (equation_id.size()==0))
   {
-   if((!data.find_keyword("LOAD_ALL"))&&(!data.find_keyword("BC_ALL"))&&(!data.find_keyword("ORIENTATION_ALL"))&&(!data.find_keyword("LOAD_FORCE_ALL"))&&(!data.find_keyword("LOAD_PRESSURE_ALL"))&&(!data.find_keyword("LOAD_HEATFLUX_ALL"))&&(!data.find_keyword("LOAD_GRAVITY_ALL"))&&(!data.find_keyword("LOAD_CENTRIFUGAL_ALL"))&&(!data.find_keyword("LOAD_TRAJECTORY_ALL"))&&(!data.find_keyword("LOAD_FILM_ALL"))&&(!data.find_keyword("LOAD_RADIATION_ALL"))&&(!data.find_keyword("BC_DISPLACEMENT_ALL"))&&(!data.find_keyword("BC_TEMPERATURE_ALL")))
+   if((!data.find_keyword("LOAD_ALL"))&&
+   (!data.find_keyword("BC_ALL"))&&
+   (!data.find_keyword("ORIENTATION_ALL"))&&
+   (!data.find_keyword("EQUATION_ALL"))&&
+   (!data.find_keyword("LOAD_FORCE_ALL"))&&
+   (!data.find_keyword("LOAD_PRESSURE_ALL"))&&
+   (!data.find_keyword("LOAD_HEATFLUX_ALL"))&&
+   (!data.find_keyword("LOAD_GRAVITY_ALL"))&&
+   (!data.find_keyword("LOAD_CENTRIFUGAL_ALL"))&&
+   (!data.find_keyword("LOAD_TRAJECTORY_ALL"))&&
+   (!data.find_keyword("LOAD_FILM_ALL"))&&
+   (!data.find_keyword("LOAD_RADIATION_ALL"))&&
+   (!data.find_keyword("LOAD_SURFACETRACTION_ALL"))&&
+   (!data.find_keyword("BC_DISPLACEMENT_ALL"))&&
+   (!data.find_keyword("BC_TEMPERATURE_ALL")))
       {
         bool_draw_all = true;
       }
@@ -181,6 +218,15 @@ bool ccxDrawCommand::execute(CubitCommandData &data)
     if (!ccx_iface.draw_orientations(size_value))
     {
       output = "Failed ccx draw orientations!\n";
+      PRINT_ERROR(output.c_str());
+    }
+  }
+  if (data.find_keyword("EQUATION_ALL"))
+  {
+    bool_draw_all = false;
+    if (!ccx_iface.draw_equations(size_value))
+    {
+      output = "Failed ccx draw equations!\n";
       PRINT_ERROR(output.c_str());
     }
   }
@@ -256,6 +302,15 @@ bool ccxDrawCommand::execute(CubitCommandData &data)
       PRINT_ERROR(output.c_str());
     }
   }
+  if (data.find_keyword("LOAD_SURFACETRACTION_ALL"))
+  {
+    bool_draw_all = false;
+    if (!ccx_iface.draw_load_surface_tractions(size_value))
+    {
+      output = "Failed ccx draw surface tractions!\n";
+      PRINT_ERROR(output.c_str());
+    }
+  }
   if (data.find_keyword("BC_DISPLACEMENT_ALL"))
   {
     bool_draw_all = false;
@@ -314,6 +369,11 @@ bool ccxDrawCommand::execute(CubitCommandData &data)
     output = "Failed ccx draw load radiation!\n";
     PRINT_ERROR(output.c_str());
   }
+  if (!ccx_iface.draw_load_surface_traction(surfacetraction_id,size_value))
+  {
+    output = "Failed ccx draw load surface traction!\n";
+    PRINT_ERROR(output.c_str());
+  }
   if (!ccx_iface.draw_bc_displacement(displacement_id,size_value))
   {
     output = "Failed ccx draw bc displacement!\n";
@@ -327,6 +387,11 @@ bool ccxDrawCommand::execute(CubitCommandData &data)
   if (!ccx_iface.draw_orientation(orientation_id,size_value))
   {
     output = "Failed ccx draw orientation!\n";
+    PRINT_ERROR(output.c_str());
+  }
+  if (!ccx_iface.draw_equation(equation_id,size_value))
+  {
+    output = "Failed ccx draw equation!\n";
     PRINT_ERROR(output.c_str());
   }
   

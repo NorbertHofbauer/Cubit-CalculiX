@@ -24,6 +24,7 @@ std::vector<std::string> ccxStepAddLoadCommand::get_syntax()
   syntax.append("[trajectory <value:label='trajectory id',help='<trajectory id>'>...] " );
   syntax.append("[film <value:label='film id',help='<film id>'>...] " );
   syntax.append("[radiation <value:label='radiation id',help='<radiation id>'>...] " );
+  syntax.append("[surfacetraction <value:label='surfacetraction id',help='<surfacetraction id>'>...] " );
   syntax_list.push_back(syntax);
   
   return syntax_list;
@@ -38,6 +39,7 @@ std::vector<std::string> ccxStepAddLoadCommand::get_syntax_help()
   help[0].append("[trajectory <trajectory id>...] ");
   help[0].append("[film <film id>...] ");
   help[0].append("[radiation <radiation id>...] ");
+  help[0].append("[surfacetraction <surfacetraction id>...] ");
 
   return help;
 }
@@ -63,6 +65,7 @@ bool ccxStepAddLoadCommand::execute(CubitCommandData &data)
   std::vector<int> trajectory_ids;
   std::vector<int> film_ids;
   std::vector<int> radiation_ids;
+  std::vector<int> surfacetraction_ids;
 
   data.get_value("step id", step_id);
 
@@ -74,6 +77,7 @@ bool ccxStepAddLoadCommand::execute(CubitCommandData &data)
   data.get_values("trajectory id", trajectory_ids);
   data.get_values("film id", film_ids);
   data.get_values("radiation id", radiation_ids);
+  data.get_values("surfacetraction id", surfacetraction_ids);
    
   if (!ccx_iface.step_add_loads(step_id, 1, force_ids))
   {
@@ -113,6 +117,11 @@ bool ccxStepAddLoadCommand::execute(CubitCommandData &data)
   if (!ccx_iface.step_add_loads(step_id, 8, radiation_ids))
   {
     output = "Failed adding Radiation!\n";
+    PRINT_ERROR(output.c_str());
+  }
+  if (!ccx_iface.step_add_loads(step_id, 9, surfacetraction_ids))
+  {
+    output = "Failed adding Surface Traction!\n";
     PRINT_ERROR(output.c_str());
   }
 

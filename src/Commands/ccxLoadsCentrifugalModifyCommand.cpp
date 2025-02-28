@@ -128,7 +128,7 @@ bool ccxLoadsCentrifugalModifyCommand::execute(CubitCommandData &data)
   
   if (!data.get_value("block id", block_id_value))
   {
-    amplitude_id = "-1";
+    block_id = "-1";
     options_marker.push_back(0);
   }
   else

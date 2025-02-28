@@ -40,6 +40,7 @@
 #include "CoreLoadsTrajectory.hpp"
 #include "CoreLoadsFilm.hpp"
 #include "CoreLoadsRadiation.hpp"
+#include "CoreLoadsSurfaceTraction.hpp"
 #include "CoreBCsDisplacements.hpp"
 #include "CoreBCsTemperatures.hpp"
 #include "CoreHistoryOutputs.hpp"
@@ -65,6 +66,7 @@ CalculiXCore::CalculiXCore():
   contactpairs(NULL),amplitudes(NULL),orientations(NULL),damping(NULL),physicalconstants(NULL),
   loadsforces(NULL),loadspressures(NULL),loadsheatfluxes(NULL),
   loadsgravity(NULL),loadscentrifugal(NULL),loadstrajectory(NULL),loadsfilm(NULL),loadsradiation(NULL),
+  loadssurfacetraction(NULL),
   bcsdisplacements(NULL),bcstemperatures(NULL), historyoutputs(NULL), fieldoutputs(NULL),
   initialconditions(NULL), hbcs(NULL), steps(NULL),jobs(NULL),results(NULL),timer(NULL),customlines(NULL),
   draw(NULL)
@@ -112,6 +114,8 @@ CalculiXCore::~CalculiXCore()
     delete loadsfilm;
   if(loadsradiation)
     delete loadsradiation;
+  if(loadssurfacetraction)
+    delete loadssurfacetraction;
   if(bcsdisplacements)
     delete bcsdisplacements;
   if(bcstemperatures)
@@ -140,21 +144,24 @@ CalculiXCore::~CalculiXCore()
 
 bool CalculiXCore::cmd(std::string cmd)
 {
-  #ifdef WIN32
-    CubitInterface::cmd(cmd.c_str());
-  #else
+  bool status = false;
+  //#ifdef WIN32
+  //  CubitInterface::cmd(cmd.c_str());
+  //#else
   // all commands send with CubitGuiUtil will get listed in the history
-    CubitGuiUtil::send_cubit_command(cmd.c_str());
-  #endif
-  
-  return true;
+  CubitGuiUtil::send_cubit_command(cmd.c_str());
+  //#endif
+  status = !CubitInterface::was_last_cmd_undoable();
+
+  return status;
 }
 
 bool CalculiXCore::silent_cmd(std::string cmd)
 {
-  CubitInterface::silent_cmd_without_running_journal_lines(cmd.c_str());
+  //CubitInterface::silent_cmd_without_running_journal_lines(cmd.c_str());
+  bool status = CubitInterface::silent_cmd(cmd.c_str());
   
-  return true;
+  return status;
 }
 
 std::string CalculiXCore::get_version()
@@ -269,6 +276,11 @@ bool CalculiXCore::init()
     loadsradiation = new CoreLoadsRadiation;
   
   loadsradiation->init();
+
+  if(!loadssurfacetraction)
+    loadssurfacetraction = new CoreLoadsSurfaceTraction;
+  
+  loadssurfacetraction->init();
 
   if(!bcsdisplacements)
     bcsdisplacements = new CoreBCsDisplacements;
@@ -499,6 +511,7 @@ bool CalculiXCore::reset()
   loadstrajectory->reset();
   loadsfilm->reset();
   loadsradiation->reset();
+  loadssurfacetraction->reset();
   bcsdisplacements->reset();
   bcstemperatures->reset();
   historyoutputs->reset();
@@ -544,7 +557,7 @@ bool CalculiXCore::read_cub(std::string filename)
     PRINT_INFO("%s", log.c_str());
     return true;
   }else{
-    progressbar.start(0,27,"Reading Cubit-CalculiX data");
+    progressbar.start(0,28,"Reading Cubit-CalculiX data");
     progressbar.check_interrupt();
     //General
     std::vector<std::string> general;
@@ -570,6 +583,8 @@ bool CalculiXCore::read_cub(std::string filename)
     cubTool.read_dataset_int_rank_2("constraints_data","Cubit-CalculiX/Constraints", constraints->constraints_data);
     cubTool.read_dataset_string_rank_2("rigidbody_constraint_data","Cubit-CalculiX/Constraints", constraints->rigidbody_constraint_data);
     cubTool.read_dataset_string_rank_2("tie_constraint_data","Cubit-CalculiX/Constraints", constraints->tie_constraint_data);
+    cubTool.read_dataset_string_rank_2("equation_constraint_data","Cubit-CalculiX/Constraints", constraints->equation_constraint_data);
+    cubTool.read_dataset_double_rank_2("equation_data","Cubit-CalculiX/Constraints", constraints->equation_data);
     progressbar.step();
     progressbar.check_interrupt();
     //SurfaceInteractions
@@ -686,6 +701,13 @@ bool CalculiXCore::read_cub(std::string filename)
     cubTool.read_dataset_string_rank_2("name_data","Cubit-CalculiX/Loads/Radiation", loadsradiation->name_data);
     progressbar.step();
     progressbar.check_interrupt();
+    //LoadsSurfaceTraction
+    cubTool.read_dataset_int_rank_2("loads_data","Cubit-CalculiX/Loads/SurfaceTraction", loadssurfacetraction->loads_data);
+    cubTool.read_dataset_string_rank_2("time_delay_data","Cubit-CalculiX/Loads/SurfaceTraction", loadssurfacetraction->time_delay_data);
+    cubTool.read_dataset_double_rank_2("force_data","Cubit-CalculiX/Loads/SurfaceTraction", loadssurfacetraction->force_data);
+    cubTool.read_dataset_string_rank_2("name_data","Cubit-CalculiX/Loads/SurfaceTraction", loadssurfacetraction->name_data);
+    progressbar.step();
+    progressbar.check_interrupt();
     //BCs
     //BCsDisplacements
     cubTool.read_dataset_int_rank_2("bcs_data","Cubit-CalculiX/BCs/Displacements", bcsdisplacements->bcs_data);
@@ -703,6 +725,7 @@ bool CalculiXCore::read_cub(std::string filename)
     cubTool.read_dataset_string_rank_2("node_data","Cubit-CalculiX/HistoryOutputs", historyoutputs->node_data);
     cubTool.read_dataset_string_rank_2("element_data","Cubit-CalculiX/HistoryOutputs", historyoutputs->element_data);
     cubTool.read_dataset_string_rank_2("contact_data","Cubit-CalculiX/HistoryOutputs", historyoutputs->contact_data);
+    cubTool.read_dataset_string_rank_2("section_data","Cubit-CalculiX/HistoryOutputs", historyoutputs->section_data);
     progressbar.step();
     progressbar.check_interrupt();
     //FieldOutputs
@@ -717,6 +740,9 @@ bool CalculiXCore::read_cub(std::string filename)
     cubTool.read_dataset_int_rank_2("initialconditions_data","Cubit-CalculiX/InitialConditions", initialconditions->initialconditions_data);
     cubTool.read_dataset_string_rank_2("displacement_data","Cubit-CalculiX/InitialConditions", initialconditions->displacement_data);
     cubTool.read_dataset_string_rank_2("temperature_data","Cubit-CalculiX/InitialConditions", initialconditions->temperature_data);
+    cubTool.read_dataset_int_rank_1("stress_data","Cubit-CalculiX/InitialConditions", initialconditions->stress_data);
+    cubTool.read_dataset_double_rank_2("stress_block_data","Cubit-CalculiX/InitialConditions", initialconditions->stress_block_data);
+    cubTool.read_dataset_double_rank_2("stress_element_data","Cubit-CalculiX/InitialConditions", initialconditions->stress_element_data);
     progressbar.step();
     progressbar.check_interrupt();
     //HBCs
@@ -1041,7 +1067,7 @@ bool CalculiXCore::save_cub(std::string filename)
 
   if (!cubTool.nameExists("Cubit-CalculiX"))
   {
-    progressbar.start(0,27,"Writing Cubit-CalculiX data");
+    progressbar.start(0,28,"Writing Cubit-CalculiX data");
     progressbar.check_interrupt();
     //General
     cubTool.createGroup("Cubit-CalculiX");
@@ -1073,6 +1099,8 @@ bool CalculiXCore::save_cub(std::string filename)
     cubTool.write_dataset_int_rank_2("constraints_data","Cubit-CalculiX/Constraints", constraints->constraints_data);
     cubTool.write_dataset_string_rank_2("rigidbody_constraint_data","Cubit-CalculiX/Constraints", constraints->rigidbody_constraint_data);
     cubTool.write_dataset_string_rank_2("tie_constraint_data","Cubit-CalculiX/Constraints", constraints->tie_constraint_data);
+    cubTool.write_dataset_string_rank_2("equation_constraint_data","Cubit-CalculiX/Constraints", constraints->equation_constraint_data);
+    cubTool.write_dataset_double_rank_2("equation_data","Cubit-CalculiX/Constraints", constraints->equation_data);
     progressbar.step();
     progressbar.check_interrupt();
     //SurfaceInteractions
@@ -1113,10 +1141,12 @@ bool CalculiXCore::save_cub(std::string filename)
     progressbar.step();
     progressbar.check_interrupt();
     //Damping
+    cubTool.createGroup("Cubit-CalculiX/Damping");
     cubTool.write_dataset_string_rank_1("damping_data","Cubit-CalculiX/Damping", damping->damping_data);
     progressbar.step();
     progressbar.check_interrupt();
     //Physical Constants
+    cubTool.createGroup("Cubit-CalculiX/PhysicalConstants");
     cubTool.write_dataset_string_rank_1("physicalconstants_data","Cubit-CalculiX/PhysicalConstants", physicalconstants->physicalconstants_data);
     progressbar.step();
     progressbar.check_interrupt();
@@ -1190,6 +1220,14 @@ bool CalculiXCore::save_cub(std::string filename)
     cubTool.write_dataset_string_rank_2("name_data","Cubit-CalculiX/Loads/Radiation", loadsradiation->name_data);
     progressbar.step();
     progressbar.check_interrupt();
+    //LoadsSurfaceTraction
+    cubTool.createGroup("Cubit-CalculiX/Loads/SurfaceTraction");
+    cubTool.write_dataset_int_rank_2("loads_data","Cubit-CalculiX/Loads/SurfaceTraction", loadssurfacetraction->loads_data);
+    cubTool.write_dataset_string_rank_2("time_delay_data","Cubit-CalculiX/Loads/SurfaceTraction", loadssurfacetraction->time_delay_data);
+    cubTool.write_dataset_double_rank_2("force_data","Cubit-CalculiX/Loads/SurfaceTraction", loadssurfacetraction->force_data);
+    cubTool.write_dataset_string_rank_2("name_data","Cubit-CalculiX/Loads/SurfaceTraction", loadssurfacetraction->name_data);
+    progressbar.step();
+    progressbar.check_interrupt();
     //BCs
     cubTool.createGroup("Cubit-CalculiX/BCs");
     //BCsDisplacements
@@ -1211,6 +1249,7 @@ bool CalculiXCore::save_cub(std::string filename)
     cubTool.write_dataset_string_rank_2("node_data","Cubit-CalculiX/HistoryOutputs", historyoutputs->node_data);
     cubTool.write_dataset_string_rank_2("element_data","Cubit-CalculiX/HistoryOutputs", historyoutputs->element_data);
     cubTool.write_dataset_string_rank_2("contact_data","Cubit-CalculiX/HistoryOutputs", historyoutputs->contact_data);
+    cubTool.write_dataset_string_rank_2("section_data","Cubit-CalculiX/HistoryOutputs", historyoutputs->section_data);
     progressbar.step();
     progressbar.check_interrupt();
     //FieldOutputs
@@ -1227,6 +1266,9 @@ bool CalculiXCore::save_cub(std::string filename)
     cubTool.write_dataset_int_rank_2("initialconditions_data","Cubit-CalculiX/InitialConditions", initialconditions->initialconditions_data);
     cubTool.write_dataset_string_rank_2("displacement_data","Cubit-CalculiX/InitialConditions", initialconditions->displacement_data);
     cubTool.write_dataset_string_rank_2("temperature_data","Cubit-CalculiX/InitialConditions", initialconditions->temperature_data);
+    cubTool.write_dataset_int_rank_1("stress_data","Cubit-CalculiX/InitialConditions", initialconditions->stress_data);
+    cubTool.write_dataset_double_rank_2("stress_block_data","Cubit-CalculiX/InitialConditions", initialconditions->stress_block_data);
+    cubTool.write_dataset_double_rank_2("stress_element_data","Cubit-CalculiX/InitialConditions", initialconditions->stress_element_data);
     progressbar.step();
     progressbar.check_interrupt();
     //HBCs
@@ -1927,6 +1969,37 @@ std::string CalculiXCore::autocleanup()
       loadsradiation->delete_load(loadsradiation->loads_data[i-1][0]);
     }
   }
+  // SURFACE TRACTION
+  for (size_t i = loadssurfacetraction->loads_data.size(); i > 0; i--)
+  { 
+    sub_bool = false;
+    if (loadssurfacetraction->loads_data[i-1][2]!=-1)
+    {
+      if (!check_amplitude_exists(loadssurfacetraction->loads_data[i-1][2]))
+      {
+        log.append("Amplitude ID " + std::to_string(loadssurfacetraction->loads_data[i-1][2]) + " doesn't exist.\n");
+        log.append("Amplitude Reference from Load Surface Traction ID " + std::to_string(loadssurfacetraction->loads_data[i-1][0]) + " will be deleted.\n");
+        sub_bool = true;
+      }
+    }
+    if (sub_bool)
+    {
+      print_log = sub_bool;
+      loadssurfacetraction->loads_data[i-1][2]=-1;
+    }
+    sub_bool = false;
+    if (!check_sideset_exists(loadssurfacetraction->loads_data[i-1][4]))
+      {
+        log.append("Sideset ID " + std::to_string(loadssurfacetraction->loads_data[i-1][4]) + " doesn't exist.\n");
+        log.append("Surface Traction ID " + std::to_string(loadssurfacetraction->loads_data[i-1][0]) + " will be deleted.\n");
+        sub_bool = true;
+      }
+    if (sub_bool)
+    {
+      print_log = sub_bool;
+      loadssurfacetraction->delete_load(loadssurfacetraction->loads_data[i-1][0]);
+    }
+  }
   // BCS DISPLACEMENTS
   for (size_t i = bcsdisplacements->bcs_data.size(); i > 0; i--)
   { 
@@ -2132,7 +2205,6 @@ std::string CalculiXCore::autocleanup()
     }
   }
   // STEPS
-  
   for (size_t i = steps->steps_data.size(); i > 0; i--)
   { 
     sub_bool = false;
@@ -2257,6 +2329,21 @@ std::string CalculiXCore::autocleanup()
         }
       }
     }
+    // Surface Traction
+    sub_data_ids = steps->get_load_data_ids_from_loads_id(steps->steps_data[i-1][5]);
+    for (size_t ii = sub_data_ids.size(); ii > 0; ii--)
+    {
+      if (steps->loads_data[sub_data_ids[ii-1]][1]==9)
+      {
+        if (!check_bc_exists(steps->loads_data[sub_data_ids[ii-1]][2],14))
+        {
+          log.append("Load Surface Traction ID " + std::to_string(steps->loads_data[sub_data_ids[ii-1]][2]) + " doesn't exist.\n");
+          log.append("Load Surface Traction Reference from Step ID " + std::to_string(steps->steps_data[i-1][0]) + " will be deleted.\n");
+          sub_bool = true;
+          steps->remove_loads(steps->steps_data[i-1][0], 9, {steps->loads_data[sub_data_ids[ii-1]][2]});
+        }
+      }
+    }
     // STEP BCS
     // Displacement 
     sub_data_ids = steps->get_bc_data_ids_from_bcs_id(steps->steps_data[i-1][6]);
@@ -2347,6 +2434,7 @@ std::string CalculiXCore::print_data()
   str_return.append(loadstrajectory->print_data());
   str_return.append(loadsfilm->print_data());
   str_return.append(loadsradiation->print_data());
+  str_return.append(loadssurfacetraction->print_data());
   str_return.append(bcsdisplacements->print_data());
   str_return.append(bcstemperatures->print_data());
   str_return.append(historyoutputs->print_data());
@@ -2477,6 +2565,11 @@ bool CalculiXCore::set_ccx_element_type(int block_id, std::string ccx_element_ty
 std::string CalculiXCore::get_ccx_element_type(int block_id)
 {
   return cb->get_ccx_element_type_name(block_id);
+}
+
+int CalculiXCore::get_ccx_element_type_integration_points(int block_id)
+{
+  return cb->get_ccx_element_type_integration_points(block_id);
 }
 
 std::string CalculiXCore::get_cubit_element_type_entity(std::string cubit_element_type)
@@ -3076,6 +3169,16 @@ std::vector<int> CalculiXCore::get_loadsradiation_ids()
   return tmp;
 }
 
+std::vector<int> CalculiXCore::get_loadssurfacetraction_ids()
+{
+  std::vector<int> tmp;
+  for (size_t i = 0; i < loadssurfacetraction->loads_data.size(); i++)
+  {
+    tmp.push_back(loadssurfacetraction->loads_data[i][0]);
+  }
+  return tmp;
+}
+
 std::vector<int> CalculiXCore::get_bcsdisplacements_ids()
 {
   std::vector<int> tmp;
@@ -3092,6 +3195,19 @@ std::vector<int> CalculiXCore::get_orientations_ids()
   for (size_t i = 0; i < orientations->orientations_data.size(); i++)
   {
     tmp.push_back(orientations->orientations_data[i][0]);
+  }
+  return tmp;
+}
+
+std::vector<int> CalculiXCore::get_equation_ids()
+{
+  std::vector<int> tmp;
+  for (size_t i = 0; i < constraints->constraints_data.size(); i++)
+  {
+    if (constraints->constraints_data[i][1]==3)
+    {
+      tmp.push_back(constraints->constraints_data[i][0]);
+    }
   }
   return tmp;
 }
@@ -3165,6 +3281,12 @@ bool CalculiXCore::check_bc_exists(int bc_id,int BCType)
     for (size_t i = 0; i < loadsradiation->loads_data.size(); i++)
     {
       ids.push_back(loadsradiation->loads_data[i][0]);
+    }
+  }else if (BCType == 14) // Surface Traction
+  {
+    for (size_t i = 0; i < loadssurfacetraction->loads_data.size(); i++)
+    {
+      ids.push_back(loadssurfacetraction->loads_data[i][0]);
     }
   }
   
@@ -3522,14 +3644,14 @@ bool CalculiXCore::delete_section(int section_id)
   return sections->delete_section(section_id);
 }
 
-bool CalculiXCore::create_constraint(std::string constraint_type, std::vector<std::string> options)
+bool CalculiXCore::create_constraint(std::string constraint_type, std::vector<std::string> options,std::vector<std::vector<double>> options2)
 {
-  return constraints->create_constraint(constraint_type, options);
+  return constraints->create_constraint(constraint_type, options,options2);
 }
 
-bool CalculiXCore::modify_constraint(std::string constraint_type,int constraint_id, std::vector<std::string> options, std::vector<int> options_marker)
+bool CalculiXCore::modify_constraint(std::string constraint_type,int constraint_id, std::vector<std::string> options, std::vector<int> options_marker,std::vector<std::vector<double>> options2)
 {
-  return constraints->modify_constraint(constraint_type, constraint_id, options, options_marker);
+  return constraints->modify_constraint(constraint_type, constraint_id, options, options_marker,options2);
 }
 
 bool CalculiXCore::delete_constraint(int constraint_id)
@@ -3540,6 +3662,7 @@ bool CalculiXCore::delete_constraint(int constraint_id)
 bool CalculiXCore::create_constraint_tie_from_cubitcontactpair(std::string name, std::string position_tolerance) // create constraint tie from cubit contact pairs
 {
   std::vector<std::string> options;
+  std::vector<std::vector<double>> options2;
 
   std::vector<int> contact_ids;
   contact_ids = CubitInterface::get_bc_id_list(CI_BCTYPE_CONTACT_PAIR);
@@ -3575,7 +3698,7 @@ bool CalculiXCore::create_constraint_tie_from_cubitcontactpair(std::string name,
     options.push_back(std::to_string(slave_id));
     options.push_back(position_tolerance);
 
-    this->create_constraint("TIE", options);
+    this->create_constraint("TIE", options,options2);
     options.clear();
   } 
   
@@ -3849,6 +3972,21 @@ bool CalculiXCore::delete_loadsradiation(int radiation_id)
   return loadsradiation->delete_load(radiation_id);
 } 
 
+bool CalculiXCore::create_loadssurfacetraction(std::vector<std::string> options, std::vector<double> options2)
+{
+  return loadssurfacetraction->create_load(options, options2);
+}
+
+bool CalculiXCore::modify_loadssurfacetraction(int surfacetraction_id, std::vector<std::string> options, std::vector<double> options2, std::vector<int> options_marker)
+{
+  return loadssurfacetraction->modify_load(surfacetraction_id, options, options2, options_marker);
+}
+
+bool CalculiXCore::delete_loadssurfacetraction(int surfacetraction_id)
+{
+  return loadssurfacetraction->delete_load(surfacetraction_id);
+}  
+
 bool CalculiXCore::modify_bcsdisplacements(int displacement_id, std::vector<std::string> options, std::vector<int> options_marker)
 {
   return bcsdisplacements->modify_bc(displacement_id,options,options_marker);
@@ -3889,6 +4027,11 @@ std::vector<std::string> CalculiXCore::get_historyoutput_contact_keys()
   return  historyoutputs->contact_keys;
 }
 
+std::vector<std::string> CalculiXCore::get_historyoutput_section_keys()
+{
+  return  historyoutputs->section_keys;
+}
+
 bool CalculiXCore::create_fieldoutput(std::vector<std::string> options)
 {
   return fieldoutputs->create_output(options);
@@ -3927,6 +4070,11 @@ bool CalculiXCore::create_initialcondition(std::vector<std::string> options)
 bool CalculiXCore::modify_initialcondition(int initialcondition_id, int modify_type, std::vector<std::string> options, std::vector<int> options_marker)
 {
   return initialconditions->modify_initialcondition(initialcondition_id, modify_type, options, options_marker);
+}
+
+bool CalculiXCore::add_initialcondition_stress(int initialcondition_id, int modify_type, std::vector<double> options)
+{
+  return initialconditions->add_initialcondition_stress(initialcondition_id, modify_type, options);
 }
 
 bool CalculiXCore::delete_initialcondition(int initialcondition_id)
@@ -4850,6 +4998,7 @@ std::vector<std::vector<std::string>> CalculiXCore::get_entities(std::string ent
   std::vector<std::vector<std::string>> entities;
   int data_id = -1;
   int sub_data_id = -1;
+  std::vector<int> sub_data_ids;
 
   if (entity=="block")
   {
@@ -4944,6 +5093,14 @@ std::vector<std::vector<std::string>> CalculiXCore::get_entities(std::string ent
         sub_data_id = constraints->get_tie_constraint_data_id_from_tie_constraint_id(constraints->constraints_data[data_id][2]);
         entities.push_back({"sideset",constraints->tie_constraint_data[sub_data_id][2]});
         entities.push_back({"sideset",constraints->tie_constraint_data[sub_data_id][3]});
+      }else if (constraints->constraints_data[data_id][1] == 3)
+      {
+        //sub_data_id = constraints->get_equation_constraint_data_id_from_equation_constraint_id(constraints->constraints_data[data_id][2]);
+        sub_data_ids = constraints->get_equation_data_ids_from_equation_constraint_id(constraints->constraints_data[data_id][2]);
+        for (size_t i = 0; i < sub_data_ids.size(); i++)
+        {
+          entities.push_back({"node",std::to_string(int(constraints->equation_data[sub_data_ids[i]][1]))});
+        }
       }
     }
   }else if (entity=="surfaceinteraction")
@@ -5019,6 +5176,13 @@ std::vector<std::vector<std::string>> CalculiXCore::get_entities(std::string ent
     {
       entities.push_back({"sideset",std::to_string(loadsradiation->loads_data[data_id][4])});
     }
+  }else if (entity=="loadssurfacetraction")
+  {
+    data_id = loadssurfacetraction->get_loads_data_id_from_load_id(id);
+    if (data_id!=-1)
+    {
+      entities.push_back({"sideset",std::to_string(loadssurfacetraction->loads_data[data_id][4])});
+    }
   }else if (entity=="bcsdisplacement")
   {
     entities.push_back({"displacement",std::to_string(id)});
@@ -5033,11 +5197,29 @@ std::vector<std::vector<std::string>> CalculiXCore::get_entities(std::string ent
     if (initialconditions->initialconditions_data[data_id][1]==1)
     {
       sub_data_id = initialconditions->get_displacement_data_id_from_displacement_id(initialconditions->initialconditions_data[data_id][2]);
-      entities.push_back({"displacement",initialconditions->displacement_data[sub_data_id][1]});
+      if (initialconditions->displacement_data[sub_data_id][1] != "")
+      {
+        entities.push_back({"displacement",initialconditions->displacement_data[sub_data_id][1]});
+      }
     }else if (initialconditions->initialconditions_data[data_id][1]==2)
     {
       sub_data_id = initialconditions->get_temperature_data_id_from_temperature_id(initialconditions->initialconditions_data[data_id][2]);
-      entities.push_back({"temperature",initialconditions->temperature_data[sub_data_id][1]});
+      if (initialconditions->temperature_data[sub_data_id][1] != "")
+      {
+        entities.push_back({"temperature",initialconditions->temperature_data[sub_data_id][1]});
+      }
+    }else if (initialconditions->initialconditions_data[data_id][1]==3)
+    {
+      sub_data_ids = initialconditions->get_stress_block_data_ids_from_stress_id(initialconditions->initialconditions_data[data_id][2]);
+      for (size_t i = 0; i < sub_data_ids.size(); i++)
+      {
+        entities.push_back({"block",std::to_string(int(initialconditions->stress_block_data[sub_data_ids[i]][1]))});
+      }
+      sub_data_ids = initialconditions->get_stress_element_data_ids_from_stress_id(initialconditions->initialconditions_data[data_id][2]);
+      for (size_t i = 0; i < sub_data_ids.size(); i++)
+      {
+        entities.push_back({CubitInterface::get_element_type(int(initialconditions->stress_element_data[sub_data_ids[i]][1])),std::to_string(int(initialconditions->stress_element_data[sub_data_ids[i]][1]))});
+      }
     }
   }else if (entity=="hbcsdisplacement")
   {
@@ -5345,6 +5527,36 @@ std::vector<std::vector<double>> CalculiXCore::get_draw_data_for_load_radiation(
   return draw_data;
 }
 
+std::vector<std::vector<double>> CalculiXCore::get_draw_data_for_load_surface_traction(int id)
+{
+  std::vector<std::vector<double>> draw_data;
+  
+  for (size_t i = 0; i < loadssurfacetraction->loads_data.size(); i++)
+  {
+    // check for right id
+    if (id==loadssurfacetraction->loads_data[i][0])
+    { 
+      std::vector<std::vector<double>> coords_normals = get_sideset_entities_coords_normals(loadssurfacetraction->loads_data[i][4]);
+      int force_data_id = loadssurfacetraction->get_force_data_id_from_force_id(loadssurfacetraction->loads_data[i][5]);
+
+      for (size_t ii = 0; ii < coords_normals.size(); ii++)
+      {
+        std::vector<double> data;
+        
+        data.push_back(coords_normals[ii][0]);
+        data.push_back(coords_normals[ii][1]);
+        data.push_back(coords_normals[ii][2]);
+        data.push_back(loadssurfacetraction->force_data[force_data_id][1]);
+        data.push_back(loadssurfacetraction->force_data[force_data_id][2]);
+        data.push_back(loadssurfacetraction->force_data[force_data_id][3]);
+        draw_data.push_back(data);
+        data.clear();
+      }
+    }
+  }
+  return draw_data;
+}
+
 std::vector<std::vector<double>> CalculiXCore::get_draw_data_for_bc_displacement(int id) // returns coord(3) and dof
 {
   int bc_set_id=-1;
@@ -5521,6 +5733,48 @@ std::vector<std::vector<double>> CalculiXCore::get_draw_data_for_orientation(int
   return draw_data;
 }
 
+std::vector<std::vector<double>> CalculiXCore::get_draw_data_for_equation(int id)
+{
+  std::vector<std::vector<double>> draw_data;
+  int constraint_data_id;
+  constraint_data_id = constraints->get_constraints_data_id_from_constraint_id(id);
+
+  //check if constraint exists
+  if (constraint_data_id == -1)
+  {
+    return draw_data;
+  }
+  
+  // check if its a equation constraint
+  if (constraints->constraints_data[constraint_data_id][1]!=3)
+  {
+    return draw_data;
+  }  
+
+  // get equation data ids
+  std::vector<int> equation_data_ids = constraints->get_equation_data_ids_from_equation_constraint_id(constraints->constraints_data[constraint_data_id][2]);
+
+  for (size_t i = 0; i < equation_data_ids.size(); i++)
+  {
+    if (CubitInterface::get_node_exists(int(constraints->equation_data[equation_data_ids[i]][1])))
+    {
+      std::array<double, 3> coords = CubitInterface::get_nodal_coordinates(int(constraints->equation_data[equation_data_ids[i]][1]));
+        
+      if (coords.size() > 0)
+      {
+        std::vector<double> data;            
+        data.push_back(coords[0]);
+        data.push_back(coords[1]);
+        data.push_back(coords[2]);
+        data.push_back(constraints->equation_data[equation_data_ids[i]][2]);
+        draw_data.push_back(data);
+        data.clear();
+      }
+    }
+  }
+  return draw_data;
+}
+
 bool CalculiXCore::draw_all(double size) // draw all bc and loads
 {
   return draw->draw_all(size);
@@ -5606,6 +5860,16 @@ bool CalculiXCore::draw_load_radiation(std::vector<int> radiation_ids,double siz
   return true;
 }
 
+bool CalculiXCore::draw_load_surface_traction(std::vector<int> surface_traction_ids,double size)
+{
+  for (size_t i = 0; i < surface_traction_ids.size(); i++)
+  {
+    draw->draw_load_surface_traction(surface_traction_ids[i],size);
+  }
+  
+  return true;
+}
+
 bool CalculiXCore::draw_bc_displacement(std::vector<int> displacement_ids,double size)
 {
   for (size_t i = 0; i < displacement_ids.size(); i++)
@@ -5636,6 +5900,16 @@ bool CalculiXCore::draw_orientation(std::vector<int> orientation_ids,double size
   return true;
 }
 
+bool CalculiXCore::draw_equation(std::vector<int> equation_ids,double size)
+{
+  for (size_t i = 0; i < equation_ids.size(); i++)
+  {
+    draw->draw_equation(equation_ids[i],size);
+  }
+  
+  return true;
+}
+
 bool CalculiXCore::draw_loads(double size) // draw all loads
 {
   return draw->draw_loads(size);
@@ -5649,6 +5923,11 @@ bool CalculiXCore::draw_bcs(double size) // draw all bc
 bool CalculiXCore::draw_orientations(double size) // draw all orientations
 {
   return draw->draw_orientations(size);
+}
+
+bool CalculiXCore::draw_equations(double size) // draw all equations
+{
+  return draw->draw_equations(size);
 }
 
 bool CalculiXCore::draw_load_forces(double size) // draw all forces
@@ -5689,6 +5968,11 @@ bool CalculiXCore::draw_load_films(double size)
 bool CalculiXCore::draw_load_radiations(double size)
 {
   return draw->draw_load_radiations(size);
+}
+
+bool CalculiXCore::draw_load_surface_tractions(double size)
+{
+  return draw->draw_load_surface_tractions(size);
 }
 
 bool CalculiXCore::draw_bc_displacements(double size)
@@ -7278,6 +7562,7 @@ std::string CalculiXCore::get_initialcondition_export_data() // gets the export 
   std::string str_temp;
   std::string log;
   int sub_data_id;
+  std::vector<int> sub_data_ids;
   std::string command;
   int bc_set_id=-1;
   BCSetHandle bc_set;
@@ -7347,6 +7632,39 @@ std::string CalculiXCore::get_initialcondition_export_data() // gets the export 
       }
       bc_attribs.clear();
     }
+    if (initialconditions->initialconditions_data[i][1]==3)
+    {
+      str_temp = "*INITIAL CONDITIONS,TYPE=STRESS";
+      initialconditions_export_list.push_back(str_temp);
+
+      sub_data_ids = initialconditions->get_stress_element_data_ids_from_stress_id(initialconditions->initialconditions_data[i][2]);
+      for (size_t ii = 0; ii < sub_data_ids.size(); ii++)
+      {
+        std::vector<double> data = initialconditions->stress_element_data[sub_data_ids[ii]];
+        str_temp = std::to_string(int(data[1])) + "," + std::to_string(int(data[2])) + "," + to_string_scientific(data[3]) + "," + to_string_scientific(data[4]) + "," + to_string_scientific(data[5]) + "," + to_string_scientific(data[7]) + "," + to_string_scientific(data[8]);
+        initialconditions_export_list.push_back(str_temp);
+      }
+
+      sub_data_ids = initialconditions->get_stress_block_data_ids_from_stress_id(initialconditions->initialconditions_data[i][2]);
+      for (size_t ii = 0; ii < sub_data_ids.size(); ii++)
+      {
+        std::vector<double> data = initialconditions->stress_block_data[sub_data_ids[ii]];
+        
+        std::string element_type = CubitInterface::get_block_element_type(int(data[1]));
+        int ip = this->get_ccx_element_type_integration_points(int(data[1]));
+        std::vector<int> ids = this->get_block_element_ids(int(data[1]));
+        
+        for (size_t iii = 0; iii < ids.size(); iii++)
+        {
+          for (size_t iv = 0; iv < ip; iv++)
+          {
+            str_temp = std::to_string(ids[iii]) + "," + std::to_string(iv+1) + "," +  to_string_scientific(data[2]) + "," + to_string_scientific(data[3]) + "," + to_string_scientific(data[4]) + "," + to_string_scientific(data[5]) + "," + to_string_scientific(data[6]) + "," + to_string_scientific(data[7]);
+            initialconditions_export_list.push_back(str_temp);
+          }
+        }      
+      }
+    }
+    
     // CUSTOMLINE START
     customline = customlines->get_customline_data("AFTER","INITIALCONDITION",initialconditions->initialconditions_data[i][0]);
     for (size_t icl = 0; icl < customline.size(); icl++)
@@ -7802,6 +8120,34 @@ std::string CalculiXCore::get_step_export_data() // gets the export data from co
         }
       }
     }
+    // SURFACE TRACTION
+    for (size_t ii = 0; ii < loadssurfacetraction->loads_data.size(); ii++)
+    {  
+      for (size_t iii = 0; iii < sub_data_ids.size(); iii++)
+      { 
+        if ((steps->loads_data[sub_data_ids[iii]][1]==9) && (steps->loads_data[sub_data_ids[iii]][2]==loadssurfacetraction->loads_data[ii][0]))
+        {
+          // CUSTOMLINE START
+          customline = customlines->get_customline_data("BEFORE","SURFACETRACTION",steps->loads_data[sub_data_ids[iii]][2]);
+          for (size_t icl = 0; icl < customline.size(); icl++)
+          {
+            steps_export_list.push_back(customline[icl]);
+          }
+          // CUSTOMLINE END
+
+          str_temp = loadssurfacetraction->get_load_export(steps->loads_data[sub_data_ids[iii]][2]);
+          steps_export_list.push_back(str_temp);
+
+          // CUSTOMLINE START
+          customline = customlines->get_customline_data("AFTER","SURFACETRACTION",steps->loads_data[sub_data_ids[iii]][2]);
+          for (size_t icl = 0; icl < customline.size(); icl++)
+          {
+            steps_export_list.push_back(customline[icl]);
+          }
+          // CUSTOMLINE END
+        }
+      }
+    }
     // BCs
     me_iface->get_bc_restraints(bc_set, bc_handles);
     sub_data_ids = steps->get_bc_data_ids_from_bcs_id(steps->steps_data[i][6]);
@@ -8191,6 +8537,11 @@ std::vector<std::vector<std::string>> CalculiXCore::get_constraints_tree_data()
       sub_constraint_data_id = constraints->get_tie_constraint_data_id_from_tie_constraint_id(constraints->constraints_data[i][2]);
       
       constraint_name = "TIE (" + constraints->tie_constraint_data[sub_constraint_data_id][1] + ")";
+    } else if (constraints->constraints_data[i][1] == 3)
+    {
+      sub_constraint_data_id = constraints->get_equation_constraint_data_id_from_equation_constraint_id(constraints->constraints_data[i][2]);
+      
+      constraint_name = "EQUATION (" + constraints->equation_constraint_data[sub_constraint_data_id][1] + ")";
     }
     
     constraints_tree_data_set.push_back(std::to_string(constraints->constraints_data[i][0])); //constraint_id
@@ -8525,6 +8876,30 @@ std::vector<std::vector<std::string>> CalculiXCore::get_loadsradiation_tree_data
   return loadsradiation_tree_data;
 }
 
+std::vector<std::vector<std::string>> CalculiXCore::get_loadssurfacetraction_tree_data()
+{ 
+  std::vector<std::vector<std::string>> loadssurfacetraction_tree_data;
+  
+  for (size_t i = 0; i < loadssurfacetraction->loads_data.size(); i++)
+  {
+    std::vector<std::string> loadssurfacetraction_tree_data_set;
+    std::string name;
+    
+    int subdata_id = loadssurfacetraction->get_name_data_id_from_name_id(loadssurfacetraction->loads_data[i][6]);
+    if ((subdata_id!=-1)&&(loadssurfacetraction->name_data[subdata_id][1]!=""))
+    {
+      name = loadssurfacetraction->name_data[subdata_id][1];
+    }else{
+      name = "SurfaceTraction_" + std::to_string(loadssurfacetraction->loads_data[i][0]);
+    }
+    
+    loadssurfacetraction_tree_data_set.push_back(std::to_string(loadssurfacetraction->loads_data[i][0])); //load_id
+    loadssurfacetraction_tree_data_set.push_back(name); 
+    loadssurfacetraction_tree_data.push_back(loadssurfacetraction_tree_data_set);
+  }
+  return loadssurfacetraction_tree_data;
+}
+
 std::vector<std::vector<std::string>> CalculiXCore::get_bcsdisplacements_tree_data()
 { 
   std::vector<std::vector<std::string>> bcsdisplacements_tree_data;
@@ -8591,6 +8966,9 @@ std::vector<std::vector<std::string>> CalculiXCore::get_historyoutputs_tree_data
     }else if (historyoutputs->outputs_data[i][2]==3)
     {
       output_name = output_name + " (contact)";
+    }else if (historyoutputs->outputs_data[i][2]==4)
+    {
+      output_name = output_name + " (section)";
     }
 
     outputs_tree_data_set.push_back(std::to_string(historyoutputs->outputs_data[i][0])); //output_id
@@ -8687,6 +9065,11 @@ std::vector<std::vector<std::string>> CalculiXCore::get_initialconditions_tree_d
       }
       initialcondition_name = initialcondition_name + " (Temperature)";
       
+    }else if (initialconditions->initialconditions_data[i][1]==3)
+    { 
+      sub_id = initialconditions->initialconditions_data[i][2];
+      
+      initialcondition_name = "Stress_" + std::to_string(sub_id);
     }
 
     initialconditions_tree_data_set.push_back(std::to_string(initialconditions->initialconditions_data[i][0])); //initialcondition_id
@@ -9109,6 +9492,45 @@ std::vector<std::vector<std::string>> CalculiXCore::get_steps_loadsradiation_tre
   return loadsradiation_tree_data;
 }
 
+std::vector<std::vector<std::string>> CalculiXCore::get_steps_loadssurfacetraction_tree_data(int step_id)
+{ 
+  std::vector<std::vector<std::string>> loadssurfacetraction_tree_data;
+  int step_data_id;
+  std::vector<int> loads_ids;
+  step_data_id = steps->get_steps_data_id_from_step_id(step_id);
+  if (step_data_id==-1)
+  {
+    return loadssurfacetraction_tree_data;
+  }
+  loads_ids = steps->get_load_data_ids_from_loads_id(steps->steps_data[step_data_id][5]);
+
+  for (size_t i = 0; i < loads_ids.size(); i++)
+  {
+    std::vector<std::string> loadssurfacetraction_tree_data_set;
+    std::string name;
+    if (steps->loads_data[loads_ids[i]][1]==9)
+    { 
+      int loaddata_id = loadssurfacetraction->get_loads_data_id_from_load_id(steps->loads_data[loads_ids[i]][2]);
+      if (loaddata_id!=-1)
+      {
+        int subdata_id = loadssurfacetraction->get_name_data_id_from_name_id(loadssurfacetraction->loads_data[loaddata_id][6]);
+        if ((subdata_id!=-1)&&(loadssurfacetraction->name_data[subdata_id][1]!=""))
+        {
+          name = loadssurfacetraction->name_data[subdata_id][1];
+        }else{
+          name = "SurfaceTraction_" + std::to_string(steps->loads_data[loads_ids[i]][2]);
+        }
+      }else{
+        name = "SurfaceTraction_" + std::to_string(steps->loads_data[loads_ids[i]][2]);
+      }
+    
+      loadssurfacetraction_tree_data_set.push_back(std::to_string(steps->loads_data[loads_ids[i]][2])); //load_id
+      loadssurfacetraction_tree_data_set.push_back(name); 
+      loadssurfacetraction_tree_data.push_back(loadssurfacetraction_tree_data_set);  
+    }
+  }
+  return loadssurfacetraction_tree_data;
+}
 
 std::vector<std::vector<std::string>> CalculiXCore::get_steps_bcsdisplacements_tree_data(int step_id)
 { 
@@ -9206,6 +9628,9 @@ std::vector<std::vector<std::string>> CalculiXCore::get_steps_historyoutputs_tre
     }else if (historyoutputs->outputs_data[output_data_id][2]==3)
     {
       output_name = output_name + " (contact)";
+    }else if (historyoutputs->outputs_data[output_data_id][2]==4)
+    {
+      output_name = output_name + " (section)";
     }
 
     outputs_tree_data_set.push_back(std::to_string(historyoutputs->outputs_data[output_data_id][0])); //output_id
@@ -9373,6 +9798,12 @@ std::vector<int> CalculiXCore::parser(std::string parse_type, std::string parse_
       for (size_t i = 0; i < loadsradiation->loads_data.size(); i++)
       {
         all_ids.push_back(loadsradiation->loads_data[i][0]);
+      }
+    } else if (parse_type=="loadssurfacetraction")
+    {
+      for (size_t i = 0; i < loadssurfacetraction->loads_data.size(); i++)
+      {
+        all_ids.push_back(loadssurfacetraction->loads_data[i][0]);
       }
     } else if (parse_type=="historyoutput")
     {

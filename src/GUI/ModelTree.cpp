@@ -21,6 +21,7 @@
 #include "LoadsTrajectoryTree.hpp"
 #include "LoadsFilmTree.hpp"
 #include "LoadsRadiationTree.hpp"
+#include "LoadsSurfaceTractionTree.hpp"
 #include "BCsTree.hpp"
 #include "BCsDisplacementsTree.hpp"
 #include "BCsTemperaturesTree.hpp"
@@ -41,6 +42,7 @@
 #include "StepsLoadsTrajectoryTree.hpp"
 #include "StepsLoadsFilmTree.hpp"
 #include "StepsLoadsRadiationTree.hpp"
+#include "StepsLoadsSurfaceTractionTree.hpp"
 #include "StepsBCsTree.hpp"
 #include "StepsBCsDisplacementsTree.hpp"
 #include "StepsBCsTemperaturesTree.hpp"
@@ -125,7 +127,7 @@ ModelTree::~ModelTree()
 
 void ModelTree::showContextMenu(const QPoint &pos)
 {
-  //current highest contextMenuAction[0][0] = 46;
+  //current highest contextMenuAction[0][0] = 48;
 
   QTreeWidgetItem* item = this->itemAt(pos);
   if (item)
@@ -151,6 +153,7 @@ void ModelTree::showContextMenu(const QPoint &pos)
     LoadsTrajectoryTree* LoadsTrajectoryTreeItem;
     LoadsFilmTree* LoadsFilmTreeItem;
     LoadsRadiationTree* LoadsRadiationTreeItem;
+    LoadsSurfaceTractionTree* LoadsSurfaceTractionTreeItem;
     BCsTree* BCsTreeItem;
     BCsDisplacementsTree* BCsDisplacementsTreeItem;
     BCsTemperaturesTree* BCsTemperaturesTreeItem;
@@ -170,6 +173,7 @@ void ModelTree::showContextMenu(const QPoint &pos)
     StepsLoadsTrajectoryTree* StepsLoadsTrajectoryTreeItem;
     StepsLoadsFilmTree* StepsLoadsFilmTreeItem;
     StepsLoadsRadiationTree* StepsLoadsRadiationTreeItem;
+    StepsLoadsSurfaceTractionTree* StepsLoadsSurfaceTractionTreeItem;
     StepsBCsTree* StepsBCsTreeItem;
     StepsBCsDisplacementsTree* StepsBCsDisplacementsTreeItem;
     StepsBCsTemperaturesTree* StepsBCsTemperaturesTreeItem;
@@ -458,6 +462,21 @@ void ModelTree::showContextMenu(const QPoint &pos)
         contextMenuAction[0][0] = 44;
         contextMenu.exec(mapToGlobal(pos));
       }
+    }else if (LoadsSurfaceTractionTreeItem = dynamic_cast<LoadsSurfaceTractionTree*>(item))
+    {
+      if (LoadsSurfaceTractionTreeItem->text(1).toStdString()=="")
+      { 
+        QMenu contextMenu("Context Menu",this);
+        QAction action1("Create Surface Traction",this);
+        connect(&action1, SIGNAL(triggered()),this,SLOT(ContextMenuAction1()));
+        contextMenu.addAction(&action1);
+        QAction action2("Draw Surface Tractions", this);
+        connect(&action2, SIGNAL(triggered()),this,SLOT(ContextMenuAction2()));
+        contextMenu.addAction(&action2);
+
+        contextMenuAction[0][0] = 47;
+        contextMenu.exec(mapToGlobal(pos));
+      }
     }else if (BCsTreeItem = dynamic_cast<BCsTree*>(item)) 
     {
       if (BCsTreeItem->text(1).toStdString()=="")
@@ -729,6 +748,22 @@ void ModelTree::showContextMenu(const QPoint &pos)
         contextMenu.addAction(&action2);
 
         contextMenuAction[0][0] = 46;
+        contextMenuAction[0][2] = std::stoi(item->parent()->parent()->text(1).toStdString()); //Step id
+        contextMenu.exec(mapToGlobal(pos));
+      }
+    }else if (StepsLoadsSurfaceTractionTreeItem = dynamic_cast<StepsLoadsSurfaceTractionTree*>(item))
+    {
+      if (StepsLoadsSurfaceTractionTreeItem->text(1).toStdString()=="")
+      { 
+        QMenu contextMenu("Context Menu",this);
+        QAction action1("Steps Management",this);
+        connect(&action1, SIGNAL(triggered()),this,SLOT(ContextMenuAction4()));
+        contextMenu.addAction(&action1);
+        QAction action2("Draw Surface Tractions",this);
+        connect(&action2, SIGNAL(triggered()),this,SLOT(ContextMenuAction5()));
+        contextMenu.addAction(&action2);
+
+        contextMenuAction[0][0] = 48;
         contextMenuAction[0][2] = std::stoi(item->parent()->parent()->text(1).toStdString()); //Step id
         contextMenu.exec(mapToGlobal(pos));
       }
@@ -1166,6 +1201,25 @@ void ModelTree::showContextMenu(const QPoint &pos)
         contextMenuAction[0][0] = 44;
         contextMenuAction[0][2] = std::stoi(item->text(1).toStdString());
         contextMenu.exec(mapToGlobal(pos));
+      } else if (LoadsSurfaceTractionTreeItem = dynamic_cast<LoadsSurfaceTractionTree*>(item->parent()))
+      {
+        QMenu contextMenu("Context Menu",this);
+        QAction action1("Create Surface Traction",this);
+        connect(&action1, SIGNAL(triggered()),this,SLOT(ContextMenuAction1()));
+        contextMenu.addAction(&action1);
+        QAction action3("Modify Surface Traction",this); //action 2 is "Draw SurfaceTraction All"
+        connect(&action3, SIGNAL(triggered()),this,SLOT(ContextMenuAction3()));
+        contextMenu.addAction(&action3);
+        QAction action4("Delete Surface Traction",this);
+        connect(&action4, SIGNAL(triggered()),this,SLOT(ContextMenuAction4()));
+        contextMenu.addAction(&action4);
+        QAction action5("Draw Surface Traction",this);
+        connect(&action5, SIGNAL(triggered()),this,SLOT(ContextMenuAction5()));
+        contextMenu.addAction(&action5);
+
+        contextMenuAction[0][0] = 47;
+        contextMenuAction[0][2] = std::stoi(item->text(1).toStdString());
+        contextMenu.exec(mapToGlobal(pos));
       } else if (BCsDisplacementsTreeItem = dynamic_cast<BCsDisplacementsTree*>(item->parent()))
       {
         QMenu contextMenu("Context Menu",this);
@@ -1526,6 +1580,28 @@ void ModelTree::showContextMenu(const QPoint &pos)
         contextMenuAction[0][0] = 46;
         contextMenuAction[0][2] = std::stoi(item->text(1).toStdString());
         contextMenu.exec(mapToGlobal(pos));
+      } else if (StepsLoadsSurfaceTractionTreeItem = dynamic_cast<StepsLoadsSurfaceTractionTree*>(item->parent()))
+      {
+        QMenu contextMenu("Context Menu",this);
+        QAction action1("Create Surface Traction",this);
+        connect(&action1, SIGNAL(triggered()),this,SLOT(ContextMenuAction1()));
+        contextMenu.addAction(&action1);
+        QAction action2("Modify Surface Traction",this);
+        connect(&action2, SIGNAL(triggered()),this,SLOT(ContextMenuAction2()));
+        contextMenu.addAction(&action2);
+        QAction action3("Delete Surface Traction",this);
+        connect(&action3, SIGNAL(triggered()),this,SLOT(ContextMenuAction3()));
+        contextMenu.addAction(&action3);
+        QAction action4("Steps Management",this);
+        connect(&action4, SIGNAL(triggered()),this,SLOT(ContextMenuAction4()));
+        contextMenu.addAction(&action4);
+        QAction action6("Draw Surface Traction",this);
+        connect(&action6, SIGNAL(triggered()),this,SLOT(ContextMenuAction6()));
+        contextMenu.addAction(&action6);
+
+        contextMenuAction[0][0] = 48;
+        contextMenuAction[0][2] = std::stoi(item->text(1).toStdString());
+        contextMenu.exec(mapToGlobal(pos));
       }else if (StepsBCsTreeItem = dynamic_cast<StepsBCsTree*>(item->parent()))
       {
         QMenu contextMenu("Context Menu",this);
@@ -1694,6 +1770,7 @@ void ModelTree::ModelTreeItemDoubleClicked(QTreeWidgetItem* item, int column)
   LoadsTrajectoryTree* LoadsTrajectoryTreeItem;
   LoadsFilmTree* LoadsFilmTreeItem;
   LoadsRadiationTree* LoadsRadiationTreeItem;
+  LoadsSurfaceTractionTree* LoadsSurfaceTractionTreeItem;
   BCsDisplacementsTree* BCsDisplacementsTreeItem;
   BCsTemperaturesTree* BCsTemperaturesTreeItem;
   HistoryOutputsTree* HistoryOutputsTreeItem;
@@ -1712,6 +1789,7 @@ void ModelTree::ModelTreeItemDoubleClicked(QTreeWidgetItem* item, int column)
   StepsLoadsTrajectoryTree* StepsLoadsTrajectoryTreeItem;
   StepsLoadsFilmTree* StepsLoadsFilmTreeItem;
   StepsLoadsRadiationTree* StepsLoadsRadiationTreeItem;
+  StepsLoadsSurfaceTractionTree* StepsLoadsSurfaceTractionTreeItem;
   StepsBCsTree* StepsBCsTreeItem;
   StepsBCsDisplacementsTree* StepsBCsDisplacementsTreeItem;
   StepsBCsTemperaturesTree* StepsBCsTemperaturesTreeItem;
@@ -1840,6 +1918,12 @@ void ModelTree::ModelTreeItemDoubleClicked(QTreeWidgetItem* item, int column)
     if (LoadsRadiationTreeItem->text(1).toStdString()=="")
     {
       this->setWidgetInCmdPanelMarker("CCXLoadsRadiationCreate");
+    }
+  }else if (LoadsSurfaceTractionTreeItem = dynamic_cast<LoadsSurfaceTractionTree*>(item))
+  {
+    if (LoadsSurfaceTractionTreeItem->text(1).toStdString()=="")
+    {
+      this->setWidgetInCmdPanelMarker("CCXLoadsSurfaceTractionCreate");
     }
   }else if (BCsDisplacementsTreeItem = dynamic_cast<BCsDisplacementsTree*>(item))
   {
@@ -2127,6 +2211,9 @@ void ModelTree::ModelTreeItemDoubleClicked(QTreeWidgetItem* item, int column)
     } else if (LoadsRadiationTreeItem = dynamic_cast<LoadsRadiationTree*>(item->parent()))
     {
       this->setWidgetInCmdPanelMarker("CCXLoadsRadiationModify");
+    } else if (LoadsSurfaceTractionTreeItem = dynamic_cast<LoadsSurfaceTractionTree*>(item->parent()))
+    {
+      this->setWidgetInCmdPanelMarker("CCXLoadsSurfaceTractionModify");
     } else if (BCsDisplacementsTreeItem = dynamic_cast<BCsDisplacementsTree*>(item->parent()))
     {
       this->setWidgetInCmdPanelMarker("FEADisplacementModify");
@@ -2222,6 +2309,14 @@ void ModelTree::ModelTreeItemDoubleClicked(QTreeWidgetItem* item, int column)
       myStepsManagement->close();
       myStepsManagement->show();
     } else if (StepsLoadsRadiationTreeItem = dynamic_cast<StepsLoadsRadiationTree*>(item->parent()))
+    {
+      if (TreeItem = dynamic_cast<QTreeWidgetItem*>(item->parent()->parent()->parent()))
+      {
+        myStepsManagement->setStep(TreeItem->text(1));
+      }
+      myStepsManagement->close();
+      myStepsManagement->show();
+    } else if (StepsLoadsSurfaceTractionTreeItem = dynamic_cast<StepsLoadsSurfaceTractionTree*>(item->parent()))
     {
       if (TreeItem = dynamic_cast<QTreeWidgetItem*>(item->parent()->parent()->parent()))
       {
@@ -2621,6 +2716,28 @@ void ModelTree::execContextMenuAction(){
         //CubitInterface::cmd(command.c_str());
         ccx_iface->cmd(command);
       }
+    }else if (contextMenuAction[0][0]==47) //LoadsSurfaceTractionTree
+    {
+      if (contextMenuAction[0][1]==0) //Action1
+      {
+        this->setWidgetInCmdPanelMarker("CCXLoadsSurfaceTractionCreate");
+      }else if (contextMenuAction[0][1]==1) //Action2
+      {
+        std::string command = "ccx draw load_surfacetraction_all";
+        //CubitInterface::cmd(command.c_str());
+        ccx_iface->cmd(command);
+      }else if (contextMenuAction[0][1]==2) //Action3
+      {
+        this->setWidgetInCmdPanelMarker("CCXLoadsSurfaceTractionModify");
+      }else if (contextMenuAction[0][1]==3) //Action4
+      {
+        this->setWidgetInCmdPanelMarker("CCXLoadsSurfaceTractionDelete");
+      }else if (contextMenuAction[0][1]==4) //Action5
+      {
+        std::string command = "ccx draw load surfacetraction " + std::to_string(contextMenuAction[0][2]);
+        //CubitInterface::cmd(command.c_str());
+        ccx_iface->cmd(command);
+      }
     }else if (contextMenuAction[0][0]==38) //BCsTree
     {
       if(contextMenuAction[0][1]==0)
@@ -3001,6 +3118,31 @@ void ModelTree::execContextMenuAction(){
       }else if (contextMenuAction[0][1]==5) //Action6
       {
         std::string command = "ccx draw load radiation " + std::to_string(contextMenuAction[0][2]);
+        //CubitInterface::cmd(command.c_str());
+        ccx_iface->cmd(command);
+      }   
+    }else if (contextMenuAction[0][0]==48) //StepsLoadsSurfaceTractionTree
+    {
+      if (contextMenuAction[0][1]==0) //Action1
+      {
+        this->setWidgetInCmdPanelMarker("CCXLoadsSurfaceTractionCreate");
+      }else if (contextMenuAction[0][1]==1) //Action2
+      {
+        this->setWidgetInCmdPanelMarker("CCXLoadsSurfaceTractionModify");
+      }else if (contextMenuAction[0][1]==2) //Action3
+      {
+        this->setWidgetInCmdPanelMarker("CCXLoadsSurfaceTractionDelete");
+      }else if (contextMenuAction[0][1]==3) //Action4
+      {
+        myStepsManagement->show();
+      }else if (contextMenuAction[0][1]==4) //Action5
+      {
+        std::string command = "ccx draw step " + std::to_string(contextMenuAction[0][2]) + " load_surfacetraction_all";
+        //CubitInterface::cmd(command.c_str());
+        ccx_iface->cmd(command);
+      }else if (contextMenuAction[0][1]==5) //Action6
+      {
+        std::string command = "ccx draw load surfacetraction " + std::to_string(contextMenuAction[0][2]);
         //CubitInterface::cmd(command.c_str());
         ccx_iface->cmd(command);
       }   

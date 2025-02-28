@@ -45,6 +45,12 @@ CoreHistoryOutputs::CoreHistoryOutputs()
   contact_keys.push_back("CF");
   contact_keys.push_back("CFN");
   contact_keys.push_back("CFS");
+
+  section_keys.push_back("SOF");
+  section_keys.push_back("SOM");
+  section_keys.push_back("SOAREA");
+  section_keys.push_back("FLUX");
+  section_keys.push_back("DRAG");
 }
 
 CoreHistoryOutputs::~CoreHistoryOutputs()
@@ -74,6 +80,7 @@ bool CoreHistoryOutputs::reset()
   node_data.clear();
   element_data.clear();
   contact_data.clear();
+  section_data.clear();
   
   init();
   return true;
@@ -161,6 +168,19 @@ bool CoreHistoryOutputs::create_output(std::vector<std::string> options)
     }
     //contact_id = sub_id;
     this->add_contact(std::to_string(sub_id));
+  }else if (output_type == 4)
+  { // section
+    if (section_data.size()==0)
+    {
+      sub_id = 1;
+    }
+    else
+    {
+      sub_last = int(section_data.size()) - 1;
+      sub_id = std::stoi(section_data[sub_last][0]) + 1;
+    }
+    //section_id = sub_id;
+    this->add_section(std::to_string(sub_id));
   }
   
   this->add_output(output_id, name_id, output_type, sub_id);
@@ -217,6 +237,16 @@ bool CoreHistoryOutputs::modify_output(int output_id,int modify_type, std::vecto
           contact_data[sub_data_id][i+1] = options[i];
         }
       }
+    } else if ((outputs_data[outputs_data_id][2]==4) && (outputs_data[outputs_data_id][2]==modify_type))
+    { // section 
+      sub_data_id = get_section_data_id_from_section_id(outputs_data[outputs_data_id][3]);
+      for (size_t i = 0; i < options.size(); i++)
+      {
+        if (options_marker[i]==1)
+        {
+          section_data[sub_data_id][i+1] = options[i];
+        }
+      }
     }
 
     return true;
@@ -268,6 +298,15 @@ bool CoreHistoryOutputs::add_contact(std::string contact_id)
   return true;
 }
 
+bool CoreHistoryOutputs::add_section(std::string section_id)
+{
+  std::vector<std::string> v = {section_id,"","","","","","","",""};
+
+  section_data.push_back(v);
+  
+  return true;
+}
+
 bool CoreHistoryOutputs::delete_output(int output_id)
 {
   int sub_data_id;
@@ -297,6 +336,12 @@ bool CoreHistoryOutputs::delete_output(int output_id)
       sub_data_id = get_contact_data_id_from_contact_id(outputs_data[outputs_data_id][3]);
       if (sub_data_id != -1){
         contact_data.erase(contact_data.begin() + sub_data_id);  
+      }
+    }else if (outputs_data[outputs_data_id][2]==4)
+    {
+      sub_data_id = get_section_data_id_from_section_id(outputs_data[outputs_data_id][3]);
+      if (sub_data_id != -1){
+        section_data.erase(section_data.begin() + sub_data_id);  
       }
     }
     outputs_data.erase(outputs_data.begin() + outputs_data_id);
@@ -362,6 +407,19 @@ int CoreHistoryOutputs::get_contact_data_id_from_contact_id(int contact_id)
   for (size_t i = 0; i < contact_data.size(); i++)
   {
     if (contact_data[i][0]==std::to_string(contact_id))
+    {
+        return_int = int(i);
+    }  
+  }
+  return return_int;
+}
+
+int CoreHistoryOutputs::get_section_data_id_from_section_id(int section_id)
+{ 
+  int return_int = -1;
+  for (size_t i = 0; i < section_data.size(); i++)
+  {
+    if (section_data[i][0]==std::to_string(section_id))
     {
         return_int = int(i);
     }  
@@ -534,6 +592,44 @@ std::string CoreHistoryOutputs::get_output_export(int output_id) // get a list o
       }
     }
     outputs_export_list.push_back(str_temp);
+  }else if (outputs_data[output_data_id][2]==4)
+  {
+    sub_data_id = get_section_data_id_from_section_id(outputs_data[output_data_id][3]);
+    
+    str_temp = "*SECTION PRINT, SURFACE=";
+    if (section_data[sub_data_id][1]=="")
+    {
+      str_temp = "** No SIDESET defined for History Output ID " + std::to_string(output_id);
+      return str_temp;
+    }
+    str_temp.append(ccx_iface->get_sideset_name(std::stoi(section_data[sub_data_id][1])));
+
+    int name_data_id = this->get_name_data_id_from_name_id(outputs_data[output_data_id][1]);
+    str_temp.append(", NAME=" + name_data[name_data_id][1]);
+
+    if (section_data[sub_data_id][2]!="")
+    {
+      str_temp.append(", FREQUENCYF=" + section_data[sub_data_id][2]);
+    }
+    
+    // TIME POINTS not implemented yet
+    outputs_export_list.push_back(str_temp);
+
+    //second line
+    str_temp = "";
+    for (size_t i = 4; i < 4 + section_keys.size(); i++)
+    {
+      if (section_data[sub_data_id][i]!="")
+      {
+        if ((i!=4)&&(first_key==false))
+        {
+          str_temp.append(",");
+        }
+        str_temp.append(section_data[sub_data_id][i]);
+        first_key = false;
+      }
+    }
+    outputs_export_list.push_back(str_temp);
   }
 
   // CUSTOMLINE START
@@ -626,6 +722,23 @@ std::string CoreHistoryOutputs::print_data()
     for (size_t ii = 0; ii < 13; ii++)
     {
       str_return.append(contact_data[i][ii] + " ");
+    }
+    str_return.append("\n");
+  }
+
+  str_return.append("\n CoreHistoryOutputs section_data: \n");
+  str_return.append("section_id, sideset_id, FREQUENCYF, TIME POINTS");
+  for (size_t i = 0; i < section_keys.size(); i++)
+  {
+    str_return.append(", " + section_keys[i]);
+  }
+  str_return.append("\n");
+
+  for (size_t i = 0; i < section_data.size(); i++)
+  {
+    for (size_t ii = 0; ii < 9; ii++)
+    {
+      str_return.append(section_data[i][ii] + " ");
     }
     str_return.append("\n");
   }

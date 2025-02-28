@@ -21,6 +21,8 @@
 #include "ccxSectionMembraneCreateCommand.hpp"
 #include "ccxSectionMembraneModifyCommand.hpp"
 #include "ccxConstraintDeleteCommand.hpp"
+#include "ccxConstraintEquationCreateCommand.hpp"
+#include "ccxConstraintEquationModifyCommand.hpp"
 #include "ccxConstraintRigidBodyCreateCommand.hpp"
 #include "ccxConstraintRigidBody2CreateCommand.hpp"
 #include "ccxConstraintRigidBodyModifyCommand.hpp"
@@ -73,12 +75,16 @@
 #include "ccxLoadsRadiationCreateCommand.hpp"
 #include "ccxLoadsRadiationModifyCommand.hpp"
 #include "ccxLoadsRadiationDeleteCommand.hpp"
+#include "ccxLoadsSurfaceTractionCreateCommand.hpp"
+#include "ccxLoadsSurfaceTractionModifyCommand.hpp"
+#include "ccxLoadsSurfaceTractionDeleteCommand.hpp"
 #include "ccxBCsDisplacementsModifyCommand.hpp"
 #include "ccxBCsTemperaturesModifyCommand.hpp"
 #include "ccxHistoryOutputCreateCommand.hpp"
 #include "ccxHistoryOutputNodeModifyCommand.hpp"
 #include "ccxHistoryOutputElementModifyCommand.hpp"
 #include "ccxHistoryOutputContactModifyCommand.hpp"
+#include "ccxHistoryOutputSectionModifyCommand.hpp"
 #include "ccxHistoryOutputDeleteCommand.hpp"
 #include "ccxFieldOutputCreateCommand.hpp"
 #include "ccxFieldOutputNodeModifyCommand.hpp"
@@ -88,6 +94,7 @@
 #include "ccxInitialConditionCreateCommand.hpp"
 #include "ccxInitialConditionDisplacementModifyCommand.hpp"
 #include "ccxInitialConditionTemperatureModifyCommand.hpp"
+#include "ccxInitialConditionStressAddCommand.hpp"
 #include "ccxInitialConditionDeleteCommand.hpp"
 #include "ccxHBCAddBCCommand.hpp"
 #include "ccxHBCRemoveBCCommand.hpp"
@@ -175,6 +182,8 @@ std::vector<std::string> CalculiXPlugin::get_keys()
   keys.push_back("ccxSectionMembraneCreateCommand");
   keys.push_back("ccxSectionMembraneModifyCommand");
   keys.push_back("ccxConstraintDeleteCommand");
+  keys.push_back("ccxConstraintEquationCreateCommand");
+  keys.push_back("ccxConstraintEquationModifyCommand");
   keys.push_back("ccxConstraintRigidBodyCreateCommand");
   keys.push_back("ccxConstraintRigidBody2CreateCommand");
   keys.push_back("ccxConstraintRigidBodyModifyCommand");
@@ -227,12 +236,16 @@ std::vector<std::string> CalculiXPlugin::get_keys()
   keys.push_back("ccxLoadsRadiationCreateCommand");
   keys.push_back("ccxLoadsRadiationModifyCommand");
   keys.push_back("ccxLoadsRadiationDeleteCommand");
+  keys.push_back("ccxLoadsSurfaceTractionCreateCommand");
+  keys.push_back("ccxLoadsSurfaceTractionModifyCommand");
+  keys.push_back("ccxLoadsSurfaceTractionDeleteCommand");
   keys.push_back("ccxBCsDisplacementsModifyCommand");
   keys.push_back("ccxBCsTemperaturesModifyCommand");
   keys.push_back("ccxHistoryOutputCreateCommand");
   keys.push_back("ccxHistoryOutputNodeModifyCommand");
   keys.push_back("ccxHistoryOutputElementModifyCommand");
   keys.push_back("ccxHistoryOutputContactModifyCommand");
+  keys.push_back("ccxHistoryOutputSectionModifyCommand");
   keys.push_back("ccxHistoryOutputDeleteCommand");
   keys.push_back("ccxFieldOutputCreateCommand");
   keys.push_back("ccxFieldOutputNodeModifyCommand");
@@ -242,6 +255,7 @@ std::vector<std::string> CalculiXPlugin::get_keys()
   keys.push_back("ccxInitialConditionCreateCommand");
   keys.push_back("ccxInitialConditionDisplacementModifyCommand");
   keys.push_back("ccxInitialConditionTemperatureModifyCommand");
+  keys.push_back("ccxInitialConditionStressAddCommand");
   keys.push_back("ccxInitialConditionDeleteCommand");
   keys.push_back("ccxHBCAddBCCommand");
   keys.push_back("ccxHBCRemoveBCCommand");
@@ -375,6 +389,12 @@ CubitCommand* CalculiXPlugin::create_command(const std::string &key)
 
   if(key == "ccxConstraintTieModifyCommand")
     return new ccxConstraintTieModifyCommand();
+
+  if(key == "ccxConstraintEquationCreateCommand")
+    return new ccxConstraintEquationCreateCommand();
+
+  if(key == "ccxConstraintEquationModifyCommand")
+    return new ccxConstraintEquationModifyCommand();
 
   if(key == "ccxConstraintTieCreateFromCubitContactPairCommand")
     return new ccxConstraintTieCreateFromCubitContactPairCommand();
@@ -516,6 +536,15 @@ CubitCommand* CalculiXPlugin::create_command(const std::string &key)
 
   if(key == "ccxLoadsRadiationDeleteCommand")
     return new ccxLoadsRadiationDeleteCommand();
+
+  if(key == "ccxLoadsSurfaceTractionCreateCommand")
+    return new ccxLoadsSurfaceTractionCreateCommand();
+
+  if(key == "ccxLoadsSurfaceTractionModifyCommand")
+    return new ccxLoadsSurfaceTractionModifyCommand();
+
+  if(key == "ccxLoadsSurfaceTractionDeleteCommand")
+    return new ccxLoadsSurfaceTractionDeleteCommand();
     
   if(key == "ccxBCsDisplacementsModifyCommand")
     return new ccxBCsDisplacementsModifyCommand();
@@ -534,6 +563,9 @@ CubitCommand* CalculiXPlugin::create_command(const std::string &key)
   
   if(key == "ccxHistoryOutputContactModifyCommand")
     return new ccxHistoryOutputContactModifyCommand();
+
+  if(key == "ccxHistoryOutputSectionModifyCommand")
+    return new ccxHistoryOutputSectionModifyCommand();
 
   if(key == "ccxHistoryOutputDeleteCommand")
     return new ccxHistoryOutputDeleteCommand();
@@ -561,6 +593,9 @@ CubitCommand* CalculiXPlugin::create_command(const std::string &key)
 
   if(key == "ccxInitialConditionTemperatureModifyCommand")
     return new ccxInitialConditionTemperatureModifyCommand();
+
+  if(key == "ccxInitialConditionStressAddCommand")
+    return new ccxInitialConditionStressAddCommand();
 
   if(key == "ccxInitialConditionDeleteCommand")
     return new ccxInitialConditionDeleteCommand();

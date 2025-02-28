@@ -82,6 +82,7 @@ bool ccxConstraintRigidBody2CreateCommand::execute(CubitCommandData &data)
   std::string output;
 
   std::vector<std::string> options;
+  std::vector<std::vector<double>> options2;
   int ref_vertex_value;
   int rot_vertex_value;
   std::string ref_vertex;
@@ -170,7 +171,7 @@ bool ccxConstraintRigidBody2CreateCommand::execute(CubitCommandData &data)
     options.push_back(ref_vertex);
     options.push_back(rot_vertex);
 
-    if (!ccx_iface.create_constraint("RIGIDBODY",options))
+    if (!ccx_iface.create_constraint("RIGIDBODY",options,options2))
     {
       output = "Failed with nodeset ID " + std::to_string(nodeset_ids[i]) + "!\n";
       PRINT_ERROR(output.c_str());

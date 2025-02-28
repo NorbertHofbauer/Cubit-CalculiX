@@ -73,11 +73,11 @@ bool CoreResultsProject::project(int step, int totalincrement,double scale)
   log = "Setting node constraint off.\n";
   PRINT_INFO("%s", log.c_str());
 
-  if (!CubitInterface::silent_cmd_without_running_journal_lines("set developer on")){return false;}
-  if (!CubitInterface::silent_cmd_without_running_journal_lines("set node constraint off")){return false;}
+  if (!ccx_iface->silent_cmd("set developer on")){return false;}
+  if (!ccx_iface->silent_cmd("set node constraint off")){return false;}
   
   cmd = "graphics off";
-  CubitInterface::silent_cmd_without_running_journal_lines(cmd.c_str());
+  ccx_iface->silent_cmd(cmd.c_str());
 
   for (size_t i = 0; i < frd->result_block_node_data[data_id].size(); i++)
   {
@@ -89,7 +89,7 @@ bool CoreResultsProject::project(int step, int totalincrement,double scale)
     + " z " + ccx_iface->to_string_scientific(scale*frd->result_block_data[data_id][frd->result_block_node_data[data_id][i][1]][2])
     ;
     
-    CubitInterface::silent_cmd_without_running_journal_lines(cmd.c_str());
+    ccx_iface->silent_cmd(cmd.c_str());
 
     //update progress bar
     const auto t_end = std::chrono::high_resolution_clock::now();
@@ -104,8 +104,8 @@ bool CoreResultsProject::project(int step, int totalincrement,double scale)
   progressbar->end();
   
   cmd = "graphics on";
-  CubitInterface::silent_cmd_without_running_journal_lines(cmd.c_str());
-  if (!CubitInterface::silent_cmd_without_running_journal_lines("set developer off")){return false;}
+  ccx_iface->silent_cmd(cmd.c_str());
+  if (!ccx_iface->silent_cmd("set developer off")){return false;}
 
   return true;
 }
